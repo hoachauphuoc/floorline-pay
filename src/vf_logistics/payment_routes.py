@@ -9,14 +9,22 @@ The routes sit behind the operator role and a rate limit, and answer in the same
 as the rest of the API. A PayPal id from the caller is checked against a strict pattern
 before it is placed in a PayPal URL. A PayPal reply that lacks the id the caller needs is
 a 502, never an empty success: a booking with no authorization id must not look booked.
+
+A caller that wants the shipper sent to PayPal to approve (return_url and cancel_url)
+must name addresses on an origin listed in PAYMENT_RETURN_ORIGINS. With the variable unset
+no return address is accepted, so a deployment that has not said where its shippers come
+back to cannot be used to send them anywhere else. The approval address handed back is
+checked to be a PayPal address before it is returned.
 """
 
 from __future__ import annotations
 
+import os
 import re
 import uuid
 from collections.abc import Callable
 from typing import Any
+from urllib.parse import urlparse
 
 from flask import Flask, jsonify, request
 
@@ -24,6 +32,9 @@ from vf_logistics import paypal_client
 
 # PayPal order and authorization ids are upper-case letters, digits and hyphens.
 PAYPAL_ID = re.compile(r"^[A-Z0-9-]{1,64}$")
+
+# The only hosts a shipper may be sent to in order to approve a payment.
+PAYPAL_APPROVAL_HOSTS = frozenset({"www.paypal.com", "www.sandbox.paypal.com"})
 
 
 def _refusal(receipt: dict[str, Any]) -> tuple[Any, int]:
@@ -52,6 +63,28 @@ def _authorization_id(body: Any) -> str | None:
     return value if isinstance(value, str) and PAYPAL_ID.match(value) else None
 
 
+def _allowed_return(url: str) -> bool:
+    allowed = {
+        origin.strip().lower().rstrip("/")
+        for origin in os.getenv("PAYMENT_RETURN_ORIGINS", "").split(",") if origin.strip()
+    }
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc or parsed.username:
+        return False
+    return f"{parsed.scheme}://{parsed.netloc}".lower() in allowed
+
+
+def _approval_url(body: Any) -> str | None:
+    links = body.get("links") if isinstance(body, dict) else None
+    for link in links if isinstance(links, list) else []:
+        if isinstance(link, dict) and link.get("rel") == "payer-action":
+            href = str(link.get("href") or "")
+            parsed = urlparse(href)
+            if parsed.scheme == "https" and parsed.netloc in PAYPAL_APPROVAL_HOSTS:
+                return href
+    return None
+
+
 def register(
     app: Flask, limiter: Any, require_operator: Callable[..., Any], run_async: Callable[[Any], Any],
 ) -> None:
@@ -61,17 +94,36 @@ def register(
     def payments_create_order() -> Any:
         body = request.get_json(silent=True) or {}
         request_id = str(body.get("request_id") or f"order-{uuid.uuid4().hex}")
-        receipt = run_async(paypal_client.create_order(
-            body.get("amount"), str(body.get("currency") or ""), request_id,
-            str(body.get("reference_id") or ""),
-        ))
+        return_url = str(body.get("return_url") or "")
+        cancel_url = str(body.get("cancel_url") or "")
+        if return_url or cancel_url:
+            if not (_allowed_return(return_url) and _allowed_return(cancel_url)):
+                return jsonify({
+                    "error": "return_url and cancel_url must be on an origin listed in "
+                             "PAYMENT_RETURN_ORIGINS",
+                }), 400
+            receipt = run_async(paypal_client.create_order_for_approval(
+                body.get("amount"), str(body.get("currency") or ""), request_id,
+                str(body.get("reference_id") or ""), return_url, cancel_url,
+            ))
+        else:
+            receipt = run_async(paypal_client.create_order(
+                body.get("amount"), str(body.get("currency") or ""), request_id,
+                str(body.get("reference_id") or ""),
+            ))
         if receipt["status"] != paypal_client.OK:
             return _refusal(receipt)
         data = receipt["body"] if isinstance(receipt["body"], dict) else {}
         order_id = data.get("id")
         if not isinstance(order_id, str) or not PAYPAL_ID.match(order_id):
             return _no_id("order id")
-        return jsonify({"order_id": order_id, "paypal_status": data.get("status")}), 201
+        reply: dict[str, Any] = {"order_id": order_id, "paypal_status": data.get("status")}
+        if return_url:
+            approval = _approval_url(data)
+            if approval is None:
+                return _no_id("approval link")
+            reply["approval_url"] = approval
+        return jsonify(reply), 201
 
     @app.route("/api/v1/payments/orders/<order_id>/authorize", methods=["POST"])
     @require_operator

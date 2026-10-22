@@ -154,3 +154,27 @@ async def create_payout(
         }],
     }
     return await _call("POST", "/v1/payments/payouts", body, request_id)
+
+
+async def create_order_for_approval(
+    amount: Any, currency: str, request_id: str, reference_id: str,
+    return_url: str, cancel_url: str,
+) -> dict[str, Any]:
+    """An AUTHORIZE order the shipper approves on PayPal, then returns to return_url."""
+    money = _money(amount, currency)
+    if money is None or not reference_id or not return_url or not cancel_url:
+        return _receipt(
+            BAD_INPUT,
+            error="amount, currency, reference_id, return_url and cancel_url are required",
+        )
+    body = {
+        "intent": "AUTHORIZE",
+        "purchase_units": [{"reference_id": reference_id, "amount": money}],
+        "payment_source": {"paypal": {"experience_context": {
+            "return_url": return_url,
+            "cancel_url": cancel_url,
+            "user_action": "PAY_NOW",
+            "shipping_preference": "NO_SHIPPING",
+        }}},
+    }
+    return await _call("POST", "/v2/checkout/orders", body, request_id)
