@@ -1052,6 +1052,41 @@ export async function reportCaseActivity(caseId: string, activeMs: number): Prom
 // create without the server's help.
 // --------------------------------------------------------------------------
 
+/** One PayPal call the settler made. Ids and statuses only, never a payee address. */
+export type PaymentStep = {
+  status: string | null;
+  http_status: number | null;
+  paypal_id: string | null;
+  error: string | null;
+};
+
+/** The payment state of a case, read from what the settler recorded (payment_status.py). */
+export type PaymentState = {
+  case_id: string;
+  payment_case: boolean;
+  state:
+    | "none"
+    | "awaiting_decision"
+    | "no_authorization"
+    | "paid"
+    | "voided"
+    | "held"
+    | "pending"
+    | "failed"
+    | "unknown";
+  reason?: string | null;
+  findings?: string[];
+  capture?: PaymentStep | null;
+  payout?: PaymentStep | null;
+  void?: PaymentStep | null;
+  at?: string | null;
+};
+
+export async function fetchPaymentState(caseId: string): Promise<PaymentState> {
+  if (DEMO_MODE) liveOnly("The payment state");
+  return getJson<PaymentState>(`payments/cases/${encodeURIComponent(caseId)}`);
+}
+
 export const queryKeys = {
   audits: (tenantId: string) => ["audits", tenantId] as const,
   usage: (tenantId: string) => ["usage", tenantId] as const,

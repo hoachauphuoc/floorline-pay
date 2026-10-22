@@ -79,6 +79,7 @@ export const ALLOWED_GET_BY_ID: ReadonlyArray<readonly [string, string]> = [
   ["orchestrator/case", ""], // full case trace, for the Case screen
   ["orchestrator/case", "dossier"], // the case as a due-diligence PDF (dossier.py)
   ["compliance/audit", ""], // one B2B audit record
+  ["payments/cases", ""], // the payment state of one case (payment_status.py)
 ];
 
 /**

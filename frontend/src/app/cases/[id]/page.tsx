@@ -11,9 +11,10 @@ import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
 import { CaseTimeline } from "@/components/operations/CaseTimeline";
 import { useCaseActivity } from "@/components/operations/useCaseActivity";
+import { PaymentCard } from "@/components/payments/PaymentCard";
 import { ReviewPanel } from "@/components/review/ReviewPanel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchAuditTrail, fetchCase, queryKeys } from "@/lib/api";
+import { fetchAuditTrail, fetchCase, fetchPaymentState, queryKeys } from "@/lib/api";
 import { caseHref } from "@/lib/case-links";
 import { caseStateLabel, formatUsd } from "@/lib/format";
 import { holds, useIdentity } from "@/lib/identity";
@@ -56,6 +57,18 @@ export default function CasePage() {
     retry: false,
   });
 
+  // What happened to the money, from the settler's own record. Optional: a failure here
+  // leaves the page without the card, never without the case. Polled while the settlement
+  // is still to come, because it follows the decision through Pub/Sub.
+  const payment = useQuery({
+    queryKey: ["payment", tenant.id, caseId],
+    queryFn: () => fetchPaymentState(caseId),
+    enabled: caseId !== "",
+    retry: false,
+    refetchInterval: (query) =>
+      ["awaiting_decision", "pending"].includes(query.state.data?.state ?? "") ? 5000 : false,
+  });
+
   const c = detail.data;
   const events = useMemo(
     () => (c ? buildCaseTimeline(c, audit.data?.items ?? []) : []),
@@ -80,6 +93,7 @@ export default function CasePage() {
     queryClient.invalidateQueries({ queryKey: queryKeys.reviewQueue(tenant.id) });
     queryClient.invalidateQueries({ queryKey: queryKeys.worklist(tenant.id) });
     queryClient.invalidateQueries({ queryKey: ["audit-trail", tenant.id] });
+    queryClient.invalidateQueries({ queryKey: ["payment", tenant.id] });
   };
 
   const back = (
@@ -145,6 +159,11 @@ export default function CasePage() {
               The audit trail could not be read, so this line is drawn from the case
               record alone.
             </p>
+          )}
+          {payment.data?.payment_case === true && (
+            <div className="mb-3">
+              <PaymentCard state={payment.data} />
+            </div>
           )}
           <CaseTimeline events={events} />
         </section>
