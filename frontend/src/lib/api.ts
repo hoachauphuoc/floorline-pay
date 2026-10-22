@@ -676,6 +676,30 @@ export async function injectBulk(
   return postJson("simulate/bulk", { count });
 }
 
+/** What creating a PayPal order for the shipper to approve answers with. */
+export interface PaymentOrderRequest {
+  amount: number;
+  currency: string;
+  reference_id: string;
+  return_url: string;
+  cancel_url: string;
+}
+
+export async function createPaymentOrder(
+  request: PaymentOrderRequest,
+): Promise<{ order_id: string; paypal_status: string | null; approval_url: string }> {
+  if (DEMO_MODE) liveOnly("Creating a PayPal order");
+  return postJson("payments/orders", request);
+}
+
+/** Authorize the order the shipper approved; the answer carries the authorization id. */
+export async function authorizePaymentOrder(
+  orderId: string,
+): Promise<{ order_id: string; authorization_id: string }> {
+  if (DEMO_MODE) liveOnly("Authorizing a PayPal payment");
+  return postJson(`payments/orders/${encodeURIComponent(orderId)}/authorize`);
+}
+
 /** Submit a shipment event, as Pub/Sub would. */
 export async function submitShipmentEvent(
   shipment: Record<string, unknown>,
@@ -1081,6 +1105,25 @@ export type PaymentState = {
   void?: PaymentStep | null;
   at?: string | null;
 };
+
+/** The newest settlement outcome of every case that has one, and a count per state. */
+export type PaymentLedger = {
+  items: Array<{
+    case_id: string;
+    state: PaymentState["state"];
+    reason?: string | null;
+    capture?: PaymentStep | null;
+    payout?: PaymentStep | null;
+    void?: PaymentStep | null;
+    at?: string | null;
+  }>;
+  counts: Record<string, number>;
+};
+
+export async function fetchPaymentLedger(): Promise<PaymentLedger> {
+  if (DEMO_MODE) liveOnly("The payment ledger");
+  return getJson<PaymentLedger>("payments/ledger");
+}
 
 export async function fetchPaymentState(caseId: string): Promise<PaymentState> {
   if (DEMO_MODE) liveOnly("The payment state");

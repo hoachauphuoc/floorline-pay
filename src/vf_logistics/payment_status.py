@@ -71,6 +71,39 @@ async def payment_state(case_id: str, tenant_id: str | None = None) -> dict[str,
     }
 
 
+async def payment_ledger(tenant_id: str | None = None, limit: int = 100) -> dict[str, Any]:
+    """
+    The newest settlement outcome of every case that has one, and a count per state.
+
+    Read from the settle_payment audit rows, newest first, so a case that was retried and
+    then settled appears once, as paid. A status this module does not know is "unknown".
+    """
+    rows, _ = await get_store().query_audit(
+        action="settle_payment", limit=limit, tenant_id=tenant_id,
+    )
+    newest: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        case_id = str(row.get("case_id") or "")
+        if case_id and case_id not in newest:
+            newest[case_id] = row
+    items: list[dict[str, Any]] = []
+    counts: dict[str, int] = {}
+    for case_id, row in newest.items():
+        detail = row.get("detail") or {}
+        state = _STATE.get(str(row.get("status")), "unknown")
+        counts[state] = counts.get(state, 0) + 1
+        items.append({
+            "case_id": case_id,
+            "state": state,
+            "reason": detail.get("reason"),
+            "capture": detail.get("capture"),
+            "payout": detail.get("payout"),
+            "void": detail.get("void"),
+            "at": row.get("at"),
+        })
+    return {"items": items, "counts": counts}
+
+
 def register(
     app: Flask, require_viewer: Callable[..., Any], run_async: Callable[[Any], Any],
     tenant: Callable[[], str | None],
@@ -82,3 +115,9 @@ def register(
         if state is None:
             return jsonify({"error": "case not found"}), 404
         return jsonify(state), 200
+
+
+    @app.route("/api/v1/payments/ledger", methods=["GET"])
+    @require_viewer
+    def payments_ledger() -> Any:
+        return jsonify(run_async(payment_ledger(tenant_id=tenant()))), 200

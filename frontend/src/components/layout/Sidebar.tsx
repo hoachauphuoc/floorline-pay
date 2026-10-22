@@ -12,8 +12,10 @@ import {
   LayoutGrid,
   Radar,
   ScrollText,
+  Receipt,
   ShieldCheck,
   Terminal,
+  Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -92,6 +94,20 @@ export const NAV_ITEMS: NavItem[] = [
     icon: LayoutGrid,
     blurb: "Live board, by workflow state",
     section: "oversight",
+  },
+  {
+    href: "/book",
+    label: "Book and pay",
+    icon: Wallet,
+    blurb: "Hold the freight with PayPal",
+    section: "work",
+  },
+  {
+    href: "/payments",
+    label: "Payments",
+    icon: Receipt,
+    blurb: "Held, paid and returned funds",
+    section: "work",
   },
   {
     href: "/radar",

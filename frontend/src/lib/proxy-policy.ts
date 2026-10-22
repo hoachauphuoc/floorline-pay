@@ -66,6 +66,8 @@ export const ALLOWED_GET = new Set([
   // The committed benchmark and HS-classifier reports (evaluation.py), for the
   // Evaluation panel. Aggregates only.
   "evaluation",
+  // What the settler did with the money on each case (payment_status.py).
+  "payments/ledger",
 ]);
 
 /**
@@ -129,6 +131,10 @@ export const ALLOWED_POST = new Set([
   "orchestrator/reset",
   // Evidence respond: token-authenticated by Flask, no console session needed.
   "evidence/respond",
+  // Booking: create the PayPal order a shipper approves, and authorize it on return.
+  // Capturing and paying out are never browser routes: only the settler does those.
+  "payments/orders",
+  "payments/orders/authorize",
 ]);
 
 /**
@@ -165,6 +171,9 @@ export const PASSWORD_ONLY_PUT = new Set(["governance/prefilter-rules"]);
  */
 export const CASE_ID = /^[A-Za-z0-9_-]{1,80}$/;
 
+/** PayPal order ids: upper-case letters, digits and hyphens. */
+export const PAYPAL_ID = /^[A-Z0-9-]{1,64}$/;
+
 /**
  * Whether a path is an allowed write, resolving the two review routes that carry
  * a case id.
@@ -181,6 +190,10 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
     }
     return false;
   }
+  // payments/orders/<order id>/authorize
+  if (parts.length === 4 && parts[0] === "payments" && parts[1] === "orders" && parts[3] === "authorize") {
+    return PAYPAL_ID.test(parts[2]) && allowed.has("payments/orders/authorize");
+  }
   // review/<id>/evidence/<rid>/link and review/<id>/evidence/<rid>/cancel
   if (parts.length === 5 && parts[0] === "review" && CASE_ID.test(parts[1]) && parts[2] === "evidence" && CASE_ID.test(parts[3])) {
     const sub = parts[4];
@@ -190,6 +203,7 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
   if (parts.length === 3 && parts[0] === "cases" && CASE_ID.test(parts[1])) {
     return parts[2] === "activity" && allowed.has("cases/activity");
   }
+  if (joined === "payments/orders/authorize") return false;
   // These are templates for the id-carrying forms above, not routes of their own;
   // Flask has none of them without an id.
   if (joined === "review/decide" || joined === "review/deep-review" || joined === "cases/activity"
