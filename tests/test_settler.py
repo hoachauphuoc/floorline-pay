@@ -26,13 +26,16 @@ from vf_logistics import decision_receiver
 from vf_logistics.store import get_store
 
 PAYEE = "payments@mekong-haulage.example"
-OK = {"status": "ok", "http_status": 201, "body": {"id": "CAP-1"}, "error": None}
+OK = {"status": "ok", "http_status": 201, "body": {"id": "CAP-1", "status": "COMPLETED"}, "error": None}
 PAID_OUT = {"status": "ok", "http_status": 201,
             "body": {"batch_header": {"payout_batch_id": "PAYOUT-1"}}, "error": None}
 VOIDED = {"status": "ok", "http_status": 204, "body": {}, "error": None}
 REFUSED = {"status": "http_error", "http_status": 422, "body": {"name": "NO"}, "error": "NO"}
 DOWN = {"status": "transport_error", "http_status": None, "body": None, "error": "ConnectError"}
 UNAVAILABLE = {"status": "http_error", "http_status": 503, "body": {}, "error": "503"}
+BOOKING = {"reference_id": "SHP-PAY-1", "amount": "1300.00", "currency": "USD"}
+LIVE = {"status": "ok", "http_status": 200, "error": None, "body": {
+    "status": "CREATED", "amount": {"currency_code": "USD", "value": "1300.00"}}}
 
 SHIPMENT = {
     "shipment_id": "SHP-PAY-1",
@@ -67,6 +70,8 @@ def pp(monkeypatch):
     settler = importlib.import_module("vf_logistics.settler")
     monkeypatch.setenv("PAYPAL_CLIENT_ID", "sandbox-id")
     monkeypatch.setenv("PAYPAL_CLIENT_SECRET", "sandbox-secret")
+    monkeypatch.setattr(settler.payment_binding, "find_authorization", AsyncMock(return_value=BOOKING))
+    monkeypatch.setattr(settler.paypal_client, "get_authorization", AsyncMock(return_value=LIVE))
     with patch.object(settler.paypal_client, "capture_authorization", AsyncMock(return_value=OK)) as capture, \
             patch.object(settler.paypal_client, "create_payout", AsyncMock(return_value=PAID_OUT)) as payout, \
             patch.object(settler.paypal_client, "void_authorization", AsyncMock(return_value=VOIDED)) as void:

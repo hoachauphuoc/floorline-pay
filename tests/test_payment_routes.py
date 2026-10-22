@@ -30,7 +30,9 @@ ORDER = {"status": "ok", "http_status": 201, "body": {"id": "5O190127TN364715T",
 AUTHORIZED = {
     "status": "ok", "http_status": 201, "error": None,
     "body": {"id": "5O190127TN364715T", "purchase_units": [
-        {"payments": {"authorizations": [{"id": "0VF52814937998046", "status": "CREATED"}]}},
+        {"reference_id": "SHP-PAY-1", "payments": {"authorizations": [{
+            "id": "0VF52814937998046", "status": "CREATED",
+            "amount": {"currency_code": "USD", "value": "1300.00"}}]}},
     ]},
 }
 

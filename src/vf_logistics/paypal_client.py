@@ -134,6 +134,13 @@ async def void_authorization(authorization_id: str, request_id: str) -> dict[str
     return await _call("POST", path, None, request_id)
 
 
+async def get_authorization(authorization_id: str, request_id: str) -> dict[str, Any]:
+    """What PayPal itself says about an authorization: its state, amount and expiry."""
+    if not authorization_id:
+        return _receipt(BAD_INPUT, error="authorization_id is required")
+    return await _call("GET", f"/v2/payments/authorizations/{authorization_id}", None, request_id)
+
+
 async def create_payout(
     receiver_email: str, amount: Any, currency: str, request_id: str, note: str,
 ) -> dict[str, Any]:

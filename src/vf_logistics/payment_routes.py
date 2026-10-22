@@ -10,6 +10,10 @@ as the rest of the API. A PayPal id from the caller is checked against a strict 
 before it is placed in a PayPal URL. A PayPal reply that lacks the id the caller needs is
 a 502, never an empty success: a booking with no authorization id must not look booked.
 
+An authorization is bound to its shipment when it is made (payment_binding.py), from what
+PayPal's own reply says: the reference the order was created for and the amount held. A
+reply that does not say both is not a booking.
+
 A caller that wants the shipper sent to PayPal to approve (return_url and cancel_url)
 must name addresses on an origin listed in PAYMENT_RETURN_ORIGINS. With the variable unset
 no return address is accepted, so a deployment that has not said where its shippers come
@@ -28,7 +32,7 @@ from urllib.parse import urlparse
 
 from flask import Flask, jsonify, request
 
-from vf_logistics import paypal_client
+from vf_logistics import payment_binding, paypal_client
 
 # PayPal order and authorization ids are upper-case letters, digits and hyphens.
 PAYPAL_ID = re.compile(r"^[A-Z0-9-]{1,64}$")
@@ -63,6 +67,21 @@ def _authorization_id(body: Any) -> str | None:
     return value if isinstance(value, str) and PAYPAL_ID.match(value) else None
 
 
+def _booking_facts(body: Any) -> dict[str, str] | None:
+    """The reference the order was made for and the amount held, as PayPal reports them."""
+    try:
+        unit = body["purchase_units"][0]
+        amount = unit["payments"]["authorizations"][0]["amount"]
+        facts = {
+            "reference_id": unit["reference_id"],
+            "amount": amount["value"],
+            "currency": amount["currency_code"],
+        }
+    except (KeyError, IndexError, TypeError):
+        return None
+    return facts if all(isinstance(v, str) and v for v in facts.values()) else None
+
+
 def _allowed_return(url: str) -> bool:
     allowed = {
         origin.strip().lower().rstrip("/")
@@ -87,6 +106,7 @@ def _approval_url(body: Any) -> str | None:
 
 def register(
     app: Flask, limiter: Any, require_operator: Callable[..., Any], run_async: Callable[[Any], Any],
+    tenant: Callable[[], str | None],
 ) -> None:
     @app.route("/api/v1/payments/orders", methods=["POST"])
     @require_operator
@@ -137,4 +157,11 @@ def register(
         authorization_id = _authorization_id(receipt["body"])
         if authorization_id is None:
             return _no_id("authorization id")
+        facts = _booking_facts(receipt["body"])
+        if facts is None:
+            return _no_id("booking reference and amount")
+        run_async(payment_binding.record_authorization(
+            authorization_id, facts["reference_id"], facts["amount"], facts["currency"],
+            order_id, tenant_id=tenant(),
+        ))
         return jsonify({"order_id": order_id, "authorization_id": authorization_id}), 200

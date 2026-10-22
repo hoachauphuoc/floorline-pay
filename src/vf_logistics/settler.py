@@ -8,10 +8,17 @@ published BLOCKED_BY_HUMAN voids the authorization so the money goes back.
 
 Every refusal is a named status and nothing is paid:
   skipped  the case moves no money, or there is nothing to void
-  held     the payment checks hold this payout; a person's release does not override them
-  retry    the outcome is not final yet (the case is still executing, or PayPal could
-           not be reached); the receiver asks Pub/Sub to deliver the decision again
+  held     the payment checks hold this payout, or the authorization is not provably this
+           shipment's money; a person's release does not override either
+  retry    the outcome is not final yet (the case is still executing, the capture is still
+           pending, or PayPal could not be reached); the receiver asks Pub/Sub to deliver
+           the decision again
   failed   PayPal refused, PayPal is not configured, or the case is not released
+
+The authorization id on a shipment is typed by whoever sent the event, so before anything
+is captured it must match the record the booking wrote when PayPal authorized it
+(payment_binding.py) for this shipment, and PayPal itself must still report it capturable
+and large enough. Money is paid out only after PayPal reports the capture COMPLETED.
 
 A redelivery runs the same steps again. Each PayPal call carries a request id derived
 from the decision's idempotency key, so PayPal returns the first result instead of
@@ -20,9 +27,10 @@ moving money a second time. settle() never raises.
 
 from __future__ import annotations
 
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from vf_logistics import payment_checks, paypal_client
+from vf_logistics import payment_binding, payment_checks, paypal_client
 from vf_logistics.store import get_store, utcnow
 
 SKIPPED = "skipped"
@@ -36,6 +44,10 @@ VOIDED = "voided"
 # is not RELEASED_BY_HUMAN means the release did not happen.
 _NOT_FINAL = frozenset({"APPROVED", "EXECUTING"})
 _RETRYABLE = frozenset({paypal_client.TRANSPORT_ERROR})
+
+# An authorization PayPal reports in one of these states can be captured. CAPTURED is
+# there for a redelivery after the capture succeeded and the payout did not.
+_CAPTURABLE = frozenset({"CREATED", "CAPTURED"})
 
 
 def _result(status: str, reason: str, **steps: Any) -> dict[str, Any]:
@@ -63,8 +75,54 @@ def _retryable(receipt: dict[str, Any]) -> bool:
     )
 
 
+def _amount(value: Any) -> Decimal | None:
+    try:
+        number = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return None
+    return number if number.is_finite() and number > 0 else None
+
+
+def _body(receipt: dict[str, Any]) -> dict[str, Any]:
+    raw = receipt.get("body")
+    return raw if isinstance(raw, dict) else {}
+
+
+async def _unproven_authorization(
+    shipment: dict[str, Any], key: str, tenant_id: str | None,
+) -> dict[str, Any] | None:
+    """A refusal when this shipment's authorization cannot be proven, else None."""
+    authorization = str(shipment.get("paypal_authorization_id") or "")
+    payout = _amount(shipment.get("payout_amount"))
+    currency = str(shipment.get("currency") or "USD")
+    bound = await payment_binding.find_authorization(authorization, tenant_id=tenant_id)
+    if bound is None:
+        return _result(HELD, "no booking made through Floorline holds this authorization; nothing is paid")
+    if bound.get("reference_id") != shipment.get("shipment_id"):
+        return _result(HELD, "this authorization was made for a different shipment; nothing is paid")
+    held = _amount(bound.get("amount"))
+    if payout is None or held is None or str(bound.get("currency")) != currency or held < payout:
+        return _result(HELD, "the booking holds less than the payout, or in another currency; nothing is paid")
+    live = await paypal_client.get_authorization(authorization, f"{key}-verify")
+    if live["status"] != paypal_client.OK:
+        status = RETRY if _retryable(live) else FAILED
+        return _result(status, "PayPal could not confirm the authorization; nothing is paid",
+                       verify=_step(live))
+    facts = _body(live)
+    state = facts.get("status")
+    if state not in _CAPTURABLE:
+        return _result(FAILED, f"PayPal reports the authorization as {state or 'unknown'}; nothing is paid",
+                       verify=_step(live))
+    amount = facts.get("amount")
+    now_held = _amount(amount.get("value")) if isinstance(amount, dict) else None
+    now_currency = amount.get("currency_code") if isinstance(amount, dict) else None
+    if now_held is None or now_held < payout or now_currency != currency:
+        return _result(HELD, "PayPal reports less held than the payout; nothing is paid", verify=_step(live))
+    return None
+
+
 async def _release(
-    case: dict[str, Any], shipment: dict[str, Any], key: str,
+    case: dict[str, Any], shipment: dict[str, Any], key: str, tenant_id: str | None,
 ) -> dict[str, Any]:
     state = case.get("state")
     if state in _NOT_FINAL:
@@ -75,6 +133,9 @@ async def _release(
     if held:
         codes = ", ".join(f["code"] for f in held)
         return _result(HELD, f"the payment checks hold this payout ({codes}); nothing is paid")
+    refusal = await _unproven_authorization(shipment, key, tenant_id)
+    if refusal is not None:
+        return refusal
     authorization = str(shipment.get("paypal_authorization_id") or "")
     payee = str(shipment.get("carrier_payee_email") or "")
     currency = str(shipment.get("currency") or "USD")
@@ -82,6 +143,11 @@ async def _release(
     if captured["status"] != paypal_client.OK:
         status = RETRY if _retryable(captured) else FAILED
         return _result(status, "PayPal did not capture the authorization; nothing is paid",
+                       capture=_step(captured))
+    capture_state = _body(captured).get("status")
+    if capture_state != "COMPLETED":
+        status = RETRY if capture_state == "PENDING" else FAILED
+        return _result(status, f"PayPal reports the capture as {capture_state or 'unknown'}, not COMPLETED; nothing is paid",
                        capture=_step(captured))
     paid = await paypal_client.create_payout(
         payee, shipment.get("payout_amount"), currency, f"{key}-payout",
@@ -122,7 +188,7 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
         if outcome == "BLOCKED_BY_HUMAN":
             result = await _block(shipment, key)
         else:
-            result = await _release(case, shipment, key)
+            result = await _release(case, shipment, key, tenant_id)
     except Exception as exc:  # noqa: BLE001 - settle never raises; the status says what happened
         return _result(RETRY, f"settlement stopped on {type(exc).__name__}; deliver the decision again")
     await get_store().add_audit_once({
