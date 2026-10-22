@@ -28,6 +28,7 @@ import logging
 import os
 from typing import Any
 
+from vf_logistics import settler
 from vf_logistics.store import get_store
 from vf_logistics.tenant import multi_tenant_enabled
 
@@ -126,4 +127,12 @@ async def receive(envelope: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         "first_message_id": str(message_id),
     }
     result = await get_store().apply_decision_once(key, record, tenant_id=owner)
-    return 200, {"outcome": "applied" if result["applied"] else "duplicate", "deliveries": result["deliveries"]}
+    settlement = await settler.settle({**record, "idempotency_key": key}, tenant_id=owner)
+    reply = {
+        "outcome": "applied" if result["applied"] else "duplicate",
+        "deliveries": result["deliveries"],
+        "settlement": settlement,
+    }
+    # An unknown settlement outcome is not acknowledged: Pub/Sub delivers the decision
+    # again, and the PayPal request ids make the repeat safe.
+    return (503 if settlement["status"] == settler.RETRY else 200), reply
