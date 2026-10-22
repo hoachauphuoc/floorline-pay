@@ -1,9 +1,11 @@
-# Floorline — shipment-fraud agents that can raise risk, never lower it
+# Floorline Pay — the agent pays the carrier the moment delivery is proven, and can never pay a shipment the rules held
 
-Deterministic checks set a risk **floor** for every shipment. AI agents may argue a case above that line; nothing they say can take it below, and a person decides every disputed case. (VF Logistics is the freight operator in the demo; the repository and the Cloud Run service `vf-app` keep that name.)
+> **Work in progress for the PayPal AI Hackathon (submissions close 12 Nov 2026).** This repository starts from Floorline as submitted to the Nebius x NVIDIA Global AI Hackathon (tag `nebius-baseline`, commit `5690ea3`). Everything after that tag is the PayPal work; `git diff nebius-baseline` shows it. Plan: [docs/PAYPAL_PLAN.md](docs/PAYPAL_PLAN.md). The sections below still describe the Nebius baseline until they are rewritten.
 
-- **Hackathon:** Nebius x NVIDIA Global AI Hackathon · **Track:** Best Apps and Agents · **Bonus target:** Best Use of Tavily
-- **Live demo (console and API):** https://vf-app-350828852747.asia-southeast1.run.app — health at `/health`, API under `/api/v1`
+Freight payments run on trust: a shipper's money is held at booking with PayPal (`intent: AUTHORIZE`), and the carrier is paid through PayPal Payouts only after Floorline has released the shipment. Deterministic checks set a risk **floor** for every shipment, including new payment checks (a payee changed just before payment, a payee that is not the registered carrier, an amount above the booked freight). AI agents may argue a case above that line; nothing they say can take it below, a held shipment keeps its money held, and a person decides every disputed case.
+
+- **Hackathon:** PayPal AI Hackathon · **Targets:** Best Use of Agentic Commerce, Best Use of PayPal + AI, Best Use of AG Studio
+- **Live demo:** pending (a separate Cloud Run service; the Nebius service `vf-app` is not changed)
 - **Demo video (under 3 minutes):** YOUTUBE_URL_PENDING
 - **Licence:** MIT · **Full reference:** [REFERENCE.md](REFERENCE.md) · **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 

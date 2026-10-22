@@ -34,7 +34,7 @@ import re
 from dataclasses import dataclass, replace
 from typing import Any, NamedTuple
 
-from vf_logistics import hs_reference
+from vf_logistics import hs_reference, payment_checks
 
 # --------------------------------------------------------------------------
 # Code-resident reference data
@@ -1758,6 +1758,7 @@ def validate(
     findings.extend(check_routing(shipment))
     findings.extend(check_origin_inputs(shipment))
     findings.extend(check_counterparty(shipment))
+    findings.extend(payment_checks.check_payment(shipment))
 
     # Deterministic, so it counts as part of the baseline rather than as a model
     # contribution -- it is included before the deterministic_only snapshot below.
@@ -1833,7 +1834,7 @@ def validate(
         "checks_run": [
             "whitelist", "blacklist", "low_value_domestic",
             "freight_ratio", "value_density", "mandatory_fields",
-            "hs_code", "routing", "origin_inputs", "counterparty",
+            "hs_code", "routing", "origin_inputs", "counterparty", "payment",
         ]
         + (["sanctions_screening"] if screening is not None else [])
         + (["hs_description_consistency"] if hs_verdict is not None else [])
