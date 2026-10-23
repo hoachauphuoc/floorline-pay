@@ -22,6 +22,9 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     globals: true,
+    // AG Grid builds its rows asynchronously and a grid page takes 2-3 s to render under jsdom. Under the load of the whole
+    // suite that crosses the 5 s default, so the same tests passed alone and failed together.
+    testTimeout: 20_000,
     setupFiles: ["./vitest.setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     // The Next build output and node_modules both contain files that match the include

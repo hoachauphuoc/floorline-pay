@@ -4,6 +4,9 @@ import {
   Activity,
   CalendarCheck,
   ChevronLeft,
+  Banknote,
+  Landmark,
+  ShieldAlert,
   FileClock,
   FlaskConical,
   Gauge,
@@ -28,7 +31,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useSidebarCollapsed } from "@/lib/sidebar-state";
 import { cn } from "@/lib/utils";
 
-export type NavSection = "work" | "oversight";
+export type NavSection = "pay" | "work" | "oversight";
 
 export interface NavItem {
   href: string;
@@ -42,6 +45,7 @@ export interface NavItem {
 
 /** The sidebar's two groups, in order, with the heading each is shown under. */
 export const NAV_SECTIONS: ReadonlyArray<{ id: NavSection; label: string }> = [
+  { id: "pay", label: "Floorline Pay" },
   { id: "work", label: "Your work" },
   { id: "oversight", label: "Verification & oversight" },
 ];
@@ -70,6 +74,55 @@ export const NAV_SECTIONS: ReadonlyArray<{ id: NavSection; label: string }> = [
  */
 export const NAV_ITEMS: NavItem[] = [
   {
+    href: "/pay",
+    label: "Overview",
+    icon: Landmark,
+    blurb: "How a payment moves, live",
+    section: "pay",
+  },
+  {
+    href: "/book",
+    label: "Book and pay",
+    icon: Wallet,
+    blurb: "Hold the freight with PayPal",
+    section: "pay",
+  },
+  {
+    href: "/payments",
+    label: "Payments",
+    icon: Receipt,
+    blurb: "Held, paid and returned funds",
+    section: "pay",
+  },
+  {
+    href: "/settlement",
+    label: "Settlement",
+    icon: Banknote,
+    blurb: "Frozen parties and payout status",
+    section: "pay",
+  },
+  {
+    href: "/carriers",
+    label: "Carriers",
+    icon: Truck,
+    blurb: "Who each carrier may be paid",
+    section: "pay",
+  },
+  {
+    href: "/controls",
+    label: "Payment controls",
+    icon: SlidersHorizontal,
+    blurb: "Pause switch and spending limits",
+    section: "pay",
+  },
+  {
+    href: "/defense",
+    label: "Defense",
+    icon: ShieldAlert,
+    blurb: "Ten attacks replayed, none moves money",
+    section: "pay",
+  },
+  {
     href: "/today",
     label: "Today",
     icon: CalendarCheck,
@@ -96,34 +149,6 @@ export const NAV_ITEMS: NavItem[] = [
     icon: LayoutGrid,
     blurb: "Live board, by workflow state",
     section: "oversight",
-  },
-  {
-    href: "/book",
-    label: "Book and pay",
-    icon: Wallet,
-    blurb: "Hold the freight with PayPal",
-    section: "work",
-  },
-  {
-    href: "/payments",
-    label: "Payments",
-    icon: Receipt,
-    blurb: "Held, paid and returned funds",
-    section: "work",
-  },
-  {
-    href: "/carriers",
-    label: "Carriers",
-    icon: Truck,
-    blurb: "Who each carrier may be paid",
-    section: "work",
-  },
-  {
-    href: "/controls",
-    label: "Payment controls",
-    icon: SlidersHorizontal,
-    blurb: "Pause switch and spending limits",
-    section: "work",
   },
   {
     href: "/radar",
@@ -185,6 +210,7 @@ export const NAV_ITEMS: NavItem[] = [
  */
 export function navItemActive(href: string, pathname: string): boolean {
   if (href === "/") return pathname === "/";
+  if (href === "/pay") return pathname === "/pay";
   if (href === "/today" && pathname.startsWith("/cases/")) return true;
   return pathname.startsWith(href);
 }
