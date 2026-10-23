@@ -199,18 +199,24 @@ async def verify_webhook_signature(
 
 async def create_order_for_approval(
     amount: Any, currency: str, request_id: str, reference_id: str,
-    return_url: str, cancel_url: str,
+    return_url: str, cancel_url: str, custom_id: str | None = None,
 ) -> dict[str, Any]:
-    """An AUTHORIZE order the shipper approves on PayPal, then returns to return_url."""
+    """An AUTHORIZE order the shipper approves on PayPal, then returns to return_url.
+
+    custom_id, when given, is the id of the shipper's mandate: PayPal keeps it on the order and echoes it.
+    """
     money = _money(amount, currency)
     if money is None or not reference_id or not return_url or not cancel_url:
         return _receipt(
             BAD_INPUT,
             error="amount, currency, reference_id, return_url and cancel_url are required",
         )
+    unit: dict[str, Any] = {"reference_id": reference_id, "amount": money}
+    if custom_id:
+        unit["custom_id"] = custom_id
     body = {
         "intent": "AUTHORIZE",
-        "purchase_units": [{"reference_id": reference_id, "amount": money}],
+        "purchase_units": [unit],
         "payment_source": {"paypal": {"experience_context": {
             "return_url": return_url,
             "cancel_url": cancel_url,

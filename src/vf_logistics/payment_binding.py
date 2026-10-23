@@ -61,3 +61,28 @@ async def find_authorization(
         return None
     detail = rows[0].get("detail")
     return dict(detail) if isinstance(detail, dict) else None
+
+
+async def record_mandate(authorization_id: str, mandate_id: str, tenant_id: str | None = None) -> bool:
+    """Link an authorization to the shipper's mandate PayPal named on the order. True when this call wrote it."""
+    written = await get_store().add_audit_once({
+        "audit_id": f"payauthm-{authorization_id}",
+        "case_id": f"AUTHM-{authorization_id}",
+        "action": "payment_mandate_linked",
+        "status": "done",
+        "detail": {"authorization_id": authorization_id, "mandate_id": mandate_id},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    return bool(written)
+
+
+async def find_mandate(authorization_id: str, tenant_id: str | None = None) -> str | None:
+    """The id of the mandate a booking was made under, or None when it was made under none."""
+    if not authorization_id:
+        return None
+    rows, _ = await get_store().query_audit(
+        case_id=f"AUTHM-{authorization_id}", limit=1, tenant_id=tenant_id,
+    )
+    detail = rows[0].get("detail") if rows else None
+    value = detail.get("mandate_id") if isinstance(detail, dict) else None
+    return str(value) if value else None

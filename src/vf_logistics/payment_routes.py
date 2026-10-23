@@ -32,7 +32,8 @@ from urllib.parse import urlparse
 
 from flask import Flask, jsonify, request
 
-from vf_logistics import payment_binding, paypal_client
+from vf_logistics import mandate, payment_binding, paypal_client
+from vf_logistics.auth import get_auth_context
 
 # PayPal order and authorization ids are upper-case letters, digits and hyphens.
 PAYPAL_ID = re.compile(r"^[A-Z0-9-]{1,64}$")
@@ -82,6 +83,15 @@ def _booking_facts(body: Any) -> dict[str, str] | None:
     return facts if all(isinstance(v, str) and v for v in facts.values()) else None
 
 
+def _mandate_id(body: Any) -> str | None:
+    """The mandate id PayPal echoes from the order's custom_id, if the order was made under one."""
+    try:
+        value = body["purchase_units"][0]["custom_id"]
+    except (KeyError, IndexError, TypeError):
+        return None
+    return value if isinstance(value, str) and value else None
+
+
 def _allowed_return(url: str) -> bool:
     allowed = {
         origin.strip().lower().rstrip("/")
@@ -116,6 +126,21 @@ def register(
         request_id = str(body.get("request_id") or f"order-{uuid.uuid4().hex}")
         return_url = str(body.get("return_url") or "")
         cancel_url = str(body.get("cancel_url") or "")
+        signed: dict[str, Any] | None = None
+        if body.get("mandate") is not None:
+            if not (return_url and cancel_url):
+                return jsonify({"error": "a mandate is given with the booking that sends the shipper to PayPal"}), 400
+            terms = body["mandate"] if isinstance(body["mandate"], dict) else {}
+            context = get_auth_context()
+            try:
+                signed = mandate.issue(
+                    str(context.email) if context is not None and context.acts_for_a_person else "",
+                    terms.get("max_payout_usd"), terms.get("carriers"), terms.get("valid_days"),
+                    str(body.get("reference_id") or ""),
+                )
+            except mandate.MandateError as exc:
+                return jsonify({"error": exc.message}), exc.status
+        extras = {"custom_id": signed["mandate"]["mandate_id"]} if signed is not None else {}
         if return_url or cancel_url:
             if not (_allowed_return(return_url) and _allowed_return(cancel_url)):
                 return jsonify({
@@ -124,7 +149,7 @@ def register(
                 }), 400
             receipt = run_async(paypal_client.create_order_for_approval(
                 body.get("amount"), str(body.get("currency") or ""), request_id,
-                str(body.get("reference_id") or ""), return_url, cancel_url,
+                str(body.get("reference_id") or ""), return_url, cancel_url, **extras,
             ))
         else:
             receipt = run_async(paypal_client.create_order(
@@ -138,6 +163,9 @@ def register(
         if not isinstance(order_id, str) or not PAYPAL_ID.match(order_id):
             return _no_id("order id")
         reply: dict[str, Any] = {"order_id": order_id, "paypal_status": data.get("status")}
+        if signed is not None:
+            run_async(mandate.record(signed, tenant_id=tenant()))
+            reply["mandate_id"] = signed["mandate"]["mandate_id"]
         if return_url:
             approval = _approval_url(data)
             if approval is None:
@@ -164,4 +192,7 @@ def register(
             authorization_id, facts["reference_id"], facts["amount"], facts["currency"],
             order_id, tenant_id=tenant(),
         ))
+        mandate_id = _mandate_id(receipt["body"])
+        if mandate_id:
+            run_async(payment_binding.record_mandate(authorization_id, mandate_id, tenant_id=tenant()))
         return jsonify({"order_id": order_id, "authorization_id": authorization_id}), 200

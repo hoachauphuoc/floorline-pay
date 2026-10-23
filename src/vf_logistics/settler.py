@@ -34,6 +34,7 @@ from vf_logistics import (
     authorization_lifecycle,
     carrier_registry,
     credit_profile,
+    mandate,
     payment_binding,
     payment_checks,
     payment_controls,
@@ -112,6 +113,14 @@ async def _unproven_authorization(
     held = _amount(bound.get("amount"))
     if payout is None or held is None or str(bound.get("currency")) != currency or held < payout:
         return _result(HELD, "the booking holds less than the payout, or in another currency; nothing is paid")
+    mandate_id = await payment_binding.find_mandate(authorization, tenant_id)
+    if mandate_id:
+        outside = await mandate.refusal_for(
+            mandate_id, payout, carrier_registry.carrier_key(shipment.get("carrier_name")),
+            str(shipment.get("shipment_id") or ""), tenant_id,
+        )
+        if outside is not None:
+            return _result(HELD, outside)
     live = await paypal_client.get_authorization(authorization, f"{key}-verify")
     if live["status"] != paypal_client.OK:
         status = RETRY if _retryable(live) else FAILED
