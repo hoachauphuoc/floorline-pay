@@ -8,6 +8,60 @@ and **Pub/Sub**, which carries a released decision to the settler. Without Pub/S
 Use a **new project**. The Nebius submission `vf-app` lives in another project and must not change. Run the commands below in a folder
 outside the repository: the key file in step 6 must never be committed.
 
+## The quickest way: Cloud Shell
+
+Nothing to install. Open https://console.cloud.google.com, sign in, and click **Activate Cloud Shell** (the `>_` icon, top right). It is a terminal in the
+browser with `gcloud` already signed in as you. Paste this block (bash). Replace `floorline-pay-demo` with a project id of your own, unique across Google Cloud.
+
+```bash
+P=floorline-pay-demo
+SA=floorline-render@$P.iam.gserviceaccount.com
+gcloud projects create $P
+gcloud config set project $P
+```
+
+Stop here and link a billing account to the project if Google asks (Console, Billing). Then:
+
+```bash
+gcloud services enable firestore.googleapis.com pubsub.googleapis.com iam.googleapis.com
+gcloud firestore databases create --location=asia-southeast1 --type=firestore-native
+gcloud pubsub topics create case-decisions
+gcloud iam service-accounts create floorline-render --display-name="Floorline Pay on Render"
+gcloud projects add-iam-policy-binding $P --member="serviceAccount:$SA" --role="roles/datastore.user"
+gcloud pubsub topics add-iam-policy-binding case-decisions --member="serviceAccount:$SA" --role="roles/pubsub.publisher"
+```
+
+The indexes the app needs, without the Firebase CLI (they build in the background; check with `gcloud firestore indexes composite list`):
+
+```bash
+gcloud firestore indexes composite create --collection-group=cases --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=state,order=ascending --field-config=field-path=created_at,order=descending
+gcloud firestore indexes composite create --collection-group=cases --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=created_at,order=descending
+gcloud firestore indexes composite create --collection-group=cases --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=client_reference,order=ascending --field-config=field-path=created_at,order=descending
+gcloud firestore indexes composite create --collection-group=cases --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=state,order=ascending --field-config=field-path=cleared_by,order=ascending
+gcloud firestore indexes composite create --collection-group=events --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=at,order=descending
+gcloud firestore indexes composite create --collection-group=audit_log --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=at,order=descending
+gcloud firestore indexes composite create --collection-group=audit_log --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=case_id,order=ascending --field-config=field-path=at,order=descending
+gcloud firestore indexes composite create --collection-group=audit_log --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=action,order=ascending --field-config=field-path=at,order=descending
+gcloud firestore indexes composite create --collection-group=audit_log --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=status,order=ascending --field-config=field-path=at,order=descending
+gcloud firestore indexes composite create --collection-group=delegation_boundaries --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=status,order=ascending
+gcloud firestore indexes composite create --collection-group=delegation_boundaries --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=version,order=descending
+```
+
+Those eleven cover the case list, the audit log and the delegation boundaries. The token-count indexes in `infra/firestore.indexes.json` serve only the usage
+totals; if a page later says a query needs an index, its message carries a link that creates it.
+
+The key (the one step that makes a secret), then show it so you can paste it into Render's secret file, then delete it:
+
+```bash
+gcloud iam service-accounts keys create gcp-key.json --iam-account=$SA
+cat gcp-key.json
+rm gcp-key.json
+```
+
+Select the text `cat` printed (from `{` to `}`) and copy it before you run `rm`. After the first deploy, step 7 below creates the push subscription.
+
+The rest of this page is the same steps one at a time, in PowerShell, with the reasons.
+
 PowerShell, one line each. Replace `floorline-pay-demo` with your project id (it must be unique across Google Cloud).
 
 ## 1. Project, billing and APIs
