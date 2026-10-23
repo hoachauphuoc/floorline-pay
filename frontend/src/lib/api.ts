@@ -1222,6 +1222,7 @@ export type PaymentLedger = {
     capture?: PaymentStep | null;
     payout?: PaymentStep | null;
     void?: PaymentStep | null;
+    payout_status?: { state: "confirmed" | "failed" | "pending" | "unconfirmed"; status: string | null; at: string | null };
     at?: string | null;
   }>;
   counts: Record<string, number>;
@@ -1235,6 +1236,76 @@ export async function fetchPaymentLedger(): Promise<PaymentLedger> {
 export async function fetchPaymentState(caseId: string): Promise<PaymentState> {
   if (DEMO_MODE) liveOnly("The payment state");
   return getJson<PaymentState>(`payments/cases/${encodeURIComponent(caseId)}`);
+}
+
+/** One of the attacks the Defense page replays against the payment layers (defense_scenarios.py). */
+export type DefenseScenario = {
+  id: string;
+  title: string;
+  attack: string;
+  layer: string;
+  live: boolean;
+  outcome: string;
+  findings: string[];
+  floor: number | null;
+  money_moved_usd: string;
+  proof: string;
+  detail: string;
+};
+
+export async function fetchDefenseScenarios(): Promise<{
+  scenarios: DefenseScenario[];
+  stopped: number;
+  of: number;
+  note: string;
+}> {
+  if (DEMO_MODE) liveOnly("The attack replay");
+  return getJson("defense/scenarios");
+}
+
+type Rate = { count: number; of: number; rate: number | null; low: number | null; high: number | null };
+type Arm = { recall: Rate; false_positive_rate: Rate };
+
+/** What the payment checks catch on the synthetic corpus (payment_eval.py); the analyst arm is null until it is measured. */
+export type DefenseEvaluation = {
+  synthetic: boolean;
+  flag_floor: number;
+  note: string;
+  summary: {
+    cases: number;
+    fraud: number;
+    legit: number;
+    arms: { floor: Arm | null; identity: Arm | null; analyst: Arm | null };
+  };
+};
+
+export async function fetchDefenseEvaluation(): Promise<DefenseEvaluation> {
+  if (DEMO_MODE) liveOnly("The evaluation table");
+  return getJson<DefenseEvaluation>("defense/evaluation");
+}
+
+/** A carrier or shipper that nothing is paid to until a governance admin lifts the freeze (payment_freeze.py). */
+export type FrozenParty = {
+  kind: string;
+  party: string;
+  name?: string | null;
+  reason: string;
+  source?: string | null;
+  at?: string | null;
+};
+
+export async function fetchFrozenParties(): Promise<{ frozen: FrozenParty[] }> {
+  if (DEMO_MODE) liveOnly("The frozen parties");
+  return getJson<{ frozen: FrozenParty[] }>("payments/freezes");
+}
+
+export async function liftFreeze(request: {
+  kind: string;
+  name: string;
+  reason: string;
+}): Promise<{ frozen: FrozenParty[] }> {
+  if (DEMO_MODE) liveOnly("Lifting a freeze");
+  return postJson("payments/freezes/lift", request);
 }
 
 export const queryKeys = {

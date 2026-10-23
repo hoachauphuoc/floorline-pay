@@ -72,6 +72,10 @@ export const ALLOWED_GET = new Set([
   "carriers",
   // Payment controls: the pause switch, the limits in force, what was paid today.
   "payments/controls",
+  // The attack replay and the evaluation table of the Defense page; who is frozen and why (Settlement).
+  "defense/scenarios",
+  "defense/evaluation",
+  "payments/freezes",
 ]);
 
 /**
@@ -86,6 +90,7 @@ export const ALLOWED_GET_BY_ID: ReadonlyArray<readonly [string, string]> = [
   ["orchestrator/case", "dossier"], // the case as a due-diligence PDF (dossier.py)
   ["compliance/audit", ""], // one B2B audit record
   ["payments/cases", ""], // the payment state of one case (payment_status.py)
+  ["payments/cases", "risk"], // what the payment layers say about one case
 ];
 
 /**
@@ -145,6 +150,8 @@ export const ALLOWED_POST = new Set([
   "payments/pause",
   "payments/resume",
   "payments/limits",
+  // Settlement: a governance admin lifts the freeze on a carrier or shipper.
+  "payments/freezes/lift",
   // Carrier payee registry: register a payee, and verify one as a different person.
   "carriers/payee",
   "carriers/payee/verify",
@@ -171,6 +178,8 @@ export const PASSWORD_ONLY_POST = new Set([
   "payments/pause",
   "payments/resume",
   "payments/limits",
+  // Lifting a freeze loosens a hold: only a person signed in with a password.
+  "payments/freezes/lift",
   // Carrier payees: a payee is moved by a person signed in with a password, never by a
   // one-click session.
   "carriers/payee",
