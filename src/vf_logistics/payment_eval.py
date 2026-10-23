@@ -1,7 +1,7 @@
 """
 A measurement of what the payment checks catch, and what the AI layers add, on a synthetic corpus.
 
-The corpus (data/payment_fraud_corpus.json) is SYNTHETIC: 84 invented payouts, 40 fraudulent and
+The corpus (data/payment_fraud_corpus.json) is SYNTHETIC: 80 invented payouts, 36 fraudulent and
 44 legitimate, built by scripts/build_payment_corpus.py from a fixed seed. The carriers do not
 exist and the search results the carrier look-up reads are written into the corpus. What it can
 show is how the checks behave on the patterns it was built from, which are the ones the checks
@@ -189,3 +189,13 @@ def report(summary: dict[str, Any]) -> str:
         cells = ", ".join(f"{arm} {n}/{entry['cases']}" for arm, n in entry["flagged"].items())
         lines.append(f"  {entry['label']:<5} {name:<28} {cells}")
     return "\n".join(lines)
+
+
+_CACHE: dict[str, dict[str, Any]] = {}
+
+
+async def offline_summary() -> dict[str, Any]:
+    """The arms that need no model (checks, request screen, carrier look-up) on the corpus, computed once per process."""
+    if "summary" not in _CACHE:
+        _CACHE["summary"] = summarize(await run(load_corpus()))
+    return _CACHE["summary"]

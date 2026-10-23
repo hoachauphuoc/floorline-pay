@@ -17,7 +17,7 @@ from typing import Any
 
 from flask import Flask, jsonify
 
-from vf_logistics import carrier_registry, payment_checks, payout_tracking
+from vf_logistics import carrier_registry, credit_profile, dual_approval, payment_checks, payout_tracking
 from vf_logistics.store import get_store
 
 _STATE = {
@@ -89,6 +89,7 @@ async def payment_ledger(tenant_id: str | None = None, limit: int = 100) -> dict
         case_id = str(row.get("case_id") or "")
         if case_id and case_id not in newest:
             newest[case_id] = row
+    payouts = await payout_tracking.confirmations(list(newest), tenant_id)
     items: list[dict[str, Any]] = []
     counts: dict[str, int] = {}
     for case_id, row in newest.items():
@@ -103,8 +104,54 @@ async def payment_ledger(tenant_id: str | None = None, limit: int = 100) -> dict
             "payout": detail.get("payout"),
             "void": detail.get("void"),
             "at": row.get("at"),
+            "payout_status": payouts[case_id],
         })
     return {"items": items, "counts": counts}
+
+
+async def payment_risk(case_id: str, tenant_id: str | None = None) -> dict[str, Any] | None:
+    """
+    What the payment layers say about one case: the findings of the checks and of the AI answers stored on
+    it, its carrier's credit standing and cap, and who has approved a release that needs two.
+
+    No finding quotes a payee address. None when there is no such case.
+    """
+    case = await get_store().get_case(case_id, tenant_id=tenant_id)
+    if case is None:
+        return None
+    shipment = case.get("shipment") or {}
+    if not payment_checks.is_payment_case(shipment):
+        return {"case_id": case_id, "payment_case": False}
+    shipment = await carrier_registry.enrich(dict(shipment), tenant_id=tenant_id)
+    ai = case.get("payment_ai")
+    found = payment_checks.check_payment(shipment) + payment_checks.check_payment_ai(shipment, ai)
+    profile = await credit_profile.profile(shipment.get("carrier_name"), ai, tenant_id)
+    approvals = (case.get("verification") or {}).get("approvals") or []
+    release = next(
+        (a for a in reversed(approvals) if isinstance(a, dict) and a.get("action") == "release" and a.get("status") == "VALID"),
+        None,
+    )
+    second = release.get("second_approval") if release else None
+    cap = profile["cap_usd"]
+    return {
+        "case_id": case_id,
+        "payment_case": True,
+        "findings": [
+            {"code": f["code"], "severity": f["severity"], "floor": f["floor"], "detail": f["detail"]} for f in found
+        ],
+        "analyst": ai.get("analyst") if isinstance(ai, dict) else None,
+        "identity": ai.get("identity") if isinstance(ai, dict) else None,
+        "credit": {
+            "tier": profile["tier"], "baseline": profile["baseline"], "suggested": profile["suggested"],
+            "cap_usd": None if cap is None else str(cap), "paid_count": profile["paid_count"], "frozen": profile["frozen"],
+        },
+        "dual_approval": {
+            "needed": dual_approval.needed(shipment),
+            "threshold_usd": str(dual_approval.threshold()),
+            "first_approver": release.get("approver") if release else None,
+            "second_approver": second.get("approver") if isinstance(second, dict) else None,
+        },
+    }
 
 
 def register(
@@ -124,3 +171,11 @@ def register(
     @require_viewer
     def payments_ledger() -> Any:
         return jsonify(run_async(payment_ledger(tenant_id=tenant()))), 200
+
+    @app.route("/api/v1/payments/cases/<case_id>/risk", methods=["GET"])
+    @require_viewer
+    def payments_case_risk(case_id: str) -> Any:
+        risk = run_async(payment_risk(case_id, tenant_id=tenant()))
+        if risk is None:
+            return jsonify({"error": "case not found"}), 404
+        return jsonify(risk), 200

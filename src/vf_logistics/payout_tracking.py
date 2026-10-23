@@ -20,6 +20,7 @@ from vf_logistics.store import get_store, utcnow
 
 ACTION = "payout_status"
 _ROWS = 100
+_ALL_ROWS = 500
 
 CONFIRMED = "confirmed"
 FAILED = "failed"
@@ -69,12 +70,8 @@ async def apply(
     return state
 
 
-async def confirmation(case_id: str, tenant_id: str | None = None) -> dict[str, Any]:
-    """The state of a case's payout from the statuses recorded for it."""
-    rows, _ = await get_store().query_audit(
-        case_id=case_id, limit=_ROWS, tenant_id=tenant_id,
-    )
-    rows = [r for r in rows if r.get("action") == ACTION]
+def _summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """The state of a payout from the payout_status rows of one case, newest first."""
     if not rows:
         return {"state": UNCONFIRMED, "status": None, "at": None}
     ranked = []
@@ -87,6 +84,23 @@ async def confirmation(case_id: str, tenant_id: str | None = None) -> dict[str, 
             if state == wanted:
                 return {"state": state, "status": status, "at": at}
     return {"state": PENDING, "status": ranked[0][1], "at": ranked[0][2]}
+
+
+async def confirmation(case_id: str, tenant_id: str | None = None) -> dict[str, Any]:
+    """The state of a case's payout from the statuses recorded for it."""
+    rows, _ = await get_store().query_audit(
+        case_id=case_id, limit=_ROWS, tenant_id=tenant_id,
+    )
+    return _summary([r for r in rows if r.get("action") == ACTION])
+
+
+async def confirmations(case_ids: list[str], tenant_id: str | None = None) -> dict[str, dict[str, Any]]:
+    """The state of the payout of each case named, from one read of the newest payout_status rows."""
+    rows, _ = await get_store().query_audit(action=ACTION, limit=_ALL_ROWS, tenant_id=tenant_id)
+    by_case: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        by_case.setdefault(str(row.get("case_id") or ""), []).append(row)
+    return {case_id: _summary(by_case.get(case_id, [])) for case_id in case_ids}
 
 
 def _overall(body: dict[str, Any]) -> str:
