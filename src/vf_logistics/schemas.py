@@ -645,6 +645,10 @@ class ComplianceAuditRequest(BaseModel):
     payout_amount: float | None = Field(None, gt=0)
     paypal_order_id: str | None = Field(None, max_length=64, pattern=r"^[A-Z0-9-]+$")
     paypal_authorization_id: str | None = Field(None, max_length=64, pattern=r"^[A-Z0-9-]+$")
+    tracking_number: str | None = Field(
+        None, max_length=64, pattern=r"^[A-Za-z0-9._-]+$",
+        description="The bill of lading or container number of the load, sent to PayPal after the carrier is paid.",
+    )
 
     webhook_url: str | None = Field(
         None, max_length=500,

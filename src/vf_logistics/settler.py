@@ -225,7 +225,31 @@ async def _release(
     return _result(
         SETTLED, "captured and paid", capture=_step(captured), payout=_step(paid),
         amount=str(_amount(shipment.get("payout_amount"))), carrier_key=carrier,
+        **await _tracking(shipment, _step(captured), key, tenant_id),
     )
+
+
+async def _tracking(
+    shipment: dict[str, Any], capture: dict[str, Any], key: str, tenant_id: str | None,
+) -> dict[str, Any]:
+    """Tell PayPal the tracking number once the carrier is paid; a failure here never changes the payment."""
+    number = str(shipment.get("tracking_number") or "")
+    if not number:
+        return {}
+    try:
+        bound = await payment_binding.find_authorization(
+            str(shipment.get("paypal_authorization_id") or ""), tenant_id=tenant_id,
+        )
+        order_id = str((bound or {}).get("order_id") or "")
+        if not order_id:
+            return {"tracking": {"status": "skipped", "http_status": None, "error": "the booking holds no PayPal order"}}
+        receipt = await paypal_client.add_tracking(
+            order_id, str(capture.get("paypal_id") or ""), number, str(shipment.get("carrier_name") or ""),
+            f"{key}-tracking",
+        )
+    except Exception as exc:  # noqa: BLE001 - the carrier is already paid; PayPal's copy of the proof is best effort
+        return {"tracking": {"status": "error", "http_status": None, "error": type(exc).__name__}}
+    return {"tracking": {"status": receipt.get("status"), "http_status": receipt.get("http_status"), "error": receipt.get("error")}}
 
 
 async def _block(shipment: dict[str, Any], key: str) -> dict[str, Any]:

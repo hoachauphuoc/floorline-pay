@@ -130,6 +130,21 @@ async def _freeze_for(
     return {"matched": True, "case_id": case_id, "frozen": frozen}
 
 
+async def _disputed_transactions(event_id: str, resource: dict[str, Any]) -> Any:
+    """The transactions a dispute is about. The event may leave them out, so PayPal is asked; a dispute that cannot be
+    looked up raises, so the event is delivered again instead of being recorded as matching nothing."""
+    if isinstance(resource.get("disputed_transactions"), list):
+        return resource["disputed_transactions"]
+    dispute_id = str(resource.get("dispute_id") or "")
+    if not dispute_id:
+        return None
+    found = await paypal_client.get_dispute(dispute_id, f"dispute-{event_id}")
+    body = found.get("body")
+    if found["status"] != paypal_client.OK or not isinstance(body, dict):
+        raise RuntimeError("the dispute could not be looked up at PayPal")
+    return body.get("disputed_transactions")
+
+
 async def _apply(
     event_id: str, event_type: str, resource: dict[str, Any], tenant_id: str | None,
 ) -> dict[str, Any]:
@@ -140,7 +155,7 @@ async def _apply(
             event_id, [str(resource.get("id") or "")], f"PayPal reported {event_type}", tenant_id,
         )
     if event_type == _DISPUTE_OPENED:
-        disputed = resource.get("disputed_transactions")
+        disputed = await _disputed_transactions(event_id, resource)
         captures = [
             str(t.get("seller_transaction_id") or "")
             for t in (disputed if isinstance(disputed, list) else []) if isinstance(t, dict)

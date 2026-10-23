@@ -170,6 +170,29 @@ async def get_payout_batch(batch_id: str, request_id: str) -> dict[str, Any]:
     return await _call("GET", f"/v1/payments/payouts/{batch_id}", None, request_id)
 
 
+async def add_tracking(
+    order_id: str, capture_id: str, tracking_number: str, carrier_name: str, request_id: str,
+) -> dict[str, Any]:
+    """Attach a bill of lading or container number to a captured order, so PayPal holds proof of shipment."""
+    if not (order_id and capture_id and tracking_number and carrier_name):
+        return _receipt(BAD_INPUT, error="an order, a capture, a tracking number and a carrier name are required")
+    body = {
+        "capture_id": capture_id,
+        "tracking_number": tracking_number,
+        "carrier": "OTHER",
+        "carrier_name_other": carrier_name,
+        "notify_payer": False,
+    }
+    return await _call("POST", f"/v2/checkout/orders/{order_id}/track", body, request_id)
+
+
+async def get_dispute(dispute_id: str, request_id: str) -> dict[str, Any]:
+    """What PayPal itself says about a dispute, including the transactions it is about."""
+    if not dispute_id:
+        return _receipt(BAD_INPUT, error="dispute_id is required")
+    return await _call("GET", f"/v1/customer/disputes/{dispute_id}", None, request_id)
+
+
 async def reauthorize_authorization(authorization_id: str, request_id: str) -> dict[str, Any]:
     """Renew an authorization whose three-day honor period has passed; it expires after 29 days."""
     if not authorization_id:
