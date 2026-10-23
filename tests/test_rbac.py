@@ -511,6 +511,9 @@ class TestRoutePolicy(unittest.TestCase):
             "/api/v1/review/<case_id>/approve-exception",
             "/api/v1/carriers/payee",
             "/api/v1/carriers/<carrier_key>/payee/<version>/verify",
+            "/api/v1/payments/pause",
+            "/api/v1/payments/resume",
+            "/api/v1/payments/limits",
         })
         put = next(
             r for r in self.rows

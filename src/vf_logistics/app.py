@@ -2146,10 +2146,14 @@ def receiver_decision() -> Any:
 receiver_decision._required_role = "operator"  # type: ignore[attr-defined]
 
 
-from vf_logistics import carrier_routes, payment_routes, payment_status
+from vf_logistics import carrier_routes, controls_routes, payment_routes, payment_status
 
 payment_routes.register(app, limiter, require_operator, _on_worker, _tenant)
 payment_status.register(app, require_viewer, _on_worker, _tenant)
+controls_routes.register(
+    app, limiter, require_viewer, require_operator, require_governance_admin,
+    require_password_session, _on_worker, _tenant, get_auth_context,
+)
 carrier_routes.register(
     app, limiter, require_reviewer, require_operator, require_password_session,
     _on_worker, _tenant, get_auth_context,

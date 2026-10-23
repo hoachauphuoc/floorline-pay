@@ -30,7 +30,7 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from vf_logistics import carrier_registry, payment_binding, payment_checks, paypal_client
+from vf_logistics import carrier_registry, payment_binding, payment_checks, payment_controls, paypal_client
 from vf_logistics.store import get_store, utcnow
 
 SKIPPED = "skipped"
@@ -129,10 +129,19 @@ async def _release(
         return _result(RETRY, f"the case is still {state}; deliver the decision again")
     if state != "RELEASED_BY_HUMAN":
         return _result(FAILED, f"the case is {state}, not RELEASED_BY_HUMAN; nothing is paid")
+    paused = await payment_controls.pause_state(tenant_id)
+    if paused["paused"]:
+        return _result(RETRY, f"payments are paused ({paused['reason']}); the decision is retried when they resume")
     held = payment_checks.check_payment(shipment)
     if held:
         codes = ", ".join(f["code"] for f in held)
         return _result(HELD, f"the payment checks hold this payout ({codes}); nothing is paid")
+    carrier = carrier_registry.carrier_key(shipment.get("carrier_name"))
+    limited = await payment_controls.check_payout(
+        str(shipment.get("currency") or "USD"), _amount(shipment.get("payout_amount")), carrier, tenant_id,
+    )
+    if limited is not None:
+        return _result(limited[0], limited[1])
     refusal = await _unproven_authorization(shipment, key, tenant_id)
     if refusal is not None:
         return refusal
@@ -157,7 +166,10 @@ async def _release(
         status = RETRY if _retryable(paid) else FAILED
         return _result(status, "PayPal captured the funds but did not pay the carrier",
                        capture=_step(captured), payout=_step(paid))
-    return _result(SETTLED, "captured and paid", capture=_step(captured), payout=_step(paid))
+    return _result(
+        SETTLED, "captured and paid", capture=_step(captured), payout=_step(paid),
+        amount=str(_amount(shipment.get("payout_amount"))), carrier_key=carrier,
+    )
 
 
 async def _block(shipment: dict[str, Any], key: str) -> dict[str, Any]:
