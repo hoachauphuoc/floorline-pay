@@ -1,7 +1,8 @@
 # Render Blueprint for the public Floorline Pay demo: one Docker web service, the Flask API and the Next.js console in one
 # container (see Dockerfile). Secrets are never stored here: every `sync: false` value is typed into the Render dashboard.
-# The store is in memory, so a restart empties it; VF_SEED_PAYMENT_DEMO restores the demo's starting state (src/vf_logistics/demo_seed.py).
-# Step by step: docs/RENDER_DEPLOY.md.
+# Hybrid: Render runs the app; a Google Cloud project of its own holds Firestore (the store) and Pub/Sub (a release reaches the
+# settler through a push to /api/v1/receiver/decision). VF_SEED_PAYMENT_DEMO puts the demo's starting state back when the store is
+# empty (src/vf_logistics/demo_seed.py). The Google side is docs/GCP_FOR_RENDER.md; the Render side is docs/RENDER_DEPLOY.md.
 services:
   - type: web
     name: floorline-pay
@@ -13,7 +14,10 @@ services:
     autoDeploy: false
     envVars:
       - key: STORE_BACKEND
-        value: memory
+        value: firestore
+      # The key file of the Google service account, added in the dashboard as a secret file named gcp-key.json.
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/gcp-key.json
       - key: VF_SEED_PAYMENT_DEMO
         value: "true"
       - key: VF_ONE_CLICK_JUDGE
@@ -37,6 +41,14 @@ services:
         sync: false
       # The address Render gives the service, e.g. https://floorline-pay.onrender.com (known after the first deploy).
       - key: PAYMENT_RETURN_ORIGINS
+        sync: false
+      # The id of the Google Cloud project that holds Firestore and Pub/Sub.
+      - key: PROJECT_ID
+        sync: false
+      # The service account the Pub/Sub push presents, and the audience it signs for (the push endpoint itself).
+      - key: RECEIVER_PUSH_SA
+        sync: false
+      - key: RECEIVER_PUSH_AUDIENCE
         sync: false
       # Two or more people with passwords (reviewer A and B, so a release above 2500 USD can be seen needing a second person).
       - key: VF_OPERATORS
