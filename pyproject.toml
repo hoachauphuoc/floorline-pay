@@ -69,6 +69,10 @@ dependencies = [
 
     # Request/response validation (Phase 2)
     "pydantic>=2.0.0,<3.0.0",
+
+    # Model Context Protocol server: the read-only tools an outside agent may call (mcp_server.py).
+    # 1.x on purpose: FastMCP is the 1.x API.
+    "mcp>=1.30.0,<2.0.0",
 ]
 
 [project.optional-dependencies]
