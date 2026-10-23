@@ -44,7 +44,7 @@ import json
 import time
 from typing import Any
 
-from vf_logistics import auth, dossier, tenant
+from vf_logistics import auth, dossier, dual_approval, tenant
 from vf_logistics.store import OptimisticLockError, get_store, new_id, utcnow
 
 AWAITING_EVIDENCE = "AWAITING_EVIDENCE"
@@ -1046,6 +1046,8 @@ async def approve(
     }
     if exception is not None:
         approval["exception"] = exception
+    if action == "release" and dual_approval.needed(case.get("shipment") or {}):
+        approval["requires_second"] = True
     record["approvals"].append(approval)
     case["state"] = APPROVED
     case["updated_at"] = now
@@ -1076,6 +1078,66 @@ async def approve(
 # Execution (step 6)
 # --------------------------------------------------------------------------
 
+async def second_approve(
+    case_id: str,
+    approval_id: str,
+    approver: str,
+    note: str,
+    *,
+    actor_auth: str | None = None,
+    tenant_id: str | None = None,
+) -> dict[str, Any]:
+    """
+    The second person's approval of a release that needs two (dual_approval.needed).
+
+    Password sign-in only, a note saying what was checked, and a person other than the
+    first approver (compared case-insensitively). The approval keeps who and when.
+    """
+    if not approver:
+        raise EvidenceError("A second approval is made by a named person")
+    if actor_auth != "password":
+        raise EvidenceError("A second approval needs a password sign-in, not a one-click session.", 403)
+    if not (note or "").strip():
+        raise EvidenceError("A second approval needs a note saying what was checked.", 400)
+
+    stored = await get_store().get_case(case_id, tenant_id=tenant_id)
+    if not stored:
+        raise EvidenceError("case not found", 404)
+    expected_version = stored.get("_version")
+    case = copy.deepcopy(stored)
+    approval = next(
+        (a for a in verification_of(case).get("approvals") or []
+         if isinstance(a, dict) and a.get("approval_id") == approval_id),
+        None,
+    )
+    if approval is None:
+        raise EvidenceError("approval not found", 404)
+    if approval.get("status") != "VALID" or case.get("state") != APPROVED:
+        raise EvidenceError(
+            f"The approval is {approval.get('status')} and the case is {case.get('state')}: "
+            "a second approval is only possible while a valid release waits to be executed.", 409,
+        )
+    if not approval.get("requires_second"):
+        raise EvidenceError("This release does not need a second approver.", 409)
+    if approval.get("second_approval"):
+        raise EvidenceError("This release already has its second approval.", 409)
+    if approver.strip().lower() == str(approval.get("approver") or "").strip().lower():
+        raise EvidenceError(
+            "The second approver must be a different person than the one who approved the release first.", 403,
+        )
+
+    now = utcnow()
+    approval["second_approval"] = {
+        "approver": approver, "approver_auth": actor_auth, "at": now, "note": note.strip(),
+    }
+    case["updated_at"] = now
+    await _write(case, expected_version, tenant_id)
+    await _audit(case_id, "evidence_second_approval", approver, actor_auth, {
+        "approval_id": approval_id, "first_approver": approval.get("approver"),
+    }, tenant_id)
+    return {"approval": approval, "state": case["state"]}
+
+
 def approval_is_executable(
     case: dict[str, Any], approval_id: str,
 ) -> tuple[dict[str, Any] | None, str | None]:
@@ -1099,6 +1161,11 @@ def approval_is_executable(
     # (the process died between claim and confirm): it may be resumed.
     if status == "CLAIMING" and state != "EXECUTING":
         return None, f"approval is CLAIMING but the case is {state}, not EXECUTING"
+    if approval.get("requires_second") and not approval.get("second_approval"):
+        return None, (
+            "this release needs a second approver: a different person must second-approve it "
+            "before it is executed"
+        )
     if status == "VALID" and state not in (APPROVED, "EXECUTION_FAILED"):
         return None, f"case is {state}, not APPROVED or EXECUTION_FAILED"
     ev_version = record.get("evidence_version") or 0

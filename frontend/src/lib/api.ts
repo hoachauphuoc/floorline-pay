@@ -449,6 +449,22 @@ export async function approveException(
   );
 }
 
+/**
+ * The second person's approval of a release large enough to need two. The API wants a
+ * reviewer other than the first approver, a password sign-in and a note.
+ */
+export async function secondApprove(
+  caseId: string,
+  approvalId: string,
+  note: string,
+): Promise<Record<string, unknown>> {
+  if (DEMO_MODE) liveOnly("Approving as the second approver");
+  return postJson<Record<string, unknown>>(
+    `review/${encodeURIComponent(caseId)}/second-approve`,
+    { approval_id: approvalId, note },
+  );
+}
+
 export async function executeApproval(
   caseId: string,
   approvalId: string,

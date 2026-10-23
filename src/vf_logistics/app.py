@@ -2548,6 +2548,23 @@ def review_approve(case_id: str) -> Any:
     ))
 
 
+@app.route("/api/v1/review/<case_id>/second-approve", methods=["POST"])
+@require_reviewer
+@require_password_session
+@limiter.limit("10 per minute")
+def review_second_approve(case_id: str) -> Any:
+    """The second person's approval of a release large enough to need two."""
+    from vf_logistics import evidence
+
+    body = _json_object()
+    person, actor_auth = _acting_person(body)
+    return _evidence_response(evidence.second_approve(
+        case_id, str(body.get("approval_id") or "").strip(), person,
+        str(body.get("note") or "").strip(),
+        actor_auth=actor_auth, tenant_id=_tenant(),
+    ))
+
+
 @app.route("/api/v1/review/<case_id>/approve-exception", methods=["POST"])
 @require_operator
 @require_password_session

@@ -45,6 +45,7 @@ describe("matchWrite", () => {
     expect(matchWrite("review/CASE-1/approve", ALLOWED_POST)).toBe(true);
     expect(matchWrite("review/CASE-1/approve-exception", ALLOWED_POST)).toBe(true);
     expect(matchWrite("review/CASE-1/execute", ALLOWED_POST)).toBe(true);
+    expect(matchWrite("review/CASE-1/second-approve", ALLOWED_POST)).toBe(true);
   });
 
   it("resolves the evidence sub-routes by shape", () => {
@@ -63,6 +64,7 @@ describe("matchWrite", () => {
     expect(matchWrite("review/approve", ALLOWED_POST)).toBe(false);
     expect(matchWrite("review/approve-exception", ALLOWED_POST)).toBe(false);
     expect(matchWrite("review/execute", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("review/second-approve", ALLOWED_POST)).toBe(false);
     expect(matchWrite("review/evidence/link", ALLOWED_POST)).toBe(false);
     expect(matchWrite("review/evidence/cancel", ALLOWED_POST)).toBe(false);
     expect(matchWrite("cases/activity", ALLOWED_POST)).toBe(false);
@@ -103,6 +105,7 @@ describe("matchWrite", () => {
       "review/approve",
       "review/approve-exception",
       "review/execute",
+      "review/second-approve",
     ]);
     expect([...PASSWORD_ONLY_PUT]).toEqual(["governance/prefilter-rules"]);
     for (const path of PASSWORD_ONLY_PUT) expect(ALLOWED_PUT.has(path)).toBe(true);
@@ -133,6 +136,7 @@ describe("the lists the Access Control screen shows", () => {
     expect(shown).toContain("POST review/<id>/approve");
     expect(shown).toContain("POST review/<id>/execute");
     expect(shown).toContain("POST review/<id>/approve-exception");
+    expect(shown).toContain("POST review/<id>/second-approve");
     expect(shown).toContain("POST review/<id>/evidence/<id>/link");
     expect(shown).toContain("POST review/<id>/evidence/<id>/cancel");
     expect(shown).toContain("POST cases/<id>/activity");
@@ -147,6 +151,7 @@ describe("policyKey", () => {
     expect(policyKey("review/CASE-1/approve")).toBe("review/approve");
     expect(policyKey("review/CASE-1/execute")).toBe("review/execute");
     expect(policyKey("review/CASE-1/approve-exception")).toBe("review/approve-exception");
+    expect(policyKey("review/CASE-1/second-approve")).toBe("review/second-approve");
     expect(policyKey("review/CASE-1/evidence/evreq-9/cancel")).toBe("review/evidence/cancel");
     expect(policyKey("cases/CASE-1/activity")).toBe("cases/activity");
     expect(policyKey("orchestrator/reset")).toBe("orchestrator/reset");

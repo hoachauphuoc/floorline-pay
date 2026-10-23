@@ -121,14 +121,30 @@ async def _unproven_authorization(
     return None
 
 
+def _lacks_second_approval(case: dict[str, Any], approval_id: str) -> bool:
+    """True when the decision's approval needs a second approver and has none.
+
+    Only an approval found in the case can say so: a case with no verification record
+    (a release made before dual approval existed) is judged by the checks that follow.
+    """
+    verification = case.get("verification")
+    approvals = verification.get("approvals") if isinstance(verification, dict) else None
+    for approval in approvals or []:
+        if isinstance(approval, dict) and approval.get("approval_id") == approval_id:
+            return bool(approval.get("requires_second")) and not approval.get("second_approval")
+    return False
+
+
 async def _release(
-    case: dict[str, Any], shipment: dict[str, Any], key: str, tenant_id: str | None,
+    case: dict[str, Any], shipment: dict[str, Any], key: str, tenant_id: str | None, approval_id: str,
 ) -> dict[str, Any]:
     state = case.get("state")
     if state in _NOT_FINAL:
         return _result(RETRY, f"the case is still {state}; deliver the decision again")
     if state != "RELEASED_BY_HUMAN":
         return _result(FAILED, f"the case is {state}, not RELEASED_BY_HUMAN; nothing is paid")
+    if _lacks_second_approval(case, approval_id):
+        return _result(HELD, "this release needs a second approver; nothing is paid until a different person approves it too")
     paused = await payment_controls.pause_state(tenant_id)
     if paused["paused"]:
         return _result(RETRY, f"payments are paused ({paused['reason']}); the decision is retried when they resume")
@@ -201,7 +217,7 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
         if outcome == "BLOCKED_BY_HUMAN":
             result = await _block(shipment, key)
         else:
-            result = await _release(case, shipment, key, tenant_id)
+            result = await _release(case, shipment, key, tenant_id, str(decision.get("approval_id") or ""))
     except Exception as exc:  # noqa: BLE001 - settle never raises; the status says what happened
         return _result(RETRY, f"settlement stopped on {type(exc).__name__}; deliver the decision again")
     await get_store().add_audit_once({

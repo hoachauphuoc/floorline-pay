@@ -100,6 +100,7 @@ export const ALLOWED_POST = new Set([
   "review/decide",
   "review/deep-review",
   // Verification loop: request, evaluate, approve, execute, cancel, re-link.
+  "review/second-approve",
   "review/approve-exception",
   "review/request-evidence",
   "review/reevaluate",
@@ -175,6 +176,7 @@ export const PASSWORD_ONLY_POST = new Set([
   "carriers/payee",
   "carriers/payee/verify",
   // Verification loop: approve and execute change downstream state.
+  "review/second-approve",
   "review/approve-exception",
   "review/approve",
   "review/execute",
@@ -208,7 +210,7 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
   const parts = joined.split("/");
   if (parts.length === 3 && parts[0] === "review" && CASE_ID.test(parts[1])) {
     const action = parts[2];
-    if (["decide", "deep-review", "request-evidence", "reevaluate", "approve", "approve-exception", "execute"].includes(action)) {
+    if (["decide", "deep-review", "request-evidence", "reevaluate", "approve", "approve-exception", "second-approve", "execute"].includes(action)) {
       return allowed.has(`review/${action}`);
     }
     return false;
@@ -237,6 +239,7 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
   if (joined === "review/decide" || joined === "review/deep-review" || joined === "cases/activity"
       || joined === "review/request-evidence" || joined === "review/reevaluate"
       || joined === "review/approve" || joined === "review/approve-exception" || joined === "review/execute"
+      || joined === "review/second-approve"
       || joined === "review/evidence/link" || joined === "review/evidence/cancel") {
     return false;
   }
