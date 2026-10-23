@@ -72,6 +72,7 @@ def pp(monkeypatch):
     monkeypatch.setenv("PAYPAL_CLIENT_ID", "sandbox-id")
     monkeypatch.setenv("PAYPAL_CLIENT_SECRET", "sandbox-secret")
     client = settler.paypal_client
+    monkeypatch.setattr(settler.authorization_lifecycle, "stage", lambda facts, now=None: "honored")
     with patch.object(client, "get_authorization", AsyncMock(return_value=LIVE)), \
             patch.object(client, "capture_authorization", AsyncMock(return_value=CAPTURED)) as capture, \
             patch.object(client, "create_payout", AsyncMock(return_value=PAID_OUT)) as payout, \

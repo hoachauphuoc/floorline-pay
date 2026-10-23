@@ -17,7 +17,7 @@ from typing import Any
 
 from flask import Flask, jsonify
 
-from vf_logistics import carrier_registry, payment_checks
+from vf_logistics import carrier_registry, payment_checks, payout_tracking
 from vf_logistics.store import get_store
 
 _STATE = {
@@ -42,8 +42,9 @@ async def payment_state(case_id: str, tenant_id: str | None = None) -> dict[str,
             "reason": "the case moves no money",
         }
     rows, _ = await store.query_audit(
-        case_id=case_id, action="settle_payment", limit=20, tenant_id=tenant_id,
+        case_id=case_id, limit=100, tenant_id=tenant_id,
     )
+    rows = [r for r in rows if r.get("action") == "settle_payment"]
     if rows:
         latest = rows[0]
         detail = latest.get("detail") or {}
@@ -55,6 +56,7 @@ async def payment_state(case_id: str, tenant_id: str | None = None) -> dict[str,
             "capture": detail.get("capture"),
             "payout": detail.get("payout"),
             "void": detail.get("void"),
+            "payout_status": await payout_tracking.confirmation(case_id, tenant_id=tenant_id),
             "at": latest.get("at"),
         }
     shipment = await carrier_registry.enrich(dict(shipment), tenant_id=tenant_id)

@@ -30,7 +30,15 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from vf_logistics import carrier_registry, payment_binding, payment_checks, payment_controls, paypal_client
+from vf_logistics import (
+    authorization_lifecycle,
+    carrier_registry,
+    payment_binding,
+    payment_checks,
+    payment_controls,
+    payment_freeze,
+    paypal_client,
+)
 from vf_logistics.store import get_store, utcnow
 
 SKIPPED = "skipped"
@@ -118,6 +126,18 @@ async def _unproven_authorization(
     now_currency = amount.get("currency_code") if isinstance(amount, dict) else None
     if now_held is None or now_held < payout or now_currency != currency:
         return _result(HELD, "PayPal reports less held than the payout; nothing is paid", verify=_step(live))
+    stage = authorization_lifecycle.stage(facts)
+    if stage == authorization_lifecycle.EXPIRED:
+        return _result(FAILED, "the authorization has expired at PayPal; the shipper must authorize again; nothing is paid",
+                       verify=_step(live))
+    if stage == authorization_lifecycle.UNKNOWN:
+        return _result(HELD, "PayPal does not say when the authorization was made; nothing is paid", verify=_step(live))
+    if stage == authorization_lifecycle.REAUTHORIZE:
+        renewed = await paypal_client.reauthorize_authorization(authorization, f"{key}-reauth")
+        if renewed["status"] != paypal_client.OK or _body(renewed).get("status") != "CREATED":
+            status = RETRY if _retryable(renewed) else FAILED
+            return _result(status, "PayPal could not renew the authorization after its honor period; nothing is paid",
+                           reauthorize=_step(renewed))
     return None
 
 
@@ -148,6 +168,14 @@ async def _release(
     paused = await payment_controls.pause_state(tenant_id)
     if paused["paused"]:
         return _result(RETRY, f"payments are paused ({paused['reason']}); the decision is retried when they resume")
+    for kind, name in (("carrier", shipment.get("carrier_name")), ("shipper", shipment.get("shipper_name"))):
+        frozen = await payment_freeze.frozen(kind, name, tenant_id)
+        if frozen is not None:
+            return _result(
+                HELD,
+                f"payments to this {kind} are frozen ({frozen['reason']}); a governance admin must lift the "
+                "freeze; nothing is paid",
+            )
     held = payment_checks.check_payment(shipment)
     if held:
         codes = ", ".join(f["code"] for f in held)

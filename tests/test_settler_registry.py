@@ -79,6 +79,7 @@ def pp(monkeypatch):
     client = settler.paypal_client
     monkeypatch.setattr(settler.payment_controls, "pause_state", AsyncMock(return_value={"paused": False}))
     monkeypatch.setattr(settler.payment_controls, "check_payout", AsyncMock(return_value=None))
+    monkeypatch.setattr(settler.authorization_lifecycle, "stage", lambda facts, now=None: "honored")
     with patch.object(client, "get_authorization", AsyncMock(return_value=LIVE)), \
             patch.object(client, "capture_authorization", AsyncMock(return_value=CAPTURED)) as capture, \
             patch.object(client, "create_payout", AsyncMock(return_value=PAID_OUT)) as payout:

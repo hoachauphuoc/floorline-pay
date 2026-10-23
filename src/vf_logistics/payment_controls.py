@@ -84,11 +84,13 @@ def validate_limits(raw: Any) -> dict[str, float | int]:
     return limits
 
 
+# One filter only: Firestore applies just one of case_id, action and status in an audit query, so
+# the rows of the case are read and the action is picked here.
 async def _newest(action: str, tenant_id: str | None) -> dict[str, Any] | None:
     rows, _ = await get_store().query_audit(
-        case_id=CASE, action=action, limit=1, tenant_id=tenant_id,
+        case_id=CASE, limit=_PAGE, tenant_id=tenant_id,
     )
-    return rows[0] if rows else None
+    return next((r for r in rows if r.get("action") == action), None)
 
 
 def _detail(row: dict[str, Any]) -> dict[str, Any]:

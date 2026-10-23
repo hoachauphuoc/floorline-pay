@@ -163,6 +163,40 @@ async def create_payout(
     return await _call("POST", "/v1/payments/payouts", body, request_id)
 
 
+async def get_payout_batch(batch_id: str, request_id: str) -> dict[str, Any]:
+    """What PayPal itself says about a payout batch and each of its items."""
+    if not batch_id:
+        return _receipt(BAD_INPUT, error="batch_id is required")
+    return await _call("GET", f"/v1/payments/payouts/{batch_id}", None, request_id)
+
+
+async def reauthorize_authorization(authorization_id: str, request_id: str) -> dict[str, Any]:
+    """Renew an authorization whose three-day honor period has passed; it expires after 29 days."""
+    if not authorization_id:
+        return _receipt(BAD_INPUT, error="authorization_id is required")
+    path = f"/v2/payments/authorizations/{authorization_id}/reauthorize"
+    return await _call("POST", path, {}, request_id)
+
+
+async def verify_webhook_signature(
+    headers: dict[str, str], event: dict[str, Any], webhook_id: str, request_id: str,
+) -> dict[str, Any]:
+    """Ask PayPal whether a webhook delivery is its own. `headers` are the five PayPal
+    transmission headers, keyed in lower case."""
+    fields = {
+        "auth_algo": headers.get("paypal-auth-algo"),
+        "cert_url": headers.get("paypal-cert-url"),
+        "transmission_id": headers.get("paypal-transmission-id"),
+        "transmission_sig": headers.get("paypal-transmission-sig"),
+        "transmission_time": headers.get("paypal-transmission-time"),
+        "webhook_id": webhook_id,
+    }
+    if not all(fields.values()):
+        return _receipt(BAD_INPUT, error="the five transmission headers and a webhook id are required")
+    body = {**fields, "webhook_event": event}
+    return await _call("POST", "/v1/notifications/verify-webhook-signature", body, request_id)
+
+
 async def create_order_for_approval(
     amount: Any, currency: str, request_id: str, reference_id: str,
     return_url: str, cancel_url: str,
