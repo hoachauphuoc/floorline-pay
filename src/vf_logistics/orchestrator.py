@@ -53,6 +53,7 @@ import time
 from typing import Any
 
 from vf_logistics import budget
+from vf_logistics import carrier_registry
 from vf_logistics import config
 from vf_logistics import document_render
 from vf_logistics import document_store
@@ -288,6 +289,7 @@ async def ingest_shipment(
     # an event-sourced claim against. An unknown or mismatched counterparty
     # writes nothing and leaves the unverified-history floor standing.
     shipper_registry.enrich(shipment)
+    await carrier_registry.enrich(shipment, tenant_id=tenant_id)
 
     case: dict[str, Any] = {
         "case_id": case_id,

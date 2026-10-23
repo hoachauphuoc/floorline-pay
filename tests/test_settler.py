@@ -72,6 +72,7 @@ def pp(monkeypatch):
     monkeypatch.setenv("PAYPAL_CLIENT_SECRET", "sandbox-secret")
     monkeypatch.setattr(settler.payment_binding, "find_authorization", AsyncMock(return_value=BOOKING))
     monkeypatch.setattr(settler.paypal_client, "get_authorization", AsyncMock(return_value=LIVE))
+    monkeypatch.setattr(settler.carrier_registry, "enrich", AsyncMock(side_effect=lambda s, tenant_id=None: s))
     with patch.object(settler.paypal_client, "capture_authorization", AsyncMock(return_value=OK)) as capture, \
             patch.object(settler.paypal_client, "create_payout", AsyncMock(return_value=PAID_OUT)) as payout, \
             patch.object(settler.paypal_client, "void_authorization", AsyncMock(return_value=VOIDED)) as void:

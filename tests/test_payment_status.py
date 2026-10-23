@@ -18,6 +18,7 @@ import json
 import os
 import sys
 import uuid
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -48,6 +49,13 @@ def run(coro):
 @pytest.fixture
 def status_module():
     return importlib.import_module("vf_logistics.payment_status")
+
+
+@pytest.fixture(autouse=True)
+def _shipment_fields_stand(monkeypatch):
+    """These tests pin the state on the shipment's own fields; test_carrier_registry.py pins the registry."""
+    registry = importlib.import_module("vf_logistics.carrier_registry")
+    monkeypatch.setattr(registry, "enrich", AsyncMock(side_effect=lambda s, tenant_id=None: s))
 
 
 class TestThePaymentState(Base):

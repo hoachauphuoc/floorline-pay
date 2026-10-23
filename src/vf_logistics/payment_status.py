@@ -17,7 +17,7 @@ from typing import Any
 
 from flask import Flask, jsonify
 
-from vf_logistics import payment_checks
+from vf_logistics import carrier_registry, payment_checks
 from vf_logistics.store import get_store
 
 _STATE = {
@@ -57,6 +57,7 @@ async def payment_state(case_id: str, tenant_id: str | None = None) -> dict[str,
             "void": detail.get("void"),
             "at": latest.get("at"),
         }
+    shipment = await carrier_registry.enrich(dict(shipment), tenant_id=tenant_id)
     findings = [f["code"] for f in payment_checks.check_payment(shipment)]
     has_authorization = bool(shipment.get("paypal_authorization_id"))
     return {

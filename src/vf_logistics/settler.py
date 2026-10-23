@@ -30,7 +30,7 @@ from __future__ import annotations
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from vf_logistics import payment_binding, payment_checks, paypal_client
+from vf_logistics import carrier_registry, payment_binding, payment_checks, paypal_client
 from vf_logistics.store import get_store, utcnow
 
 SKIPPED = "skipped"
@@ -137,7 +137,7 @@ async def _release(
     if refusal is not None:
         return refusal
     authorization = str(shipment.get("paypal_authorization_id") or "")
-    payee = str(shipment.get("carrier_payee_email") or "")
+    payee = str(shipment.get("carrier_registered_payee_email") or "")
     currency = str(shipment.get("currency") or "USD")
     captured = await paypal_client.capture_authorization(authorization, f"{key}-capture")
     if captured["status"] != paypal_client.OK:
@@ -185,6 +185,7 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
             return _result(SKIPPED, "the case moves no money")
         if not paypal_client.configured():
             return _result(FAILED, "PayPal is not configured; nothing is paid")
+        shipment = await carrier_registry.enrich(dict(shipment), tenant_id=tenant_id)
         if outcome == "BLOCKED_BY_HUMAN":
             result = await _block(shipment, key)
         else:
