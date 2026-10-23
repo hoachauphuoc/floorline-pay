@@ -14,6 +14,7 @@ import {
   ScrollText,
   Receipt,
   ShieldCheck,
+  SlidersHorizontal,
   Terminal,
   Truck,
   Wallet,
@@ -115,6 +116,13 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Carriers",
     icon: Truck,
     blurb: "Who each carrier may be paid",
+    section: "work",
+  },
+  {
+    href: "/controls",
+    label: "Payment controls",
+    icon: SlidersHorizontal,
+    blurb: "Pause switch and spending limits",
     section: "work",
   },
   {

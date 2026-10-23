@@ -744,6 +744,48 @@ export async function verifyCarrierPayee(
   );
 }
 
+/** The limits that cap what leaves in a day, in US dollars. Set by a governance admin. */
+export type PaymentLimits = {
+  max_payout_usd: number;
+  carrier_daily_usd: number;
+  tenant_daily_usd: number;
+  carrier_daily_count: number;
+};
+
+/** GET payments/controls: the pause switch, the limits in force and what was paid today. */
+export type PaymentControls = {
+  pause: { paused: boolean; reason?: string | null; by?: string | null; at?: string | null };
+  limits: PaymentLimits | null;
+  limits_are_defaults: boolean;
+  usage_today: {
+    tenant_usd: string;
+    carriers: Record<string, { usd: string; count: number }>;
+  };
+};
+
+export async function fetchPaymentControls(): Promise<PaymentControls> {
+  if (DEMO_MODE) liveOnly("The payment controls");
+  return getJson<PaymentControls>("payments/controls");
+}
+
+export async function pausePayments(reason: string): Promise<PaymentControls["pause"]> {
+  if (DEMO_MODE) liveOnly("Pausing payments");
+  return postJson("payments/pause", { reason });
+}
+
+export async function resumePayments(reason: string): Promise<PaymentControls["pause"]> {
+  if (DEMO_MODE) liveOnly("Resuming payments");
+  return postJson("payments/resume", { reason });
+}
+
+export async function publishPaymentLimits(
+  limits: PaymentLimits,
+  reason: string,
+): Promise<{ limits: PaymentLimits }> {
+  if (DEMO_MODE) liveOnly("Publishing payment limits");
+  return postJson("payments/limits", { limits, reason });
+}
+
 /** Submit a shipment event, as Pub/Sub would. */
 export async function submitShipmentEvent(
   shipment: Record<string, unknown>,

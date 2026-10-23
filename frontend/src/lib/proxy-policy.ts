@@ -70,6 +70,8 @@ export const ALLOWED_GET = new Set([
   "payments/ledger",
   // The carrier payee registry (carrier_registry.py).
   "carriers",
+  // Payment controls: the pause switch, the limits in force, what was paid today.
+  "payments/controls",
 ]);
 
 /**
@@ -137,6 +139,11 @@ export const ALLOWED_POST = new Set([
   // Capturing and paying out are never browser routes: only the settler does those.
   "payments/orders",
   "payments/orders/authorize",
+  // Payment controls: any operator may pause payments; a governance admin resumes them and
+  // publishes the limits.
+  "payments/pause",
+  "payments/resume",
+  "payments/limits",
   // Carrier payee registry: register a payee, and verify one as a different person.
   "carriers/payee",
   "carriers/payee/verify",
@@ -159,6 +166,10 @@ export const PASSWORD_ONLY_POST = new Set([
   "orchestrator/reset",
   "governance/revoke",
   "governance/publish",
+  // Payment controls: stopping and starting money, and its limits, need a password sign-in.
+  "payments/pause",
+  "payments/resume",
+  "payments/limits",
   // Carrier payees: a payee is moved by a person signed in with a password, never by a
   // one-click session.
   "carriers/payee",
