@@ -214,6 +214,7 @@ async def usage_today(tenant_id: str | None = None) -> dict[str, Any]:
 
 async def check_payout(
     currency: str, payout: Decimal | None, carrier_key: str, tenant_id: str | None = None,
+    tier_cap: Decimal | None = None, tier: str = "",
 ) -> tuple[str, str] | None:
     """
     None when the payout fits the limits, else (status, reason): "held" for one that no
@@ -230,6 +231,11 @@ async def check_payout(
         return "held", (
             f"the payout of {payout} USD is above the per-payout limit of "
             f"{live['max_payout_usd']} USD; nothing is paid"
+        )
+    if tier_cap is not None and payout > tier_cap:
+        return "held", (
+            f"the payout of {payout} USD is above the {tier_cap} USD that credit tier {tier} allows this carrier; "
+            "it is paid once the carrier has a record of being paid without trouble; nothing is paid"
         )
     used = await usage_today(tenant_id)
     mine = used["carriers"].get(carrier_key, {"usd": Decimal(0), "count": 0})

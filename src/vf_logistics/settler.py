@@ -33,6 +33,7 @@ from typing import Any
 from vf_logistics import (
     authorization_lifecycle,
     carrier_registry,
+    credit_profile,
     payment_binding,
     payment_checks,
     payment_controls,
@@ -181,8 +182,10 @@ async def _release(
         codes = ", ".join(f["code"] for f in held)
         return _result(HELD, f"the payment checks hold this payout ({codes}); nothing is paid")
     carrier = carrier_registry.carrier_key(shipment.get("carrier_name"))
+    profile = await credit_profile.profile(shipment.get("carrier_name"), case.get("payment_ai"), tenant_id)
     limited = await payment_controls.check_payout(
         str(shipment.get("currency") or "USD"), _amount(shipment.get("payout_amount")), carrier, tenant_id,
+        tier_cap=profile["cap_usd"], tier=profile["tier"],
     )
     if limited is not None:
         return _result(limited[0], limited[1])

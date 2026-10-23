@@ -68,3 +68,13 @@ Task chi tiết sẽ được viết vào `orchestrator/execution_plan.md` theo 
 - `python -m pytest tests/ -q`, mypy, ruff, frontend `tsc/lint/test` (CLAUDE.md §7) — không giảm baseline.
 - Test mới: release sạch → capture + payout được gọi đúng một lần; held → không capture; reject → void; payee change → floor tăng, không auto-release; lỗi PayPal → không release (fail closed).
 - Chạy thật trên sandbox: booking → upload POD → payout xuất hiện trong sandbox carrier account; quay lại thành video.
+
+## Tiến độ (23/10/2026)
+
+Đã xong và có test (mọi cuộc gọi PayPal trong test đều qua fake; chưa có cuộc gọi sandbox thật):
+
+- P1-P5: client sandbox, kiểm tra thanh toán trong risk floor, settler (capture + payout khi người release, void khi block), route booking, trang `/book`, `/payments`.
+- Lớp an toàn tín dụng L1-L7 (xem "Credit security" trong README): authorization gắn với shipment (L1); sổ đăng ký payee của carrier, hai người (L2); giới hạn chi và công tắc tạm dừng (L3, L6); duyệt kép từ 2.500 USD (L4); toàn vẹn thanh toán — webhook có xác minh chữ ký, trạng thái payout, vòng đời authorization, đóng băng khi tranh chấp (L5); lớp AI chỉ được nâng rủi ro hoặc siết hạn mức (L7).
+- Quy tắc cho mọi lớp AI (CLAUDE.md mục 4, điều 7): mô hình hoặc tìm kiếm chỉ được nâng rủi ro hay siết giới hạn; chỉ người mới nới. Settler không bao giờ gọi mô hình.
+
+Chưa xong / chỉ người làm được: tài khoản PayPal developer và khóa sandbox; Cloud Run service thứ hai và Pub/Sub (settler chỉ chạy khi quyết định tới `/api/v1/receiver/decision`); đăng ký webhook PayPal (`PAYPAL_WEBHOOK_ID`) khi có địa chỉ công khai; đo lớp phân tích viên AI bằng `scripts/evaluate_payment_ai.py --live-analyst`; video demo; mở public repo trước 12/11.

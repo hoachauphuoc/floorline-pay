@@ -1,0 +1,3523 @@
+{
+ "synthetic": true,
+ "note": "Invented payouts and carriers. Built by scripts/build_payment_corpus.py from a fixed seed; the search results are recorded here, not fetched.",
+ "seed": 20261023,
+ "cases": [
+  {
+   "id": "F-PAYEE-MISMATCH-001",
+   "label": "fraud",
+   "scenario": "payee_mismatch",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-001",
+    "shipping_cost": 3400.0,
+    "avg_route_cost": 3400.0,
+    "carrier_name": "Garnet Freight 001 Co",
+    "payout_amount": 3400.0,
+    "paypal_authorization_id": "SYNAUTH000000001",
+    "carrier_payee_email": "accounts@yarrow-payments.example",
+    "carrier_registered_payee_email": "payments@garnet-freight-001.example"
+   },
+   "history": {
+    "paid_count": 8,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Garnet Freight 001 Co | road and sea freight",
+     "content": "Garnet Freight 001 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://garnet-freight-001.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-PAYEE-MISMATCH-002",
+   "label": "fraud",
+   "scenario": "payee_mismatch",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-002",
+    "shipping_cost": 5200.0,
+    "avg_route_cost": 5200.0,
+    "carrier_name": "Sable Freight 002 Co",
+    "payout_amount": 5200.0,
+    "paypal_authorization_id": "SYNAUTH000000002",
+    "carrier_payee_email": "accounts@harbor-payments.example",
+    "carrier_registered_payee_email": "payments@sable-freight-002.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Sable Freight 002 Co | road and sea freight",
+     "content": "Sable Freight 002 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://sable-freight-002.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-PAYEE-MISMATCH-003",
+   "label": "fraud",
+   "scenario": "payee_mismatch",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-003",
+    "shipping_cost": 4100.0,
+    "avg_route_cost": 4100.0,
+    "carrier_name": "Cobalt Freight 003 Co",
+    "payout_amount": 4100.0,
+    "paypal_authorization_id": "SYNAUTH000000003",
+    "carrier_payee_email": "accounts@nimbus-payments.example",
+    "carrier_registered_payee_email": "payments@cobalt-freight-003.example"
+   },
+   "history": {
+    "paid_count": 4,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Cobalt Freight 003 Co | road and sea freight",
+     "content": "Cobalt Freight 003 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://cobalt-freight-003.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-PAYEE-MISMATCH-004",
+   "label": "fraud",
+   "scenario": "payee_mismatch",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-004",
+    "shipping_cost": 4350.0,
+    "avg_route_cost": 4350.0,
+    "carrier_name": "Lagoon Freight 004 Co",
+    "payout_amount": 4350.0,
+    "paypal_authorization_id": "SYNAUTH000000004",
+    "carrier_payee_email": "accounts@juniper-payments.example",
+    "carrier_registered_payee_email": "payments@lagoon-freight-004.example"
+   },
+   "history": {
+    "paid_count": 7,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Lagoon Freight 004 Co | road and sea freight",
+     "content": "Lagoon Freight 004 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://lagoon-freight-004.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-PAYEE-MISMATCH-005",
+   "label": "fraud",
+   "scenario": "payee_mismatch",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-005",
+    "shipping_cost": 3650.0,
+    "avg_route_cost": 3650.0,
+    "carrier_name": "Lagoon Freight 005 Co",
+    "payout_amount": 3650.0,
+    "paypal_authorization_id": "SYNAUTH000000005",
+    "carrier_payee_email": "accounts@sable-payments.example",
+    "carrier_registered_payee_email": "payments@lagoon-freight-005.example"
+   },
+   "history": {
+    "paid_count": 8,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Lagoon Freight 005 Co | road and sea freight",
+     "content": "Lagoon Freight 005 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://lagoon-freight-005.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-PAYEE-MISMATCH-006",
+   "label": "fraud",
+   "scenario": "payee_mismatch",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-006",
+    "shipping_cost": 2050.0,
+    "avg_route_cost": 2050.0,
+    "carrier_name": "Ember Freight 006 Co",
+    "payout_amount": 2050.0,
+    "paypal_authorization_id": "SYNAUTH000000006",
+    "carrier_payee_email": "accounts@aster-payments.example",
+    "carrier_registered_payee_email": "payments@ember-freight-006.example"
+   },
+   "history": {
+    "paid_count": 10,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Ember Freight 006 Co | road and sea freight",
+     "content": "Ember Freight 006 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://ember-freight-006.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-RECENT-PAYEE-CHANGE-007",
+   "label": "fraud",
+   "scenario": "recent_payee_change",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-007",
+    "shipping_cost": 4700.0,
+    "avg_route_cost": 4700.0,
+    "carrier_name": "Maple Freight 007 Co",
+    "payout_amount": 4700.0,
+    "paypal_authorization_id": "SYNAUTH000000007",
+    "carrier_payee_email": "payments@maple-freight-007.example",
+    "carrier_registered_payee_email": "payments@maple-freight-007.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 10,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Maple Freight 007 Co | road and sea freight",
+     "content": "Maple Freight 007 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://maple-freight-007.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-RECENT-PAYEE-CHANGE-008",
+   "label": "fraud",
+   "scenario": "recent_payee_change",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-008",
+    "shipping_cost": 2700.0,
+    "avg_route_cost": 2700.0,
+    "carrier_name": "Juniper Freight 008 Co",
+    "payout_amount": 2700.0,
+    "paypal_authorization_id": "SYNAUTH000000008",
+    "carrier_payee_email": "payments@juniper-freight-008.example",
+    "carrier_registered_payee_email": "payments@juniper-freight-008.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 1,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Juniper Freight 008 Co | road and sea freight",
+     "content": "Juniper Freight 008 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://juniper-freight-008.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-RECENT-PAYEE-CHANGE-009",
+   "label": "fraud",
+   "scenario": "recent_payee_change",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-009",
+    "shipping_cost": 3200.0,
+    "avg_route_cost": 3200.0,
+    "carrier_name": "Indigo Freight 009 Co",
+    "payout_amount": 3200.0,
+    "paypal_authorization_id": "SYNAUTH000000009",
+    "carrier_payee_email": "payments@indigo-freight-009.example",
+    "carrier_registered_payee_email": "payments@indigo-freight-009.example"
+   },
+   "history": {
+    "paid_count": 7,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 7,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Indigo Freight 009 Co | road and sea freight",
+     "content": "Indigo Freight 009 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://indigo-freight-009.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-RECENT-PAYEE-CHANGE-010",
+   "label": "fraud",
+   "scenario": "recent_payee_change",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-010",
+    "shipping_cost": 4150.0,
+    "avg_route_cost": 4150.0,
+    "carrier_name": "Birch Freight 010 Co",
+    "payout_amount": 4150.0,
+    "paypal_authorization_id": "SYNAUTH000000010",
+    "carrier_payee_email": "payments@birch-freight-010.example",
+    "carrier_registered_payee_email": "payments@birch-freight-010.example"
+   },
+   "history": {
+    "paid_count": 8,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 6,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Birch Freight 010 Co | road and sea freight",
+     "content": "Birch Freight 010 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://birch-freight-010.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-RECENT-PAYEE-CHANGE-011",
+   "label": "fraud",
+   "scenario": "recent_payee_change",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-011",
+    "shipping_cost": 5400.0,
+    "avg_route_cost": 5400.0,
+    "carrier_name": "Indigo Freight 011 Co",
+    "payout_amount": 5400.0,
+    "paypal_authorization_id": "SYNAUTH000000011",
+    "carrier_payee_email": "payments@indigo-freight-011.example",
+    "carrier_registered_payee_email": "payments@indigo-freight-011.example"
+   },
+   "history": {
+    "paid_count": 3,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 5,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Indigo Freight 011 Co | road and sea freight",
+     "content": "Indigo Freight 011 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://indigo-freight-011.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-RECENT-PAYEE-CHANGE-012",
+   "label": "fraud",
+   "scenario": "recent_payee_change",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-012",
+    "shipping_cost": 6150.0,
+    "avg_route_cost": 6150.0,
+    "carrier_name": "Umber Freight 012 Co",
+    "payout_amount": 6150.0,
+    "paypal_authorization_id": "SYNAUTH000000012",
+    "carrier_payee_email": "payments@umber-freight-012.example",
+    "carrier_registered_payee_email": "payments@umber-freight-012.example"
+   },
+   "history": {
+    "paid_count": 4,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 9,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Umber Freight 012 Co | road and sea freight",
+     "content": "Umber Freight 012 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://umber-freight-012.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-PAYOUT-013",
+   "label": "fraud",
+   "scenario": "inflated_payout",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-013",
+    "shipping_cost": 5000.0,
+    "avg_route_cost": 5000.0,
+    "carrier_name": "Sable Freight 013 Co",
+    "payout_amount": 8866.85,
+    "paypal_authorization_id": "SYNAUTH000000013",
+    "carrier_payee_email": "payments@sable-freight-013.example",
+    "carrier_registered_payee_email": "payments@sable-freight-013.example"
+   },
+   "history": {
+    "paid_count": 7,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Sable Freight 013 Co | road and sea freight",
+     "content": "Sable Freight 013 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://sable-freight-013.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-PAYOUT-014",
+   "label": "fraud",
+   "scenario": "inflated_payout",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-014",
+    "shipping_cost": 6050.0,
+    "avg_route_cost": 6050.0,
+    "carrier_name": "Xenon Freight 014 Co",
+    "payout_amount": 8816.68,
+    "paypal_authorization_id": "SYNAUTH000000014",
+    "carrier_payee_email": "payments@xenon-freight-014.example",
+    "carrier_registered_payee_email": "payments@xenon-freight-014.example"
+   },
+   "history": {
+    "paid_count": 4,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Xenon Freight 014 Co | road and sea freight",
+     "content": "Xenon Freight 014 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://xenon-freight-014.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-PAYOUT-015",
+   "label": "fraud",
+   "scenario": "inflated_payout",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-015",
+    "shipping_cost": 3500.0,
+    "avg_route_cost": 3500.0,
+    "carrier_name": "Lagoon Freight 015 Co",
+    "payout_amount": 6339.22,
+    "paypal_authorization_id": "SYNAUTH000000015",
+    "carrier_payee_email": "payments@lagoon-freight-015.example",
+    "carrier_registered_payee_email": "payments@lagoon-freight-015.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Lagoon Freight 015 Co | road and sea freight",
+     "content": "Lagoon Freight 015 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://lagoon-freight-015.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-PAYOUT-016",
+   "label": "fraud",
+   "scenario": "inflated_payout",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-016",
+    "shipping_cost": 1900.0,
+    "avg_route_cost": 1900.0,
+    "carrier_name": "Ember Freight 016 Co",
+    "payout_amount": 3454.84,
+    "paypal_authorization_id": "SYNAUTH000000016",
+    "carrier_payee_email": "payments@ember-freight-016.example",
+    "carrier_registered_payee_email": "payments@ember-freight-016.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Ember Freight 016 Co | road and sea freight",
+     "content": "Ember Freight 016 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://ember-freight-016.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-PAYOUT-017",
+   "label": "fraud",
+   "scenario": "inflated_payout",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-017",
+    "shipping_cost": 3500.0,
+    "avg_route_cost": 3500.0,
+    "carrier_name": "Dune Freight 017 Co",
+    "payout_amount": 4835.59,
+    "paypal_authorization_id": "SYNAUTH000000017",
+    "carrier_payee_email": "payments@dune-freight-017.example",
+    "carrier_registered_payee_email": "payments@dune-freight-017.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Dune Freight 017 Co | road and sea freight",
+     "content": "Dune Freight 017 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://dune-freight-017.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-PAYOUT-018",
+   "label": "fraud",
+   "scenario": "inflated_payout",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-018",
+    "shipping_cost": 2000.0,
+    "avg_route_cost": 2000.0,
+    "carrier_name": "Zephyr Freight 018 Co",
+    "payout_amount": 3860.5,
+    "paypal_authorization_id": "SYNAUTH000000018",
+    "carrier_payee_email": "payments@zephyr-freight-018.example",
+    "carrier_registered_payee_email": "payments@zephyr-freight-018.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Zephyr Freight 018 Co | road and sea freight",
+     "content": "Zephyr Freight 018 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://zephyr-freight-018.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-CHANGE-REQUEST-019",
+   "label": "fraud",
+   "scenario": "bec_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-019",
+    "shipping_cost": 5650.0,
+    "avg_route_cost": 5650.0,
+    "carrier_name": "Umber Freight 019 Co",
+    "payout_amount": 5650.0,
+    "paypal_authorization_id": "SYNAUTH000000019",
+    "carrier_payee_email": "payments@umber-freight-019.example",
+    "carrier_registered_payee_email": "payments@umber-freight-019.example"
+   },
+   "history": {
+    "paid_count": 7,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 24,
+   "change_request_text": "URGENT: our bank has changed. Please pay the new account today and do not call us to confirm, our line is down.",
+   "search_results": [
+    {
+     "title": "Umber Freight 019 Co | road and sea freight",
+     "content": "Umber Freight 019 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://umber-freight-019.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-CHANGE-REQUEST-020",
+   "label": "fraud",
+   "scenario": "bec_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-020",
+    "shipping_cost": 5600.0,
+    "avg_route_cost": 5600.0,
+    "carrier_name": "Fjord Freight 020 Co",
+    "payout_amount": 5600.0,
+    "paypal_authorization_id": "SYNAUTH000000020",
+    "carrier_payee_email": "payments@fjord-freight-020.example",
+    "carrier_registered_payee_email": "payments@fjord-freight-020.example"
+   },
+   "history": {
+    "paid_count": 3,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 37,
+   "change_request_text": "This is confidential. Our old account is closed after an audit, so send the next payment to the new one immediately.",
+   "search_results": [
+    {
+     "title": "Fjord Freight 020 Co | road and sea freight",
+     "content": "Fjord Freight 020 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://fjord-freight-020.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-CHANGE-REQUEST-021",
+   "label": "fraud",
+   "scenario": "bec_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-021",
+    "shipping_cost": 1850.0,
+    "avg_route_cost": 1850.0,
+    "carrier_name": "Umber Freight 021 Co",
+    "payout_amount": 1850.0,
+    "paypal_authorization_id": "SYNAUTH000000021",
+    "carrier_payee_email": "payments@umber-freight-021.example",
+    "carrier_registered_payee_email": "payments@umber-freight-021.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 27,
+   "change_request_text": "The managing director asked me to tell you the account has changed. Please act right away and keep this between us.",
+   "search_results": [
+    {
+     "title": "Umber Freight 021 Co | road and sea freight",
+     "content": "Umber Freight 021 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://umber-freight-021.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-CHANGE-REQUEST-022",
+   "label": "fraud",
+   "scenario": "bec_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-022",
+    "shipping_cost": 6100.0,
+    "avg_route_cost": 6100.0,
+    "carrier_name": "Ember Freight 022 Co",
+    "payout_amount": 6100.0,
+    "paypal_authorization_id": "SYNAUTH000000022",
+    "carrier_payee_email": "payments@ember-freight-022.example",
+    "carrier_registered_payee_email": "payments@ember-freight-022.example"
+   },
+   "history": {
+    "paid_count": 3,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 40,
+   "change_request_text": "Kindly update our payment details before the end of the day. Do not phone, we cannot take calls this week.",
+   "search_results": [
+    {
+     "title": "Ember Freight 022 Co | road and sea freight",
+     "content": "Ember Freight 022 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://ember-freight-022.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-CHANGE-REQUEST-023",
+   "label": "fraud",
+   "scenario": "bec_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-023",
+    "shipping_cost": 3850.0,
+    "avg_route_cost": 3850.0,
+    "carrier_name": "Birch Freight 023 Co",
+    "payout_amount": 3850.0,
+    "paypal_authorization_id": "SYNAUTH000000023",
+    "carrier_payee_email": "payments@birch-freight-023.example",
+    "carrier_registered_payee_email": "payments@birch-freight-023.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 28,
+   "change_request_text": "URGENT: our bank has changed. Please pay the new account today and do not call us to confirm, our line is down.",
+   "search_results": [
+    {
+     "title": "Birch Freight 023 Co | road and sea freight",
+     "content": "Birch Freight 023 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://birch-freight-023.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-CHANGE-REQUEST-024",
+   "label": "fraud",
+   "scenario": "bec_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-024",
+    "shipping_cost": 4650.0,
+    "avg_route_cost": 4650.0,
+    "carrier_name": "Maple Freight 024 Co",
+    "payout_amount": 4650.0,
+    "paypal_authorization_id": "SYNAUTH000000024",
+    "carrier_payee_email": "payments@maple-freight-024.example",
+    "carrier_registered_payee_email": "payments@maple-freight-024.example"
+   },
+   "history": {
+    "paid_count": 6,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 35,
+   "change_request_text": "This is confidential. Our old account is closed after an audit, so send the next payment to the new one immediately.",
+   "search_results": [
+    {
+     "title": "Maple Freight 024 Co | road and sea freight",
+     "content": "Maple Freight 024 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://maple-freight-024.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-SHELL-CARRIER-025",
+   "label": "fraud",
+   "scenario": "shell_carrier",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-025",
+    "shipping_cost": 5050.0,
+    "avg_route_cost": 5050.0,
+    "carrier_name": "Sable Freight 025 Co",
+    "payout_amount": 4955.65,
+    "paypal_authorization_id": "SYNAUTH000000025",
+    "carrier_payee_email": "payments@sable-freight-025.example",
+    "carrier_registered_payee_email": "payments@sable-freight-025.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "F-SHELL-CARRIER-026",
+   "label": "fraud",
+   "scenario": "shell_carrier",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-026",
+    "shipping_cost": 2900.0,
+    "avg_route_cost": 2900.0,
+    "carrier_name": "Ember Freight 026 Co",
+    "payout_amount": 2868.92,
+    "paypal_authorization_id": "SYNAUTH000000026",
+    "carrier_payee_email": "payments@ember-freight-026.example",
+    "carrier_registered_payee_email": "payments@ember-freight-026.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "F-SHELL-CARRIER-027",
+   "label": "fraud",
+   "scenario": "shell_carrier",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-027",
+    "shipping_cost": 3000.0,
+    "avg_route_cost": 3000.0,
+    "carrier_name": "Nimbus Freight 027 Co",
+    "payout_amount": 2952.14,
+    "paypal_authorization_id": "SYNAUTH000000027",
+    "carrier_payee_email": "payments@nimbus-freight-027.example",
+    "carrier_registered_payee_email": "payments@nimbus-freight-027.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "F-SHELL-CARRIER-028",
+   "label": "fraud",
+   "scenario": "shell_carrier",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-028",
+    "shipping_cost": 5100.0,
+    "avg_route_cost": 5100.0,
+    "carrier_name": "Onyx Freight 028 Co",
+    "payout_amount": 5030.55,
+    "paypal_authorization_id": "SYNAUTH000000028",
+    "carrier_payee_email": "payments@onyx-freight-028.example",
+    "carrier_registered_payee_email": "payments@onyx-freight-028.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "F-SHELL-CARRIER-029",
+   "label": "fraud",
+   "scenario": "shell_carrier",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-029",
+    "shipping_cost": 1900.0,
+    "avg_route_cost": 1900.0,
+    "carrier_name": "Garnet Freight 029 Co",
+    "payout_amount": 1889.9,
+    "paypal_authorization_id": "SYNAUTH000000029",
+    "carrier_payee_email": "payments@garnet-freight-029.example",
+    "carrier_registered_payee_email": "payments@garnet-freight-029.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "F-SHELL-CARRIER-030",
+   "label": "fraud",
+   "scenario": "shell_carrier",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-030",
+    "shipping_cost": 2550.0,
+    "avg_route_cost": 2550.0,
+    "carrier_name": "Sable Freight 030 Co",
+    "payout_amount": 2516.36,
+    "paypal_authorization_id": "SYNAUTH000000030",
+    "carrier_payee_email": "payments@sable-freight-030.example",
+    "carrier_registered_payee_email": "payments@sable-freight-030.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "F-SHELL-CARRIER-031",
+   "label": "fraud",
+   "scenario": "shell_carrier",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-031",
+    "shipping_cost": 3300.0,
+    "avg_route_cost": 3300.0,
+    "carrier_name": "Harbor Freight 031 Co",
+    "payout_amount": 3230.27,
+    "paypal_authorization_id": "SYNAUTH000000031",
+    "carrier_payee_email": "payments@harbor-freight-031.example",
+    "carrier_registered_payee_email": "payments@harbor-freight-031.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "F-SHELL-CARRIER-032",
+   "label": "fraud",
+   "scenario": "shell_carrier",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-032",
+    "shipping_cost": 5450.0,
+    "avg_route_cost": 5450.0,
+    "carrier_name": "Zephyr Freight 032 Co",
+    "payout_amount": 5312.59,
+    "paypal_authorization_id": "SYNAUTH000000032",
+    "carrier_payee_email": "payments@zephyr-freight-032.example",
+    "carrier_registered_payee_email": "payments@zephyr-freight-032.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "F-IMPERSONATED-CARRIER-FREE-MAIL-033",
+   "label": "fraud",
+   "scenario": "impersonated_carrier_free_mail",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 160000.0,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-033",
+    "shipping_cost": 10500.0,
+    "avg_route_cost": 10500.0,
+    "carrier_name": "Lagoon Freight 033 Co",
+    "payout_amount": 10500.0,
+    "paypal_authorization_id": "SYNAUTH000000033",
+    "carrier_payee_email": "onyx.accounts30@gmail.com",
+    "carrier_registered_payee_email": "onyx.accounts30@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Lagoon Freight 033 Co | road and sea freight",
+     "content": "Lagoon Freight 033 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://lagoon-freight-033.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-CARRIER-FREE-MAIL-034",
+   "label": "fraud",
+   "scenario": "impersonated_carrier_free_mail",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 160000.0,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-034",
+    "shipping_cost": 11500.0,
+    "avg_route_cost": 11500.0,
+    "carrier_name": "Umber Freight 034 Co",
+    "payout_amount": 11500.0,
+    "paypal_authorization_id": "SYNAUTH000000034",
+    "carrier_payee_email": "cobalt.accounts80@gmail.com",
+    "carrier_registered_payee_email": "cobalt.accounts80@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Umber Freight 034 Co | road and sea freight",
+     "content": "Umber Freight 034 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://umber-freight-034.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-CARRIER-FREE-MAIL-035",
+   "label": "fraud",
+   "scenario": "impersonated_carrier_free_mail",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 160000.0,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-035",
+    "shipping_cost": 9500.0,
+    "avg_route_cost": 9500.0,
+    "carrier_name": "Lagoon Freight 035 Co",
+    "payout_amount": 9500.0,
+    "paypal_authorization_id": "SYNAUTH000000035",
+    "carrier_payee_email": "lagoon.accounts30@gmail.com",
+    "carrier_registered_payee_email": "lagoon.accounts30@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Lagoon Freight 035 Co | road and sea freight",
+     "content": "Lagoon Freight 035 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://lagoon-freight-035.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-CARRIER-FREE-MAIL-036",
+   "label": "fraud",
+   "scenario": "impersonated_carrier_free_mail",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 160000.0,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-036",
+    "shipping_cost": 11500.0,
+    "avg_route_cost": 11500.0,
+    "carrier_name": "Umber Freight 036 Co",
+    "payout_amount": 11500.0,
+    "paypal_authorization_id": "SYNAUTH000000036",
+    "carrier_payee_email": "xenon.accounts14@gmail.com",
+    "carrier_registered_payee_email": "xenon.accounts14@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Umber Freight 036 Co | road and sea freight",
+     "content": "Umber Freight 036 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://umber-freight-036.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-037",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-037",
+    "shipping_cost": 5700.0,
+    "avg_route_cost": 5700.0,
+    "carrier_name": "Nimbus Freight 037 Co",
+    "payout_amount": 5684.71,
+    "paypal_authorization_id": "SYNAUTH000000037",
+    "carrier_payee_email": "payments@nimbus-freight-037.example",
+    "carrier_registered_payee_email": "payments@nimbus-freight-037.example"
+   },
+   "history": {
+    "paid_count": 25,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Nimbus Freight 037 Co | road and sea freight",
+     "content": "Nimbus Freight 037 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://nimbus-freight-037.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-038",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-038",
+    "shipping_cost": 4850.0,
+    "avg_route_cost": 4850.0,
+    "carrier_name": "Quartz Freight 038 Co",
+    "payout_amount": 4419.85,
+    "paypal_authorization_id": "SYNAUTH000000038",
+    "carrier_payee_email": "payments@quartz-freight-038.example",
+    "carrier_registered_payee_email": "payments@quartz-freight-038.example"
+   },
+   "history": {
+    "paid_count": 6,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Quartz Freight 038 Co | road and sea freight",
+     "content": "Quartz Freight 038 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://quartz-freight-038.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-039",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-039",
+    "shipping_cost": 2100.0,
+    "avg_route_cost": 2100.0,
+    "carrier_name": "Nimbus Freight 039 Co",
+    "payout_amount": 2077.25,
+    "paypal_authorization_id": "SYNAUTH000000039",
+    "carrier_payee_email": "payments@nimbus-freight-039.example",
+    "carrier_registered_payee_email": "payments@nimbus-freight-039.example"
+   },
+   "history": {
+    "paid_count": 13,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Nimbus Freight 039 Co | road and sea freight",
+     "content": "Nimbus Freight 039 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://nimbus-freight-039.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-040",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-040",
+    "shipping_cost": 3900.0,
+    "avg_route_cost": 3900.0,
+    "carrier_name": "Zephyr Freight 040 Co",
+    "payout_amount": 3730.08,
+    "paypal_authorization_id": "SYNAUTH000000040",
+    "carrier_payee_email": "payments@zephyr-freight-040.example",
+    "carrier_registered_payee_email": "payments@zephyr-freight-040.example"
+   },
+   "history": {
+    "paid_count": 29,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Zephyr Freight 040 Co | road and sea freight",
+     "content": "Zephyr Freight 040 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://zephyr-freight-040.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-041",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-041",
+    "shipping_cost": 3600.0,
+    "avg_route_cost": 3600.0,
+    "carrier_name": "Sable Freight 041 Co",
+    "payout_amount": 3326.33,
+    "paypal_authorization_id": "SYNAUTH000000041",
+    "carrier_payee_email": "payments@sable-freight-041.example",
+    "carrier_registered_payee_email": "payments@sable-freight-041.example"
+   },
+   "history": {
+    "paid_count": 23,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Sable Freight 041 Co | road and sea freight",
+     "content": "Sable Freight 041 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://sable-freight-041.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-042",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-042",
+    "shipping_cost": 2400.0,
+    "avg_route_cost": 2400.0,
+    "carrier_name": "Dune Freight 042 Co",
+    "payout_amount": 2221.07,
+    "paypal_authorization_id": "SYNAUTH000000042",
+    "carrier_payee_email": "payments@dune-freight-042.example",
+    "carrier_registered_payee_email": "payments@dune-freight-042.example"
+   },
+   "history": {
+    "paid_count": 19,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Dune Freight 042 Co | road and sea freight",
+     "content": "Dune Freight 042 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://dune-freight-042.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-043",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-043",
+    "shipping_cost": 3750.0,
+    "avg_route_cost": 3750.0,
+    "carrier_name": "Kestrel Freight 043 Co",
+    "payout_amount": 3420.84,
+    "paypal_authorization_id": "SYNAUTH000000043",
+    "carrier_payee_email": "payments@kestrel-freight-043.example",
+    "carrier_registered_payee_email": "payments@kestrel-freight-043.example"
+   },
+   "history": {
+    "paid_count": 16,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Kestrel Freight 043 Co | road and sea freight",
+     "content": "Kestrel Freight 043 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://kestrel-freight-043.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-044",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-044",
+    "shipping_cost": 2800.0,
+    "avg_route_cost": 2800.0,
+    "carrier_name": "Sable Freight 044 Co",
+    "payout_amount": 2598.12,
+    "paypal_authorization_id": "SYNAUTH000000044",
+    "carrier_payee_email": "payments@sable-freight-044.example",
+    "carrier_registered_payee_email": "payments@sable-freight-044.example"
+   },
+   "history": {
+    "paid_count": 10,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Sable Freight 044 Co | road and sea freight",
+     "content": "Sable Freight 044 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://sable-freight-044.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-045",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-045",
+    "shipping_cost": 4000.0,
+    "avg_route_cost": 4000.0,
+    "carrier_name": "Tundra Freight 045 Co",
+    "payout_amount": 3925.87,
+    "paypal_authorization_id": "SYNAUTH000000045",
+    "carrier_payee_email": "payments@tundra-freight-045.example",
+    "carrier_registered_payee_email": "payments@tundra-freight-045.example"
+   },
+   "history": {
+    "paid_count": 12,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Tundra Freight 045 Co | road and sea freight",
+     "content": "Tundra Freight 045 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://tundra-freight-045.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-046",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-046",
+    "shipping_cost": 2350.0,
+    "avg_route_cost": 2350.0,
+    "carrier_name": "Cobalt Freight 046 Co",
+    "payout_amount": 2157.64,
+    "paypal_authorization_id": "SYNAUTH000000046",
+    "carrier_payee_email": "payments@cobalt-freight-046.example",
+    "carrier_registered_payee_email": "payments@cobalt-freight-046.example"
+   },
+   "history": {
+    "paid_count": 30,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Cobalt Freight 046 Co | road and sea freight",
+     "content": "Cobalt Freight 046 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://cobalt-freight-046.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-047",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-047",
+    "shipping_cost": 3150.0,
+    "avg_route_cost": 3150.0,
+    "carrier_name": "Dune Freight 047 Co",
+    "payout_amount": 3090.62,
+    "paypal_authorization_id": "SYNAUTH000000047",
+    "carrier_payee_email": "payments@dune-freight-047.example",
+    "carrier_registered_payee_email": "payments@dune-freight-047.example"
+   },
+   "history": {
+    "paid_count": 28,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Dune Freight 047 Co | road and sea freight",
+     "content": "Dune Freight 047 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://dune-freight-047.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-048",
+   "label": "legit",
+   "scenario": "routine",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-048",
+    "shipping_cost": 2950.0,
+    "avg_route_cost": 2950.0,
+    "carrier_name": "Lagoon Freight 048 Co",
+    "payout_amount": 2770.02,
+    "paypal_authorization_id": "SYNAUTH000000048",
+    "carrier_payee_email": "payments@lagoon-freight-048.example",
+    "carrier_registered_payee_email": "payments@lagoon-freight-048.example"
+   },
+   "history": {
+    "paid_count": 7,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Lagoon Freight 048 Co | road and sea freight",
+     "content": "Lagoon Freight 048 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://lagoon-freight-048.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-PAYEE-CHANGED-LONG-AGO-049",
+   "label": "legit",
+   "scenario": "payee_changed_long_ago",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-049",
+    "shipping_cost": 1950.0,
+    "avg_route_cost": 1950.0,
+    "carrier_name": "Quartz Freight 049 Co",
+    "payout_amount": 1765.27,
+    "paypal_authorization_id": "SYNAUTH000000049",
+    "carrier_payee_email": "payments@quartz-freight-049.example",
+    "carrier_registered_payee_email": "payments@quartz-freight-049.example"
+   },
+   "history": {
+    "paid_count": 18,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 102,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Quartz Freight 049 Co | road and sea freight",
+     "content": "Quartz Freight 049 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://quartz-freight-049.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-PAYEE-CHANGED-LONG-AGO-050",
+   "label": "legit",
+   "scenario": "payee_changed_long_ago",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-050",
+    "shipping_cost": 5850.0,
+    "avg_route_cost": 5850.0,
+    "carrier_name": "Quartz Freight 050 Co",
+    "payout_amount": 5702.27,
+    "paypal_authorization_id": "SYNAUTH000000050",
+    "carrier_payee_email": "payments@quartz-freight-050.example",
+    "carrier_registered_payee_email": "payments@quartz-freight-050.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 115,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Quartz Freight 050 Co | road and sea freight",
+     "content": "Quartz Freight 050 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://quartz-freight-050.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-PAYEE-CHANGED-LONG-AGO-051",
+   "label": "legit",
+   "scenario": "payee_changed_long_ago",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-051",
+    "shipping_cost": 5000.0,
+    "avg_route_cost": 5000.0,
+    "carrier_name": "Raven Freight 051 Co",
+    "payout_amount": 4912.53,
+    "paypal_authorization_id": "SYNAUTH000000051",
+    "carrier_payee_email": "payments@raven-freight-051.example",
+    "carrier_registered_payee_email": "payments@raven-freight-051.example"
+   },
+   "history": {
+    "paid_count": 18,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 148,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Raven Freight 051 Co | road and sea freight",
+     "content": "Raven Freight 051 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://raven-freight-051.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-PAYEE-CHANGED-LONG-AGO-052",
+   "label": "legit",
+   "scenario": "payee_changed_long_ago",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-052",
+    "shipping_cost": 3250.0,
+    "avg_route_cost": 3250.0,
+    "carrier_name": "Quartz Freight 052 Co",
+    "payout_amount": 3014.53,
+    "paypal_authorization_id": "SYNAUTH000000052",
+    "carrier_payee_email": "payments@quartz-freight-052.example",
+    "carrier_registered_payee_email": "payments@quartz-freight-052.example"
+   },
+   "history": {
+    "paid_count": 6,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 171,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Quartz Freight 052 Co | road and sea freight",
+     "content": "Quartz Freight 052 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://quartz-freight-052.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-PAYEE-CHANGED-LONG-AGO-053",
+   "label": "legit",
+   "scenario": "payee_changed_long_ago",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-053",
+    "shipping_cost": 3700.0,
+    "avg_route_cost": 3700.0,
+    "carrier_name": "Willow Freight 053 Co",
+    "payout_amount": 3533.22,
+    "paypal_authorization_id": "SYNAUTH000000053",
+    "carrier_payee_email": "payments@willow-freight-053.example",
+    "carrier_registered_payee_email": "payments@willow-freight-053.example"
+   },
+   "history": {
+    "paid_count": 19,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 132,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Willow Freight 053 Co | road and sea freight",
+     "content": "Willow Freight 053 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://willow-freight-053.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-PAYEE-CHANGED-LONG-AGO-054",
+   "label": "legit",
+   "scenario": "payee_changed_long_ago",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-054",
+    "shipping_cost": 5800.0,
+    "avg_route_cost": 5800.0,
+    "carrier_name": "Vesper Freight 054 Co",
+    "payout_amount": 5599.36,
+    "paypal_authorization_id": "SYNAUTH000000054",
+    "carrier_payee_email": "payments@vesper-freight-054.example",
+    "carrier_registered_payee_email": "payments@vesper-freight-054.example"
+   },
+   "history": {
+    "paid_count": 6,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 135,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Vesper Freight 054 Co | road and sea freight",
+     "content": "Vesper Freight 054 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://vesper-freight-054.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-055",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-055",
+    "shipping_cost": 4400.0,
+    "avg_route_cost": 4400.0,
+    "carrier_name": "Harbor Freight 055 Co",
+    "payout_amount": 4180.0,
+    "paypal_authorization_id": "SYNAUTH000000055",
+    "carrier_payee_email": "payments@harbor-freight-055.example",
+    "carrier_registered_payee_email": "payments@harbor-freight-055.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Harbor Freight 055 Co | road and sea freight",
+     "content": "Harbor Freight 055 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://harbor-freight-055.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-056",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-056",
+    "shipping_cost": 2200.0,
+    "avg_route_cost": 2200.0,
+    "carrier_name": "Onyx Freight 056 Co",
+    "payout_amount": 2090.0,
+    "paypal_authorization_id": "SYNAUTH000000056",
+    "carrier_payee_email": "payments@onyx-freight-056.example",
+    "carrier_registered_payee_email": "payments@onyx-freight-056.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Onyx Freight 056 Co | road and sea freight",
+     "content": "Onyx Freight 056 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://onyx-freight-056.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-057",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-057",
+    "shipping_cost": 4300.0,
+    "avg_route_cost": 4300.0,
+    "carrier_name": "Pinewood Freight 057 Co",
+    "payout_amount": 4085.0,
+    "paypal_authorization_id": "SYNAUTH000000057",
+    "carrier_payee_email": "payments@pinewood-freight-057.example",
+    "carrier_registered_payee_email": "payments@pinewood-freight-057.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Pinewood Freight 057 Co | road and sea freight",
+     "content": "Pinewood Freight 057 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://pinewood-freight-057.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-058",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-058",
+    "shipping_cost": 4750.0,
+    "avg_route_cost": 4750.0,
+    "carrier_name": "Kestrel Freight 058 Co",
+    "payout_amount": 4512.5,
+    "paypal_authorization_id": "SYNAUTH000000058",
+    "carrier_payee_email": "payments@kestrel-freight-058.example",
+    "carrier_registered_payee_email": "payments@kestrel-freight-058.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Kestrel Freight 058 Co | road and sea freight",
+     "content": "Kestrel Freight 058 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://kestrel-freight-058.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-059",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-059",
+    "shipping_cost": 5650.0,
+    "avg_route_cost": 5650.0,
+    "carrier_name": "Birch Freight 059 Co",
+    "payout_amount": 5367.5,
+    "paypal_authorization_id": "SYNAUTH000000059",
+    "carrier_payee_email": "payments@birch-freight-059.example",
+    "carrier_registered_payee_email": "payments@birch-freight-059.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Birch Freight 059 Co | road and sea freight",
+     "content": "Birch Freight 059 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://birch-freight-059.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-060",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-060",
+    "shipping_cost": 3000.0,
+    "avg_route_cost": 3000.0,
+    "carrier_name": "Tundra Freight 060 Co",
+    "payout_amount": 2850.0,
+    "paypal_authorization_id": "SYNAUTH000000060",
+    "carrier_payee_email": "payments@tundra-freight-060.example",
+    "carrier_registered_payee_email": "payments@tundra-freight-060.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Tundra Freight 060 Co | road and sea freight",
+     "content": "Tundra Freight 060 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://tundra-freight-060.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-061",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-061",
+    "shipping_cost": 4150.0,
+    "avg_route_cost": 4150.0,
+    "carrier_name": "Garnet Freight 061 Co",
+    "payout_amount": 3942.5,
+    "paypal_authorization_id": "SYNAUTH000000061",
+    "carrier_payee_email": "payments@garnet-freight-061.example",
+    "carrier_registered_payee_email": "payments@garnet-freight-061.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Garnet Freight 061 Co | road and sea freight",
+     "content": "Garnet Freight 061 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://garnet-freight-061.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-062",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-062",
+    "shipping_cost": 3700.0,
+    "avg_route_cost": 3700.0,
+    "carrier_name": "Pinewood Freight 062 Co",
+    "payout_amount": 3515.0,
+    "paypal_authorization_id": "SYNAUTH000000062",
+    "carrier_payee_email": "payments@pinewood-freight-062.example",
+    "carrier_registered_payee_email": "payments@pinewood-freight-062.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Pinewood Freight 062 Co | road and sea freight",
+     "content": "Pinewood Freight 062 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://pinewood-freight-062.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-UNDERPAID-063",
+   "label": "legit",
+   "scenario": "underpaid",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-063",
+    "shipping_cost": 3850.0,
+    "avg_route_cost": 3850.0,
+    "carrier_name": "Lagoon Freight 063 Co",
+    "payout_amount": 2487.28,
+    "paypal_authorization_id": "SYNAUTH000000063",
+    "carrier_payee_email": "payments@lagoon-freight-063.example",
+    "carrier_registered_payee_email": "payments@lagoon-freight-063.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Lagoon Freight 063 Co | road and sea freight",
+     "content": "Lagoon Freight 063 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://lagoon-freight-063.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-UNDERPAID-064",
+   "label": "legit",
+   "scenario": "underpaid",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-064",
+    "shipping_cost": 5450.0,
+    "avg_route_cost": 5450.0,
+    "carrier_name": "Tundra Freight 064 Co",
+    "payout_amount": 3763.58,
+    "paypal_authorization_id": "SYNAUTH000000064",
+    "carrier_payee_email": "payments@tundra-freight-064.example",
+    "carrier_registered_payee_email": "payments@tundra-freight-064.example"
+   },
+   "history": {
+    "paid_count": 4,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Tundra Freight 064 Co | road and sea freight",
+     "content": "Tundra Freight 064 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://tundra-freight-064.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-UNDERPAID-065",
+   "label": "legit",
+   "scenario": "underpaid",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-065",
+    "shipping_cost": 2550.0,
+    "avg_route_cost": 2550.0,
+    "carrier_name": "Indigo Freight 065 Co",
+    "payout_amount": 1853.19,
+    "paypal_authorization_id": "SYNAUTH000000065",
+    "carrier_payee_email": "payments@indigo-freight-065.example",
+    "carrier_registered_payee_email": "payments@indigo-freight-065.example"
+   },
+   "history": {
+    "paid_count": 8,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Indigo Freight 065 Co | road and sea freight",
+     "content": "Indigo Freight 065 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://indigo-freight-065.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-UNDERPAID-066",
+   "label": "legit",
+   "scenario": "underpaid",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-066",
+    "shipping_cost": 3900.0,
+    "avg_route_cost": 3900.0,
+    "carrier_name": "Indigo Freight 066 Co",
+    "payout_amount": 2678.46,
+    "paypal_authorization_id": "SYNAUTH000000066",
+    "carrier_payee_email": "payments@indigo-freight-066.example",
+    "carrier_registered_payee_email": "payments@indigo-freight-066.example"
+   },
+   "history": {
+    "paid_count": 10,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Indigo Freight 066 Co | road and sea freight",
+     "content": "Indigo Freight 066 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://indigo-freight-066.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-UNDERPAID-067",
+   "label": "legit",
+   "scenario": "underpaid",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-067",
+    "shipping_cost": 2150.0,
+    "avg_route_cost": 2150.0,
+    "carrier_name": "Raven Freight 067 Co",
+    "payout_amount": 1270.19,
+    "paypal_authorization_id": "SYNAUTH000000067",
+    "carrier_payee_email": "payments@raven-freight-067.example",
+    "carrier_registered_payee_email": "payments@raven-freight-067.example"
+   },
+   "history": {
+    "paid_count": 3,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Raven Freight 067 Co | road and sea freight",
+     "content": "Raven Freight 067 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://raven-freight-067.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-UNDERPAID-068",
+   "label": "legit",
+   "scenario": "underpaid",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-068",
+    "shipping_cost": 4200.0,
+    "avg_route_cost": 4200.0,
+    "carrier_name": "Nimbus Freight 068 Co",
+    "payout_amount": 3252.71,
+    "paypal_authorization_id": "SYNAUTH000000068",
+    "carrier_payee_email": "payments@nimbus-freight-068.example",
+    "carrier_registered_payee_email": "payments@nimbus-freight-068.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Nimbus Freight 068 Co | road and sea freight",
+     "content": "Nimbus Freight 068 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://nimbus-freight-068.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-CHANGE-REQUEST-069",
+   "label": "legit",
+   "scenario": "honest_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-069",
+    "shipping_cost": 3700.0,
+    "avg_route_cost": 3700.0,
+    "carrier_name": "Willow Freight 069 Co",
+    "payout_amount": 3615.09,
+    "paypal_authorization_id": "SYNAUTH000000069",
+    "carrier_payee_email": "payments@willow-freight-069.example",
+    "carrier_registered_payee_email": "payments@willow-freight-069.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 89,
+   "change_request_text": "From the first of next month our payments should go to the account of our finance office, as set out in the attached letter.",
+   "search_results": [
+    {
+     "title": "Willow Freight 069 Co | road and sea freight",
+     "content": "Willow Freight 069 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://willow-freight-069.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-CHANGE-REQUEST-070",
+   "label": "legit",
+   "scenario": "honest_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-070",
+    "shipping_cost": 3700.0,
+    "avg_route_cost": 3700.0,
+    "carrier_name": "Willow Freight 070 Co",
+    "payout_amount": 3366.15,
+    "paypal_authorization_id": "SYNAUTH000000070",
+    "carrier_payee_email": "payments@willow-freight-070.example",
+    "carrier_registered_payee_email": "payments@willow-freight-070.example"
+   },
+   "history": {
+    "paid_count": 11,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 86,
+   "change_request_text": "Our bank is merging branches. The new details are on our letterhead and in the contract annex; call our accounts team to check.",
+   "search_results": [
+    {
+     "title": "Willow Freight 070 Co | road and sea freight",
+     "content": "Willow Freight 070 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://willow-freight-070.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-CHANGE-REQUEST-071",
+   "label": "legit",
+   "scenario": "honest_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-071",
+    "shipping_cost": 4300.0,
+    "avg_route_cost": 4300.0,
+    "carrier_name": "Tundra Freight 071 Co",
+    "payout_amount": 4038.51,
+    "paypal_authorization_id": "SYNAUTH000000071",
+    "carrier_payee_email": "payments@tundra-freight-071.example",
+    "carrier_registered_payee_email": "payments@tundra-freight-071.example"
+   },
+   "history": {
+    "paid_count": 10,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 88,
+   "change_request_text": "We have moved our collections to a new account at the same bank. Please confirm with the contact in your contract file.",
+   "search_results": [
+    {
+     "title": "Tundra Freight 071 Co | road and sea freight",
+     "content": "Tundra Freight 071 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://tundra-freight-071.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-CHANGE-REQUEST-072",
+   "label": "legit",
+   "scenario": "honest_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-072",
+    "shipping_cost": 5800.0,
+    "avg_route_cost": 5800.0,
+    "carrier_name": "Tundra Freight 072 Co",
+    "payout_amount": 5425.06,
+    "paypal_authorization_id": "SYNAUTH000000072",
+    "carrier_payee_email": "payments@tundra-freight-072.example",
+    "carrier_registered_payee_email": "payments@tundra-freight-072.example"
+   },
+   "history": {
+    "paid_count": 12,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 30,
+   "change_request_text": "From the first of next month our payments should go to the account of our finance office, as set out in the attached letter.",
+   "search_results": [
+    {
+     "title": "Tundra Freight 072 Co | road and sea freight",
+     "content": "Tundra Freight 072 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://tundra-freight-072.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-CHANGE-REQUEST-073",
+   "label": "legit",
+   "scenario": "honest_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-073",
+    "shipping_cost": 2050.0,
+    "avg_route_cost": 2050.0,
+    "carrier_name": "Pinewood Freight 073 Co",
+    "payout_amount": 1972.33,
+    "paypal_authorization_id": "SYNAUTH000000073",
+    "carrier_payee_email": "payments@pinewood-freight-073.example",
+    "carrier_registered_payee_email": "payments@pinewood-freight-073.example"
+   },
+   "history": {
+    "paid_count": 10,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 84,
+   "change_request_text": "Our bank is merging branches. The new details are on our letterhead and in the contract annex; call our accounts team to check.",
+   "search_results": [
+    {
+     "title": "Pinewood Freight 073 Co | road and sea freight",
+     "content": "Pinewood Freight 073 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://pinewood-freight-073.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-CHANGE-REQUEST-074",
+   "label": "legit",
+   "scenario": "honest_change_request",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-074",
+    "shipping_cost": 3100.0,
+    "avg_route_cost": 3100.0,
+    "carrier_name": "Indigo Freight 074 Co",
+    "payout_amount": 2827.83,
+    "paypal_authorization_id": "SYNAUTH000000074",
+    "carrier_payee_email": "payments@indigo-freight-074.example",
+    "carrier_registered_payee_email": "payments@indigo-freight-074.example"
+   },
+   "history": {
+    "paid_count": 12,
+    "frozen": false
+   },
+   "payee_changed_days_ago": 44,
+   "change_request_text": "We have moved our collections to a new account at the same bank. Please confirm with the contact in your contract file.",
+   "search_results": [
+    {
+     "title": "Indigo Freight 074 Co | road and sea freight",
+     "content": "Indigo Freight 074 Co runs scheduled freight between ports in Asia and the United States.",
+     "url": "https://indigo-freight-074.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-SMALL-CARRIER-NOT-ONLINE-075",
+   "label": "legit",
+   "scenario": "small_carrier_not_online",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-075",
+    "shipping_cost": 2550.0,
+    "avg_route_cost": 2550.0,
+    "carrier_name": "Aster Freight 075 Co",
+    "payout_amount": 2422.5,
+    "paypal_authorization_id": "SYNAUTH000000075",
+    "carrier_payee_email": "payments@aster-freight-075.example",
+    "carrier_registered_payee_email": "payments@aster-freight-075.example"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "L-SMALL-CARRIER-NOT-ONLINE-076",
+   "label": "legit",
+   "scenario": "small_carrier_not_online",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-076",
+    "shipping_cost": 5650.0,
+    "avg_route_cost": 5650.0,
+    "carrier_name": "Dune Freight 076 Co",
+    "payout_amount": 5367.5,
+    "paypal_authorization_id": "SYNAUTH000000076",
+    "carrier_payee_email": "payments@dune-freight-076.example",
+    "carrier_registered_payee_email": "payments@dune-freight-076.example"
+   },
+   "history": {
+    "paid_count": 2,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "L-SMALL-CARRIER-NOT-ONLINE-077",
+   "label": "legit",
+   "scenario": "small_carrier_not_online",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-077",
+    "shipping_cost": 2900.0,
+    "avg_route_cost": 2900.0,
+    "carrier_name": "Onyx Freight 077 Co",
+    "payout_amount": 2755.0,
+    "paypal_authorization_id": "SYNAUTH000000077",
+    "carrier_payee_email": "payments@onyx-freight-077.example",
+    "carrier_registered_payee_email": "payments@onyx-freight-077.example"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "L-SMALL-CARRIER-NOT-ONLINE-078",
+   "label": "legit",
+   "scenario": "small_carrier_not_online",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-078",
+    "shipping_cost": 3500.0,
+    "avg_route_cost": 3500.0,
+    "carrier_name": "Maple Freight 078 Co",
+    "payout_amount": 3325.0,
+    "paypal_authorization_id": "SYNAUTH000000078",
+    "carrier_payee_email": "payments@maple-freight-078.example",
+    "carrier_registered_payee_email": "payments@maple-freight-078.example"
+   },
+   "history": {
+    "paid_count": 2,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "L-SMALL-CARRIER-NOT-ONLINE-079",
+   "label": "legit",
+   "scenario": "small_carrier_not_online",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-079",
+    "shipping_cost": 2450.0,
+    "avg_route_cost": 2450.0,
+    "carrier_name": "Xenon Freight 079 Co",
+    "payout_amount": 2327.5,
+    "paypal_authorization_id": "SYNAUTH000000079",
+    "carrier_payee_email": "payments@xenon-freight-079.example",
+    "carrier_registered_payee_email": "payments@xenon-freight-079.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  },
+  {
+   "id": "L-SMALL-CARRIER-NOT-ONLINE-080",
+   "label": "legit",
+   "scenario": "small_carrier_not_online",
+   "shipment": {
+    "origin": "Ho Chi Minh City, Vietnam",
+    "destination": "Rotterdam, Netherlands",
+    "weight_kg": 1200,
+    "declared_value": 40000,
+    "shipper_name": "Lotus Garment Works",
+    "shipper_company": "Lotus Garment Works JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0312345678",
+    "receiver_name": "Procurement",
+    "receiver_company": "Noordzee Textiel BV",
+    "receiver_country": "Netherlands",
+    "shipper_tx_count": 40,
+    "cargo_description": "Cotton T-shirts, 4000 units",
+    "hs_code": "6109.10",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "SYN-080",
+    "shipping_cost": 6050.0,
+    "avg_route_cost": 6050.0,
+    "carrier_name": "Lagoon Freight 080 Co",
+    "payout_amount": 5747.5,
+    "paypal_authorization_id": "SYNAUTH000000080",
+    "carrier_payee_email": "payments@lagoon-freight-080.example",
+    "carrier_registered_payee_email": "payments@lagoon-freight-080.example"
+   },
+   "history": {
+    "paid_count": 2,
+    "frozen": false
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": []
+  }
+ ]
+}

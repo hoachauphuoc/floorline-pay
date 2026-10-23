@@ -64,6 +64,7 @@ from vf_logistics import shipper_registry
 from vf_logistics import tavily_client
 from vf_logistics import tools
 from vf_logistics import untrusted
+from vf_logistics import payment_ai, payment_checks
 from vf_logistics import verifier
 from vf_logistics.agents import (
     analyze_shipment,
@@ -1207,11 +1208,18 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
                 }
                 case["zero_day"] = zero_day_verdict
 
+        # The payment layer's checks run only on a payment case and may only raise the floor:
+        # an answer that cannot be used adds no finding, and assess() never raises.
+        payment_ai_verdict: dict[str, Any] | None = None
+        if payment_checks.is_payment_case(shipment):
+            payment_ai_verdict = await payment_ai.assess(shipment, tenant)
+            case["payment_ai"] = payment_ai_verdict
+
         # Re-derived so the two model findings take part in the ordinary floor and
         # corroboration arithmetic rather than being merged in afterwards. One code
         # path computes the floor; a second would drift out of agreement with it.
         validation = verifier.validate(
-            shipment, hs_verdict=hs_verdict, zero_day=zero_day_verdict,
+            shipment, hs_verdict=hs_verdict, zero_day=zero_day_verdict, payment_ai=payment_ai_verdict,
             rules=await _prefilter_rules(tenant),
         )
 

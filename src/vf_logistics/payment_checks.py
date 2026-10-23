@@ -104,6 +104,18 @@ def _check_payee_change(shipment: dict[str, Any], now: datetime) -> list[dict[st
     return []
 
 
+def _check_change_request(shipment: dict[str, Any]) -> list[dict[str, Any]]:
+    # Set only by carrier_registry.enrich from the screen of the request that put the payee on
+    # file, never by the sender.
+    if shipment.get("carrier_payee_change_flagged") is not True:
+        return []
+    return [_finding(
+        "PAYEE_CHANGE_REQUEST_FLAGGED", "HIGH", 75,
+        "The request that put this payee on file carried wording typical of payment-diversion fraud; "
+        "register and verify the payee again through a callback.",
+    )]
+
+
 def _check_amount(shipment: dict[str, Any]) -> list[dict[str, Any]]:
     raw = shipment.get("payout_amount")
     if raw in (None, ""):
@@ -133,6 +145,51 @@ def _check_amount(shipment: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
+# An analyst verdict below this confidence adds nothing.
+AI_MIN_CONFIDENCE = 0.6
+
+
+def check_payment_ai(shipment: dict[str, Any], ai: dict[str, Any] | None) -> list[dict[str, Any]]:
+    """
+    Findings from the payment-risk analyst and the carrier look-up (payment_ai.py).
+
+    They can only add findings: a verdict of "normal" or "unknown", a weak "elevated", an answer
+    that cannot be read and no answer at all add none and take none away. A look-up that did not
+    run is a finding, not a pass: an outage is not evidence that the carrier exists.
+    """
+    if not isinstance(ai, dict) or not is_payment_case(shipment):
+        return []
+    findings: list[dict[str, Any]] = []
+    analyst = ai.get("analyst")
+    if isinstance(analyst, dict) and analyst.get("verdict") == "elevated":
+        try:
+            confidence = float(analyst.get("confidence") or 0.0)
+        except (TypeError, ValueError):
+            confidence = 0.0
+        if confidence >= AI_MIN_CONFIDENCE:
+            raw = analyst.get("reasons")
+            reasons = "; ".join(str(r) for r in (raw if isinstance(raw, list) else [])[:3])
+            finding = _finding(
+                "PAYMENT_AI_ELEVATED", "MEDIUM", 55,
+                "An automated analyst rated this payout as elevated risk" + (f": {reasons}." if reasons else "."),
+            )
+            finding["measured"] = {"confidence": confidence}
+            findings.append(finding)
+    who = ai.get("identity")
+    status = who.get("status") if isinstance(who, dict) else None
+    if status == "unverified":
+        findings.append(_finding(
+            "CARRIER_IDENTITY_UNVERIFIED", "MEDIUM", 50,
+            "The web check of the carrier did not run, so nothing confirms that the carrier exists.",
+        ))
+    elif status == "not_found":
+        findings.append(_finding(
+            "CARRIER_NOT_FOUND_ONLINE", "HIGH", 65,
+            "A web search found nothing that names this carrier.",
+        ))
+    return findings
+
+
 def check_payment(
     shipment: dict[str, Any], now: datetime | None = None,
 ) -> list[dict[str, Any]]:
@@ -140,4 +197,7 @@ def check_payment(
     if not is_payment_case(shipment):
         return []
     now = now or datetime.now(timezone.utc)
-    return _check_payee(shipment) + _check_payee_change(shipment, now) + _check_amount(shipment)
+    return (
+        _check_payee(shipment) + _check_payee_change(shipment, now) + _check_amount(shipment)
+        + _check_change_request(shipment)
+    )

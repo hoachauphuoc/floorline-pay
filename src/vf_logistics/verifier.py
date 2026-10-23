@@ -1706,6 +1706,7 @@ def validate(
     screen_sanctions: bool = True,
     zero_day: dict[str, Any] | None = None,
     rules: PrefilterRules | None = None,
+    payment_ai: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Run every deterministic check and return findings plus the risk floor.
@@ -1789,6 +1790,9 @@ def validate(
     zero_day_findings = check_zero_day(shipment, zero_day)
     findings.extend(zero_day_findings)
     model_findings.extend(zero_day_findings)
+    payment_ai_findings = payment_checks.check_payment_ai(shipment, payment_ai)
+    findings.extend(payment_ai_findings)
+    model_findings.extend(payment_ai_findings)
 
     # Determine if auto-clear/reject by rules
     skip_ai_findings = [f for f in findings if f.get("skip_ai")]
@@ -1822,6 +1826,7 @@ def validate(
         "cleared_by": "rules" if (auto_clear_by_rules or auto_reject_by_rules) else None,
         "hs_description_checked": hs_verdict is not None,
         "zero_day_checked": zero_day is not None,
+        "payment_ai_checked": payment_ai is not None,
         "sanctions_screening": (screening or {}).get("status"),
         "sanctions_snapshot": (screening or {}).get("snapshot") or {},
         "hs_floor_effect": {
@@ -1838,7 +1843,8 @@ def validate(
         ]
         + (["sanctions_screening"] if screening is not None else [])
         + (["hs_description_consistency"] if hs_verdict is not None else [])
-        + (["zero_day_adverse_media"] if zero_day is not None else []),
+        + (["zero_day_adverse_media"] if zero_day is not None else [])
+        + (["payment_ai"] if payment_ai is not None else []),
     }
 
 

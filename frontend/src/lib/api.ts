@@ -725,6 +725,9 @@ export type CarrierPayee = {
   verified_by?: string | null;
   verified_at?: string | null;
   changed_at?: string | null;
+  /** True when the message that asked for this payee read like payment-diversion fraud (the screen's reasons follow). */
+  change_request_flagged?: boolean;
+  change_request_reasons?: string[];
 };
 
 /** One carrier: its verified payee, if any, and the registrations still waiting. */
@@ -742,6 +745,8 @@ export async function fetchCarriers(): Promise<{ items: CarrierRow[] }> {
 
 export async function registerCarrierPayee(request: {
   carrier_name: string;
+  /** The message that asked for the change, if any. It is screened; only the reasons are kept, never the text. */
+  request_text?: string;
   payee_email: string;
 }): Promise<{ carrier_key: string; version: number; status: string }> {
   if (DEMO_MODE) liveOnly("Registering a carrier payee");

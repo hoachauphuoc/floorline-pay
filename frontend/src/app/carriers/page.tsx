@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import {
   fetchCarriers,
   registerCarrierPayee,
@@ -102,12 +103,18 @@ export default function CarriersPage() {
 function RegisterPayee({ onDone, lock }: { onDone: () => void; lock: string | null }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [requestText, setRequestText] = useState("");
   const register = useMutation({
     mutationFn: () =>
-      registerCarrierPayee({ carrier_name: name.trim(), payee_email: email.trim() }),
+      registerCarrierPayee({
+        carrier_name: name.trim(),
+        payee_email: email.trim(),
+        ...(requestText.trim() ? { request_text: requestText.trim() } : {}),
+      }),
     onSuccess: () => {
       setName("");
       setEmail("");
+      setRequestText("");
       onDone();
     },
   });
@@ -141,6 +148,19 @@ function RegisterPayee({ onDone, lock }: { onDone: () => void; lock: string | nu
             className="mt-1 h-8 border-white/10 bg-black/30 text-[12px]"
           />
         </div>
+      </div>
+      <div className="mt-2">
+        <Label htmlFor="carrier-request" className="text-[11px] text-dim">
+          Message that asked for the change (optional)
+        </Label>
+        <Textarea
+          id="carrier-request"
+          value={requestText}
+          onChange={(e) => setRequestText(e.target.value)}
+          rows={2}
+          placeholder="Paste what the carrier wrote. Only the screen's reasons are kept, never the text."
+          className="mt-1 border-white/10 bg-black/30 text-[12px]"
+        />
       </div>
       <Gated reason={lock}>
         <Button
@@ -199,6 +219,12 @@ function CarrierCard({
           No verified payee yet: nothing can be paid to this carrier.
         </p>
       )}
+      {live?.change_request_flagged && (
+        <p className="mt-1 text-[12px] text-risk-critical" role="alert">
+          The request that put this payee on file was flagged: payouts to it are held until a payee is registered
+          and verified again.
+        </p>
+      )}
       {carrier.pending.length > 0 && (
         <ul className="mt-3 space-y-3" aria-label="Pending registrations">
           {carrier.pending.map((pending) => (
@@ -249,6 +275,12 @@ function PendingPayee({
           registered by {pending.registered_by} {formatRelative(pending.registered_at)}
         </span>
       </p>
+      {pending.change_request_flagged && (
+        <p className="mt-1 text-[11.5px] text-risk-critical" role="alert">
+          The request was flagged: {(pending.change_request_reasons ?? []).join("; ") || "wording typical of payment-diversion fraud"}.
+          Call the carrier on a number you already hold before verifying.
+        </p>
+      )}
       {own ? (
         <p className="mt-1 text-[11.5px] text-faint">
           A different person must verify this payee.

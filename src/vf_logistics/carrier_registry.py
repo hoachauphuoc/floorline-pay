@@ -25,7 +25,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from vf_logistics import payment_checks
+from vf_logistics import change_screen, payment_checks
 from vf_logistics.store import get_store, utcnow
 
 REGISTERED = "carrier_payee_registered"
@@ -36,6 +36,7 @@ _EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 _REGISTERED_FIELD = "carrier_registered_payee_email"
 _CHANGED_FIELD = "carrier_payee_changed_at"
 _REQUESTED_FIELD = "carrier_payee_email"
+_FLAGGED_FIELD = "carrier_payee_change_flagged"
 
 
 class RegistryError(Exception):
@@ -97,6 +98,7 @@ def _current(
         "verified_by": ver.get("verified_by"),
         "verified_at": ver.get("at"),
         "changed_at": ver.get("at") if reg.get("previous_payee_email") else None,
+        "change_request_flagged": bool((reg.get("screen") or {}).get("flagged")),
     }
 
 
@@ -111,6 +113,7 @@ async def current(name: Any, tenant_id: str | None = None) -> dict[str, Any] | N
 
 async def register_payee(
     name: Any, payee_email: Any, actor: str, actor_auth: str | None, tenant_id: str | None = None,
+    request_text: Any = None,
 ) -> dict[str, Any]:
     """Record a payee for a carrier, pending until a different person verifies it."""
     key = carrier_key(name)
@@ -125,6 +128,7 @@ async def register_payee(
     live = _current(registered, verified)
     if live is not None and live["payee_email"] == payee:
         raise RegistryError("this is already the verified payee of this carrier", 409)
+    screened = await change_screen.screen(request_text) if str(request_text or "").strip() else None
     version = max(registered, default=0) + 1
     for _ in range(_TRIES):
         written = await get_store().add_audit_once({
@@ -140,6 +144,7 @@ async def register_payee(
                 "registered_by": actor,
                 "registered_auth": actor_auth,
                 "previous_payee_email": live["payee_email"] if live else None,
+                "screen": screened,
             },
             "at": utcnow(),
         }, tenant_id=tenant_id)
@@ -205,6 +210,8 @@ async def carriers(tenant_id: str | None = None) -> list[dict[str, Any]]:
                 "version": v,
                 "payee_email": reg.get("payee_email"),
                 "registered_by": reg.get("registered_by"),
+                "change_request_flagged": bool((reg.get("screen") or {}).get("flagged")),
+                "change_request_reasons": list((reg.get("screen") or {}).get("reasons") or []),
                 "registered_at": reg.get("at"),
             }
             for v, reg in sorted(registered.items()) if v not in verified
@@ -234,10 +241,13 @@ async def enrich(shipment: dict[str, Any], tenant_id: str | None = None) -> dict
         return shipment
     shipment.pop(_REGISTERED_FIELD, None)
     shipment.pop(_CHANGED_FIELD, None)
+    shipment.pop(_FLAGGED_FIELD, None)
     live = await current(shipment.get("carrier_name"), tenant_id=tenant_id)
     if live is None:
         return shipment
     shipment[_REGISTERED_FIELD] = live["payee_email"]
+    if live["change_request_flagged"]:
+        shipment[_FLAGGED_FIELD] = True
     if live["changed_at"]:
         shipment[_CHANGED_FIELD] = live["changed_at"]
     if not str(shipment.get(_REQUESTED_FIELD) or "").strip():

@@ -53,6 +53,7 @@ def register(
         try:
             result = run_async(carrier_registry.register_payee(
                 body.get("carrier_name"), body.get("payee_email"), actor, actor_auth,
+                request_text=body.get("request_text"),
                 tenant_id=tenant(),
             ))
         except carrier_registry.RegistryError as exc:
