@@ -92,6 +92,8 @@ describe("matchWrite", () => {
 
   it("marks publish, revoke, the prefilter, approve and execute as password-only", () => {
     expect([...PASSWORD_ONLY_POST].sort()).toEqual([
+      "carriers/payee",
+      "carriers/payee/verify",
       "governance/publish",
       "governance/revoke",
       "orchestrator/reset",

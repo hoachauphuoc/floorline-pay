@@ -22,7 +22,6 @@ export interface BookingForm {
   shipping_cost: string;
   carrier_name: string;
   carrier_payee_email: string;
-  carrier_registered_payee_email: string;
   payout_amount: string;
 }
 
@@ -39,7 +38,6 @@ export const EMPTY_BOOKING: BookingForm = {
   shipping_cost: "",
   carrier_name: "",
   carrier_payee_email: "",
-  carrier_registered_payee_email: "",
   payout_amount: "",
 };
 

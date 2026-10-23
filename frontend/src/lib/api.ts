@@ -700,6 +700,50 @@ export async function authorizePaymentOrder(
   return postJson(`payments/orders/${encodeURIComponent(orderId)}/authorize`);
 }
 
+/** A payee as the carrier registry reports it: registered by one person, verified by another. */
+export type CarrierPayee = {
+  version: number;
+  payee_email: string;
+  registered_by: string;
+  registered_at?: string | null;
+  verified_by?: string | null;
+  verified_at?: string | null;
+  changed_at?: string | null;
+};
+
+/** One carrier: its verified payee, if any, and the registrations still waiting. */
+export type CarrierRow = {
+  carrier_key: string;
+  carrier_name?: string | null;
+  current: CarrierPayee | null;
+  pending: CarrierPayee[];
+};
+
+export async function fetchCarriers(): Promise<{ items: CarrierRow[] }> {
+  if (DEMO_MODE) liveOnly("The carrier registry");
+  return getJson<{ items: CarrierRow[] }>("carriers");
+}
+
+export async function registerCarrierPayee(request: {
+  carrier_name: string;
+  payee_email: string;
+}): Promise<{ carrier_key: string; version: number; status: string }> {
+  if (DEMO_MODE) liveOnly("Registering a carrier payee");
+  return postJson("carriers/payee", request);
+}
+
+export async function verifyCarrierPayee(
+  carrierKey: string,
+  version: number,
+  callbackNote: string,
+): Promise<{ carrier_key: string; version: number; status: string }> {
+  if (DEMO_MODE) liveOnly("Verifying a carrier payee");
+  return postJson(
+    `carriers/${encodeURIComponent(carrierKey)}/payee/${version}/verify`,
+    { callback_note: callbackNote },
+  );
+}
+
 /** Submit a shipment event, as Pub/Sub would. */
 export async function submitShipmentEvent(
   shipment: Record<string, unknown>,

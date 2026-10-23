@@ -68,6 +68,8 @@ export const ALLOWED_GET = new Set([
   "evaluation",
   // What the settler did with the money on each case (payment_status.py).
   "payments/ledger",
+  // The carrier payee registry (carrier_registry.py).
+  "carriers",
 ]);
 
 /**
@@ -135,6 +137,9 @@ export const ALLOWED_POST = new Set([
   // Capturing and paying out are never browser routes: only the settler does those.
   "payments/orders",
   "payments/orders/authorize",
+  // Carrier payee registry: register a payee, and verify one as a different person.
+  "carriers/payee",
+  "carriers/payee/verify",
 ]);
 
 /**
@@ -154,6 +159,10 @@ export const PASSWORD_ONLY_POST = new Set([
   "orchestrator/reset",
   "governance/revoke",
   "governance/publish",
+  // Carrier payees: a payee is moved by a person signed in with a password, never by a
+  // one-click session.
+  "carriers/payee",
+  "carriers/payee/verify",
   // Verification loop: approve and execute change downstream state.
   "review/approve-exception",
   "review/approve",
@@ -174,6 +183,9 @@ export const CASE_ID = /^[A-Za-z0-9_-]{1,80}$/;
 /** PayPal order ids: upper-case letters, digits and hyphens. */
 export const PAYPAL_ID = /^[A-Z0-9-]{1,64}$/;
 
+/** Carrier keys: lower-case letters and digits. */
+export const CARRIER_KEY = /^[a-z0-9]{1,80}$/;
+
 /**
  * Whether a path is an allowed write, resolving the two review routes that carry
  * a case id.
@@ -190,6 +202,10 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
     }
     return false;
   }
+  // carriers/<carrier key>/payee/<version>/verify
+  if (parts.length === 5 && parts[0] === "carriers" && parts[2] === "payee" && parts[4] === "verify") {
+    return CARRIER_KEY.test(parts[1]) && /^[0-9]{1,9}$/.test(parts[3]) && allowed.has("carriers/payee/verify");
+  }
   // payments/orders/<order id>/authorize
   if (parts.length === 4 && parts[0] === "payments" && parts[1] === "orders" && parts[3] === "authorize") {
     return PAYPAL_ID.test(parts[2]) && allowed.has("payments/orders/authorize");
@@ -204,6 +220,7 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
     return parts[2] === "activity" && allowed.has("cases/activity");
   }
   if (joined === "payments/orders/authorize") return false;
+  if (joined === "carriers/payee/verify") return false;
   // These are templates for the id-carrying forms above, not routes of their own;
   // Flask has none of them without an id.
   if (joined === "review/decide" || joined === "review/deep-review" || joined === "cases/activity"
@@ -236,6 +253,10 @@ export function policyKey(joined: string): string {
   }
   if (parts.length === 3 && parts[0] === "cases" && CASE_ID.test(parts[1])) {
     return `cases/${parts[2]}`;
+  }
+  if (parts.length === 5 && parts[0] === "carriers" && parts[2] === "payee" && parts[4] === "verify"
+      && CARRIER_KEY.test(parts[1])) {
+    return "carriers/payee/verify";
   }
   return joined;
 }

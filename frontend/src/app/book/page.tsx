@@ -31,7 +31,6 @@ const FIELDS: Array<[keyof BookingForm, string, string]> = [
   ["shipping_cost", "Freight to pay (USD)", "1300"],
   ["carrier_name", "Carrier", "Mekong Haulage Co"],
   ["carrier_payee_email", "Carrier PayPal account for this load", "payments@mekong-haulage.example"],
-  ["carrier_registered_payee_email", "Carrier PayPal account on file", "payments@mekong-haulage.example"],
   ["payout_amount", "Payout to the carrier (USD)", "blank pays the freight"],
 ];
 

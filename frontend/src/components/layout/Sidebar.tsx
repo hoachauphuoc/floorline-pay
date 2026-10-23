@@ -15,6 +15,7 @@ import {
   Receipt,
   ShieldCheck,
   Terminal,
+  Truck,
   Wallet,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -107,6 +108,13 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Payments",
     icon: Receipt,
     blurb: "Held, paid and returned funds",
+    section: "work",
+  },
+  {
+    href: "/carriers",
+    label: "Carriers",
+    icon: Truck,
+    blurb: "Who each carrier may be paid",
     section: "work",
   },
   {
