@@ -74,6 +74,9 @@ COPY src/ src/
 # hs_reference.py resolves data/hs_reference.yaml relative to the repo root and
 # reads it at import with no fallback, so a missing file stops the boot.
 COPY data/hs_reference.yaml data/hs_reference.yaml
+# The synthetic payment corpus payment_eval.load_corpus reads for GET /api/v1/defense/scenarios and /defense/evaluation. A file left out
+# is not a build error: both routes answered 500 in the image while every test, run from a checkout, passed (tests/test_dockerfile_payment_corpus.py).
+COPY data/payment_fraud_corpus.json data/payment_fraud_corpus.json
 # The committed evaluation reports GET /api/v1/evaluation serves (evaluation.py).
 # Aggregates only -- a few tens of KB -- so the console can show what was measured
 # without a second deployment of anything. A directory missing here does not fail
