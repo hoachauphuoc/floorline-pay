@@ -31,7 +31,9 @@ gcloud projects add-iam-policy-binding $P --member="serviceAccount:$SA" --role="
 gcloud pubsub topics add-iam-policy-binding case-decisions --member="serviceAccount:$SA" --role="roles/pubsub.publisher"
 ```
 
-The indexes the app needs, without the Firebase CLI (they build in the background; check with `gcloud firestore indexes composite list`):
+The indexes the app needs, without the Firebase CLI (they build in the background; check with `gcloud firestore indexes composite list`). These lines are for
+bash, which is what Cloud Shell is. In PowerShell a comma outside quotes makes an array and `gcloud` refuses the command, so quote each value, for example
+`--field-config="field-path=_tenant_id,order=ascending"`, and add `--project=<id>` because the project your own gcloud is set to may not be this one:
 
 ```bash
 gcloud firestore indexes composite create --collection-group=cases --query-scope=collection --field-config=field-path=_tenant_id,order=ascending --field-config=field-path=state,order=ascending --field-config=field-path=created_at,order=descending
