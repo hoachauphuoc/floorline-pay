@@ -812,7 +812,9 @@ export async function submitShipmentEvent(
   shipment: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   if (DEMO_MODE) liveOnly("Submitting a shipment event");
-  return postJson("events/shipment", shipment);
+  // The shipment runs the whole workflow before it answers, 30 to 60 seconds with the models. With the 20 second default the
+  // booking page reported the API unreachable while the case was being created.
+  return postJson("events/shipment", shipment, LONG_WRITE_TIMEOUT_MS);
 }
 
 /**
