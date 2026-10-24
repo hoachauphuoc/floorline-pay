@@ -34,6 +34,7 @@ from vf_logistics import (
     authorization_lifecycle,
     carrier_registry,
     credit_profile,
+    dual_approval,
     mandate,
     payment_binding,
     payment_checks,
@@ -58,6 +59,9 @@ _RETRYABLE = frozenset({paypal_client.TRANSPORT_ERROR})
 # An authorization PayPal reports in one of these states can be captured. CAPTURED is
 # there for a redelivery after the capture succeeded and the payout did not.
 _CAPTURABLE = frozenset({"CREATED", "CAPTURED"})
+
+# A reauthorization can itself be reauthorized inside the 29 days; this many renewals are followed from the booking's own id.
+_RENEWALS = 5
 
 
 def _result(status: str, reason: str, **steps: Any) -> dict[str, Any]:
@@ -98,6 +102,17 @@ def _body(receipt: dict[str, Any]) -> dict[str, Any]:
     return raw if isinstance(raw, dict) else {}
 
 
+async def _current_authorization(authorization: str, tenant_id: str | None) -> str:
+    """The id to ask PayPal about and to capture or void: the booking's own, or the one PayPal issued when it renewed it."""
+    current = authorization
+    for _ in range(_RENEWALS):
+        renewed = await payment_binding.find_renewal(current, tenant_id)
+        if not renewed or renewed == current:
+            break
+        current = renewed
+    return current
+
+
 async def _unproven_authorization(
     shipment: dict[str, Any], key: str, tenant_id: str | None,
 ) -> dict[str, Any] | None:
@@ -121,7 +136,8 @@ async def _unproven_authorization(
         )
         if outside is not None:
             return _result(HELD, outside)
-    live = await paypal_client.get_authorization(authorization, f"{key}-verify")
+    current = await _current_authorization(authorization, tenant_id)
+    live = await paypal_client.get_authorization(current, f"{key}-verify")
     if live["status"] != paypal_client.OK:
         status = RETRY if _retryable(live) else FAILED
         return _result(status, "PayPal could not confirm the authorization; nothing is paid",
@@ -143,11 +159,16 @@ async def _unproven_authorization(
     if stage == authorization_lifecycle.UNKNOWN:
         return _result(HELD, "PayPal does not say when the authorization was made; nothing is paid", verify=_step(live))
     if stage == authorization_lifecycle.REAUTHORIZE:
-        renewed = await paypal_client.reauthorize_authorization(authorization, f"{key}-reauth")
+        renewed = await paypal_client.reauthorize_authorization(current, f"{key}-reauth")
         if renewed["status"] != paypal_client.OK or _body(renewed).get("status") != "CREATED":
             status = RETRY if _retryable(renewed) else FAILED
             return _result(status, "PayPal could not renew the authorization after its honor period; nothing is paid",
                            reauthorize=_step(renewed))
+        new_id = _body(renewed).get("id")
+        if not new_id:
+            return _result(HELD, "PayPal renewed the authorization but did not name the new one; nothing is paid",
+                           reauthorize=_step(renewed))
+        await payment_binding.record_renewal(current, str(new_id), tenant_id)
     return None
 
 
@@ -165,6 +186,19 @@ def _lacks_second_approval(case: dict[str, Any], approval_id: str) -> bool:
     return False
 
 
+def _approval_record_missing(case: dict[str, Any], shipment: dict[str, Any], approval_id: str) -> bool:
+    """True for a release that needs a second approver and whose approval the case does not hold.
+
+    _lacks_second_approval can only judge an approval it finds. Below the limit a case with no record is judged by the checks that
+    follow; at or above it the missing record is itself the refusal, because nothing shows that a second person was asked.
+    """
+    if not dual_approval.needed(shipment):
+        return False
+    verification = case.get("verification")
+    approvals = verification.get("approvals") if isinstance(verification, dict) else None
+    return not any(isinstance(a, dict) and a.get("approval_id") == approval_id for a in approvals or [])
+
+
 async def _release(
     case: dict[str, Any], shipment: dict[str, Any], key: str, tenant_id: str | None, approval_id: str,
 ) -> dict[str, Any]:
@@ -173,6 +207,11 @@ async def _release(
         return _result(RETRY, f"the case is still {state}; deliver the decision again")
     if state != "RELEASED_BY_HUMAN":
         return _result(FAILED, f"the case is {state}, not RELEASED_BY_HUMAN; nothing is paid")
+    if _approval_record_missing(case, shipment, approval_id):
+        return _result(
+            HELD,
+            "this release is at or above the second-approval limit and the case holds no record of its approval; nothing is paid",
+        )
     if _lacks_second_approval(case, approval_id):
         return _result(HELD, "this release needs a second approver; nothing is paid until a different person approves it too")
     paused = await payment_controls.pause_state(tenant_id)
@@ -204,6 +243,7 @@ async def _release(
     authorization = str(shipment.get("paypal_authorization_id") or "")
     payee = str(shipment.get("carrier_registered_payee_email") or "")
     currency = str(shipment.get("currency") or "USD")
+    authorization = await _current_authorization(authorization, tenant_id)
     captured = await paypal_client.capture_authorization(authorization, f"{key}-capture")
     if captured["status"] != paypal_client.OK:
         status = RETRY if _retryable(captured) else FAILED
@@ -252,11 +292,17 @@ async def _tracking(
     return {"tracking": {"status": receipt.get("status"), "http_status": receipt.get("http_status"), "error": receipt.get("error")}}
 
 
-async def _block(shipment: dict[str, Any], key: str) -> dict[str, Any]:
+async def _block(shipment: dict[str, Any], key: str, tenant_id: str | None) -> dict[str, Any]:
     authorization = str(shipment.get("paypal_authorization_id") or "")
     if not authorization:
         return _result(SKIPPED, "no PayPal authorization is held for this case")
-    voided = await paypal_client.void_authorization(authorization, f"{key}-void")
+    bound = await payment_binding.find_authorization(authorization, tenant_id=tenant_id)
+    if bound is None:
+        return _result(HELD, "no booking made through Floorline holds this authorization; nothing is voided")
+    if bound.get("reference_id") != shipment.get("shipment_id"):
+        return _result(HELD, "this authorization was made for a different shipment; nothing is voided")
+    current = await _current_authorization(authorization, tenant_id)
+    voided = await paypal_client.void_authorization(current, f"{key}-void")
     if voided["status"] != paypal_client.OK:
         status = RETRY if _retryable(voided) else FAILED
         return _result(status, "PayPal did not void the authorization", void=_step(voided))
@@ -279,7 +325,7 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
             return _result(FAILED, "PayPal is not configured; nothing is paid")
         shipment = await carrier_registry.enrich(dict(shipment), tenant_id=tenant_id)
         if outcome == "BLOCKED_BY_HUMAN":
-            result = await _block(shipment, key)
+            result = await _block(shipment, key, tenant_id)
         else:
             result = await _release(case, shipment, key, tenant_id, str(decision.get("approval_id") or ""))
     except Exception as exc:  # noqa: BLE001 - settle never raises; the status says what happened

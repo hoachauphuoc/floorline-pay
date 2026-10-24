@@ -86,3 +86,26 @@ async def find_mandate(authorization_id: str, tenant_id: str | None = None) -> s
     detail = rows[0].get("detail") if rows else None
     value = detail.get("mandate_id") if isinstance(detail, dict) else None
     return str(value) if value else None
+
+
+async def record_renewal(old_id: str, new_id: str, tenant_id: str | None = None) -> bool:
+    """Remember the id PayPal issued when it reauthorized `old_id`: every later capture or void must use it. True when this call wrote it."""
+    written = await get_store().add_audit_once({
+        "audit_id": f"payauthn-{old_id}",
+        "case_id": f"AUTHN-{old_id}",
+        "action": "payment_authorization_renewed",
+        "status": "done",
+        "detail": {"old_authorization_id": old_id, "new_authorization_id": new_id},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    return bool(written)
+
+
+async def find_renewal(authorization_id: str, tenant_id: str | None = None) -> str | None:
+    """The id that replaced this authorization when PayPal reauthorized it, or None when it was never renewed."""
+    if not authorization_id:
+        return None
+    rows, _ = await get_store().query_audit(case_id=f"AUTHN-{authorization_id}", limit=1, tenant_id=tenant_id)
+    detail = rows[0].get("detail") if rows else None
+    value = detail.get("new_authorization_id") if isinstance(detail, dict) else None
+    return str(value) if value else None

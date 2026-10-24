@@ -60,7 +60,8 @@ def big_decision(name, payout):
     run(store_mod.get_store().put_case({"case_id": case_id, "state": "RELEASED_BY_HUMAN", "shipment": {
         "shipment_id": "SHP-CRD-1", "currency": "USD", "shipping_cost": 3000.0,
         "payout_amount": payout, "carrier_name": name, "paypal_authorization_id": authorization,
-    }}))
+    }, "verification": {"approvals": [{"approval_id": "apr-1", "requires_second": True,
+                                       "second_approval": {"by": "second@example.com"}}]}}))
     return {"case_id": case_id, "outcome": "RELEASED_BY_HUMAN", "approval_id": "apr-1",
             "idempotency_key": f"exec-{uuid.uuid4().hex[:8]}"}
 

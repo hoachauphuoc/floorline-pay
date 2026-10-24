@@ -210,7 +210,11 @@ def test_a_person_releasing_does_not_override_the_payment_checks(pp):
 
 def test_an_inflated_payout_is_held_even_when_the_case_is_released(pp):
     settler, capture, payout, void = pp
-    result = run(settler.settle(decision(new_case(shipment={**SHIPMENT, "payout_amount": 4000.0}))))
+    case_id = new_case(shipment={**SHIPMENT, "payout_amount": 4000.0})
+    case = run(get_store().get_case(case_id))
+    case["verification"] = {"approvals": [{"approval_id": "apr-1", "requires_second": True, "second_approval": {"by": "second@example.com"}}]}
+    run(get_store().put_case(case))
+    result = run(settler.settle(decision(case_id)))
     assert result["status"] == "held"
     assert "PAYOUT_ABOVE_FREIGHT" in result["reason"]
     money_did_not_move(capture, payout, void)
