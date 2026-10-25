@@ -138,6 +138,7 @@ class TestTheBookingRoutes(Base):
         if mandate_id:
             unit["custom_id"] = mandate_id
         reply = {"status": "ok", "http_status": 201, "error": None, "body": {"id": "5O190127TN364715T", "purchase_units": [unit]}}
+        run(mod("payment_binding").record_order("5O190127TN364715T", "SHP-PAY-1"))
         with patch.object(self.routes.paypal_client, "authorize_order", AsyncMock(return_value=reply)):
             r = self.client.post("/api/v1/payments/orders/5O190127TN364715T/authorize", headers=KEYED)
         assert r.status_code == 200

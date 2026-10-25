@@ -88,6 +88,33 @@ async def find_mandate(authorization_id: str, tenant_id: str | None = None) -> s
     return str(value) if value else None
 
 
+async def record_order(order_id: str, reference_id: str, tenant_id: str | None = None) -> bool:
+    """Claim a PayPal order for the tenant that created it. True when this tenant holds it, by this call or an earlier one.
+
+    An order id is not a secret and PayPal answers a replayed request with the first order. The row's id is the order's and
+    audit ids are unique across tenants, so the first tenant to create an order holds it and another tenant's claim writes
+    nothing.
+    """
+    await get_store().add_audit_once({
+        "audit_id": f"payorder-{order_id}",
+        "case_id": f"ORDER-{order_id}",
+        "action": "payment_order_created",
+        "status": "done",
+        "detail": {"order_id": order_id, "reference_id": reference_id},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    return await find_order(order_id, tenant_id) is not None
+
+
+async def find_order(order_id: str, tenant_id: str | None = None) -> dict[str, Any] | None:
+    """What this tenant recorded when it created the order, or None when the order is not this tenant's."""
+    if not order_id:
+        return None
+    rows, _ = await get_store().query_audit(case_id=f"ORDER-{order_id}", limit=1, tenant_id=tenant_id)
+    detail = rows[0].get("detail") if rows else None
+    return dict(detail) if isinstance(detail, dict) else None
+
+
 async def record_renewal(old_id: str, new_id: str, tenant_id: str | None = None) -> bool:
     """Remember the id PayPal issued when it reauthorized `old_id`: every later capture or void must use it. True when this call wrote it."""
     written = await get_store().add_audit_once({

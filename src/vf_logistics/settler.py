@@ -54,7 +54,9 @@ VOIDED = "voided"
 # Case states in which a published release may still become final; any other state that
 # is not RELEASED_BY_HUMAN means the release did not happen.
 _NOT_FINAL = frozenset({"APPROVED", "EXECUTING"})
-_RETRYABLE = frozenset({paypal_client.TRANSPORT_ERROR})
+# PayPal unreachable, PayPal refusing our token, PayPal asking us to slow down (HTTP 429), or an answer that is not JSON is never PayPal's word on this
+# payment: the decision is delivered again instead of acknowledged, or a block's void would never run again.
+_RETRYABLE = frozenset({paypal_client.TRANSPORT_ERROR, paypal_client.AUTH_FAILED, paypal_client.BAD_RESPONSE})
 
 # An authorization PayPal reports in one of these states can be captured. CAPTURED is
 # there for a redelivery after the capture succeeded and the payout did not.
@@ -85,7 +87,7 @@ def _step(receipt: dict[str, Any]) -> dict[str, Any]:
 def _retryable(receipt: dict[str, Any]) -> bool:
     http = receipt.get("http_status")
     return receipt.get("status") in _RETRYABLE or (
-        receipt.get("status") == paypal_client.HTTP_ERROR and isinstance(http, int) and http >= 500
+        receipt.get("status") == paypal_client.HTTP_ERROR and isinstance(http, int) and (http >= 500 or http == 429)
     )
 
 
@@ -128,6 +130,14 @@ async def _unproven_authorization(
     held = _amount(bound.get("amount"))
     if payout is None or held is None or str(bound.get("currency")) != currency or held < payout:
         return _result(HELD, "the booking holds less than the payout, or in another currency; nothing is paid")
+    price = _amount(shipment.get("shipping_cost")) or _amount(shipment.get("freight_cost"))
+    if price is None or held > price:
+        # PayPal captures everything the booking holds: a hold above the freight price on the case would take more from
+        # the shipper than the released shipment costs, while the carrier is paid only the payout.
+        return _result(
+            HELD,
+            "the booking holds more than the freight price on the case, or the case states no price; nothing is captured",
+        )
     mandate_id = await payment_binding.find_mandate(authorization, tenant_id)
     if mandate_id:
         outside = await mandate.refusal_for(
@@ -152,7 +162,9 @@ async def _unproven_authorization(
     now_currency = amount.get("currency_code") if isinstance(amount, dict) else None
     if now_held is None or now_held < payout or now_currency != currency:
         return _result(HELD, "PayPal reports less held than the payout; nothing is paid", verify=_step(live))
-    stage = authorization_lifecycle.stage(facts)
+    # A CAPTURED authorization is a redelivery after the capture went through: its age no longer matters, and renewing it
+    # or calling it expired would leave the carrier unpaid for money already taken.
+    stage = authorization_lifecycle.HONORED if state == "CAPTURED" else authorization_lifecycle.stage(facts)
     if stage == authorization_lifecycle.EXPIRED:
         return _result(FAILED, "the authorization has expired at PayPal; the shipper must authorize again; nothing is paid",
                        verify=_step(live))
@@ -172,7 +184,7 @@ async def _unproven_authorization(
     return None
 
 
-def _lacks_second_approval(case: dict[str, Any], approval_id: str) -> bool:
+def _lacks_second_approval(case: dict[str, Any], shipment: dict[str, Any], approval_id: str) -> bool:
     """True when the decision's approval needs a second approver and has none.
 
     Only an approval found in the case can say so: a case with no verification record
@@ -182,7 +194,10 @@ def _lacks_second_approval(case: dict[str, Any], approval_id: str) -> bool:
     approvals = verification.get("approvals") if isinstance(verification, dict) else None
     for approval in approvals or []:
         if isinstance(approval, dict) and approval.get("approval_id") == approval_id:
-            return bool(approval.get("requires_second")) and not approval.get("second_approval")
+            # The flag records the limit when the first person approved; the limit now is checked too, so a flag that is
+            # missing, or was set under a higher limit, never lets a large payout leave with one approver.
+            needs_second = approval.get("requires_second") is True or dual_approval.needed(shipment)
+            return needs_second and not approval.get("second_approval")
     return False
 
 
@@ -212,7 +227,7 @@ async def _release(
             HELD,
             "this release is at or above the second-approval limit and the case holds no record of its approval; nothing is paid",
         )
-    if _lacks_second_approval(case, approval_id):
+    if _lacks_second_approval(case, shipment, approval_id):
         return _result(HELD, "this release needs a second approver; nothing is paid until a different person approves it too")
     paused = await payment_controls.pause_state(tenant_id)
     if paused["paused"]:
@@ -262,6 +277,28 @@ async def _release(
         status = RETRY if _retryable(paid) else FAILED
         return _result(status, "PayPal captured the funds but did not pay the carrier",
                        capture=_step(captured), payout=_step(paid))
+    # PayPal's payout events name the batch "<key>-payout"; this row finds the settlement by its key, however many
+    # settlements came after it.
+    await get_store().add_audit_once({
+        "audit_id": f"payidx-{key}",
+        "case_id": f"PAYOUT-{key}",
+        "action": "settle_payout_index",
+        "status": "done",
+        "detail": {"settled_case_id": case.get("case_id")},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    capture_id = _step(captured).get("paypal_id")
+    if capture_id:
+        # PayPal's refund, reversal and dispute events name the capture; this row finds the settlement by it, however many
+        # settlements came after it.
+        await get_store().add_audit_once({
+            "audit_id": f"capidx-{capture_id}",
+            "case_id": f"CAPTURE-{capture_id}",
+            "action": "settle_capture_index",
+            "status": "done",
+            "detail": {"settled_case_id": case.get("case_id"), "idempotency_key": key},
+            "at": utcnow(),
+        }, tenant_id=tenant_id)
     return _result(
         SETTLED, "captured and paid", capture=_step(captured), payout=_step(paid),
         amount=str(_amount(shipment.get("payout_amount"))), carrier_key=carrier,
@@ -292,7 +329,13 @@ async def _tracking(
     return {"tracking": {"status": receipt.get("status"), "http_status": receipt.get("http_status"), "error": receipt.get("error")}}
 
 
-async def _block(shipment: dict[str, Any], key: str, tenant_id: str | None) -> dict[str, Any]:
+async def _block(case: dict[str, Any], shipment: dict[str, Any], key: str, tenant_id: str | None) -> dict[str, Any]:
+    state = case.get("state")
+    if state in _NOT_FINAL:
+        return _result(RETRY, f"the case is still {state}; deliver the decision again")
+    if state != "BLOCKED_BY_HUMAN":
+        # A block that arrives after the case was decided another way must not void the hold a release depends on.
+        return _result(FAILED, f"the case is {state}, not BLOCKED_BY_HUMAN; nothing is voided")
     authorization = str(shipment.get("paypal_authorization_id") or "")
     if not authorization:
         return _result(SKIPPED, "no PayPal authorization is held for this case")
@@ -309,6 +352,19 @@ async def _block(shipment: dict[str, Any], key: str, tenant_id: str | None) -> d
     return _result(VOIDED, "authorization voided; the shipper's funds are released", void=_step(voided))
 
 
+async def _stored_result(case_id: str, key: str, tenant_id: str | None) -> dict[str, Any] | None:
+    """What an earlier delivery of this decision already settled or voided, so a redelivery answers the same.
+
+    Run again, the checks would count the payout it already made against the limits and turn a paid payment into held or retry.
+    """
+    rows, _ = await get_store().query_audit(case_id=case_id, limit=100, tenant_id=tenant_id)
+    done = (f"settle-{key}-{SETTLED}", f"settle-{key}-{VOIDED}")
+    for row in rows:
+        if row.get("audit_id") in done and isinstance(row.get("detail"), dict):
+            return dict(row["detail"])
+    return None
+
+
 async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict[str, Any]:
     """Move the money for one applied decision, or say why it did not move."""
     case_id = str(decision.get("case_id") or "")
@@ -321,21 +377,27 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
         shipment = (case or {}).get("shipment") or {}
         if case is None or not payment_checks.is_payment_case(shipment):
             return _result(SKIPPED, "the case moves no money")
+        stored = await _stored_result(case_id, key, tenant_id)
+        if stored is not None:
+            return stored
         if not paypal_client.configured():
             return _result(FAILED, "PayPal is not configured; nothing is paid")
         shipment = await carrier_registry.enrich(dict(shipment), tenant_id=tenant_id)
         if outcome == "BLOCKED_BY_HUMAN":
-            result = await _block(shipment, key, tenant_id)
+            result = await _block(case, shipment, key, tenant_id)
         else:
             result = await _release(case, shipment, key, tenant_id, str(decision.get("approval_id") or ""))
     except Exception as exc:  # noqa: BLE001 - settle never raises; the status says what happened
         return _result(RETRY, f"settlement stopped on {type(exc).__name__}; deliver the decision again")
-    await get_store().add_audit_once({
-        "audit_id": f"settle-{key}-{result['status']}",
-        "case_id": case_id,
-        "action": "settle_payment",
-        "status": result["status"],
-        "detail": {**result, "idempotency_key": key, "outcome": outcome},
-        "at": utcnow(),
-    }, tenant_id=tenant_id)
+    try:
+        await get_store().add_audit_once({
+            "audit_id": f"settle-{key}-{result['status']}",
+            "case_id": case_id,
+            "action": "settle_payment",
+            "status": result["status"],
+            "detail": {**result, "idempotency_key": key, "outcome": outcome},
+            "at": utcnow(),
+        }, tenant_id=tenant_id)
+    except Exception as exc:  # noqa: BLE001 - settle never raises; without its row the payment is not counted, so it is retried
+        return _result(RETRY, f"the settlement could not be recorded ({type(exc).__name__}); deliver the decision again")
     return result

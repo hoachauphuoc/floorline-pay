@@ -13,6 +13,7 @@ instead of the file failing to collect.
 
 from __future__ import annotations
 
+import asyncio
 import importlib
 import os
 import sys
@@ -56,6 +57,7 @@ class TestTheBookingRoutes(Base):
         return self.client.post("/api/v1/payments/orders", json=body or payload, headers=headers)
 
     def _authorize(self, order_id="5O190127TN364715T", headers=KEYED):
+        asyncio.run(importlib.import_module("vf_logistics.payment_binding").record_order(order_id, "SHP-PAY-1"))
         return self.client.post(f"/api/v1/payments/orders/{order_id}/authorize", headers=headers)
 
     def test_an_order_is_created_with_the_callers_amount_and_reference(self, routes):

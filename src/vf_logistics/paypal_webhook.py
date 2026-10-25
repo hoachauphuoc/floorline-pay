@@ -97,7 +97,8 @@ async def _payout_item(
 ) -> dict[str, Any]:
     batch = str(resource.get("sender_batch_id") or "")
     key = batch.removesuffix("-payout") if batch.endswith("-payout") else ""
-    row = await _find(lambda d: bool(key) and d.get("idempotency_key") == key, tenant_id)
+    # A settlement made before the index existed is still found by the scan of the newest ones.
+    row = (await _indexed_payout(key, tenant_id) if key else None) or await _find(lambda d: bool(key) and d.get("idempotency_key") == key, tenant_id)
     if row is None:
         return {"matched": False}
     case_id = str(row.get("case_id") or "")
@@ -105,6 +106,23 @@ async def _payout_item(
     carrier, _ = await _parties(case_id, tenant_id)
     state = await payout_tracking.apply(case_id, f"event-{event_id}", status, carrier, tenant_id)
     return {"matched": True, "case_id": case_id, "payout_status": state}
+
+
+async def _indexed_payout(key: str, tenant_id: str | None) -> dict[str, Any] | None:
+    """The settlement the settler indexed under this decision key, found however old it is."""
+    rows, _ = await get_store().query_audit(case_id=f"PAYOUT-{key}", limit=1, tenant_id=tenant_id)
+    settled_case = _detail(rows[0]).get("settled_case_id") if rows else None
+    return {"case_id": settled_case} if settled_case else None
+
+
+async def _indexed(captures: set[str], tenant_id: str | None) -> dict[str, Any] | None:
+    """The settlement the settler indexed under one of these capture ids, found by key however old it is."""
+    for capture in sorted(captures):
+        rows, _ = await get_store().query_audit(case_id=f"CAPTURE-{capture}", limit=1, tenant_id=tenant_id)
+        settled_case = _detail(rows[0]).get("settled_case_id") if rows else None
+        if settled_case:
+            return {"case_id": settled_case}
+    return None
 
 
 async def _freeze_for(
@@ -118,7 +136,8 @@ async def _freeze_for(
         capture = detail.get("capture")
         return isinstance(capture, dict) and capture.get("paypal_id") in wanted
 
-    row = await _find(match, tenant_id)
+    # A settlement made before the index existed is still found by the scan of the newest ones.
+    row = await _indexed(wanted, tenant_id) or await _find(match, tenant_id)
     if row is None:
         return {"matched": False}
     case_id = str(row.get("case_id") or "")
@@ -145,6 +164,20 @@ async def _disputed_transactions(event_id: str, resource: dict[str, Any]) -> Any
     return body.get("disputed_transactions")
 
 
+def _capture_ids(resource: dict[str, Any]) -> list[str]:
+    """The captures an event may be about: the resource's own id, and the capture its "up" link points to.
+
+    The resource of a refund or a reversal is the refund, whose id is not the capture's; a DENIED event's resource is the capture.
+    """
+    ids = [str(resource.get("id") or "")]
+    links = resource.get("links")
+    for link in links if isinstance(links, list) else []:
+        href = str(link.get("href") or "") if isinstance(link, dict) else ""
+        if isinstance(link, dict) and link.get("rel") == "up" and "/captures/" in href:
+            ids.append(href.rstrip("/").rsplit("/", 1)[-1])
+    return ids
+
+
 async def _apply(
     event_id: str, event_type: str, resource: dict[str, Any], tenant_id: str | None,
 ) -> dict[str, Any]:
@@ -152,7 +185,7 @@ async def _apply(
         return await _payout_item(event_id, event_type, resource, tenant_id)
     if event_type in _CAPTURE_TROUBLE:
         return await _freeze_for(
-            event_id, [str(resource.get("id") or "")], f"PayPal reported {event_type}", tenant_id,
+            event_id, _capture_ids(resource), f"PayPal reported {event_type}", tenant_id,
         )
     if event_type == _DISPUTE_OPENED:
         disputed = await _disputed_transactions(event_id, resource)

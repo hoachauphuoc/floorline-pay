@@ -93,7 +93,11 @@ class TestTheRenewedAuthorization:
         old, new = "AUTHOLD" + fresh(), fresh()
         d = booked(old)
         with patch.object(settler.paypal_client, "reauthorize_authorization", AsyncMock(return_value=reply({"id": new, "status": "CREATED"}))) as renew:
-            run(settler.settle(d))
+            capture.side_effect = [
+                {"status": settler.paypal_client.TRANSPORT_ERROR, "http_status": None, "body": None, "error": "ConnectError"},
+                capture.return_value,
+            ]
+            assert run(settler.settle(d))["status"] == "retry"
             run(settler.settle(d))
         renew.assert_awaited_once()
         asked = [call.args[0] for call in settler.paypal_client.get_authorization.await_args_list]

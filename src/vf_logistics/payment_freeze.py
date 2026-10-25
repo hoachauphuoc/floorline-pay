@@ -125,8 +125,9 @@ async def frozen_parties(tenant_id: str | None = None) -> list[dict[str, Any]]:
         if not cursor:
             break
     found: list[dict[str, Any]] = []
-    for (kind, _party), name in parties.items():
-        current = await frozen(kind, name, tenant_id)
+    # By the stored key, not the stored name: the name is cut to 120 characters, and a cut name can give another key.
+    for kind, party in parties:
+        current = await frozen(kind, party, tenant_id)
         if current is not None:
             found.append(current)
     return sorted(found, key=lambda f: str(f.get("at") or ""), reverse=True)

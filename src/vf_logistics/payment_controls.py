@@ -57,7 +57,10 @@ class ControlsError(Exception):
 def _number(value: Any) -> float | None:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
-    return float(value) if math.isfinite(value) and value > 0 else None
+    try:
+        return float(value) if math.isfinite(value) and value > 0 else None
+    except OverflowError:
+        return None
 
 
 def validate_limits(raw: Any) -> dict[str, float | int]:
@@ -87,10 +90,13 @@ def validate_limits(raw: Any) -> dict[str, float | int]:
 # One filter only: Firestore applies just one of case_id, action and status in an audit query, so
 # the rows of the case are read and the action is picked here.
 async def _newest(action: str, tenant_id: str | None) -> dict[str, Any] | None:
-    rows, _ = await get_store().query_audit(
-        case_id=CASE, limit=_PAGE, tenant_id=tenant_id,
-    )
-    return next((r for r in rows if r.get("action") == action), None)
+    cursor: str | None = None
+    for _ in range(_PAGES):
+        rows, cursor = await get_store().query_audit(case_id=CASE, limit=_PAGE, cursor=cursor, tenant_id=tenant_id)
+        found = next((r for r in rows if r.get("action") == action), None)
+        if found is not None or not cursor:
+            return found
+    raise ControlsError("too many control changes to find the newest one; payments are held", 503)
 
 
 def _detail(row: dict[str, Any]) -> dict[str, Any]:

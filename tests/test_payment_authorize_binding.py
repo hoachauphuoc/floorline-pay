@@ -60,6 +60,7 @@ class TestTheAuthorizeRoute(Base):
     def _authorize(self, reply):
         routes = importlib.import_module("vf_logistics.payment_routes")
         with patch.object(routes.paypal_client, "authorize_order", AsyncMock(return_value=reply)):
+            run(importlib.import_module("vf_logistics.payment_binding").record_order("5O190127TN364715T", "SHP-PAY-1"))
             return self.client.post("/api/v1/payments/orders/5O190127TN364715T/authorize", headers=KEYED)
 
     def test_the_route_records_the_booking_from_paypals_own_reply(self, binding):

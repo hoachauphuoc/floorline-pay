@@ -41,6 +41,11 @@ PAYPAL_ID = re.compile(r"^[A-Z0-9-]{1,64}$")
 # The only hosts a shipper may be sent to in order to approve a payment.
 PAYPAL_APPROVAL_HOSTS = frozenset({"www.paypal.com", "www.sandbox.paypal.com"})
 
+# The request id goes into a PayPal header and the reference into the order: longer values are refused here as bad input
+# instead of being sent and answered with a PayPal error.
+MAX_REQUEST_ID = 100
+MAX_REFERENCE_ID = 256
+
 
 def _refusal(receipt: dict[str, Any]) -> tuple[Any, int]:
     status = receipt["status"]
@@ -123,7 +128,14 @@ def register(
     @limiter.limit("30 per minute")
     def payments_create_order() -> Any:
         body = request.get_json(silent=True) or {}
+        if not isinstance(body, dict):
+            return jsonify({"error": "the request body must be a JSON object; nothing is booked"}), 400
         request_id = str(body.get("request_id") or f"order-{uuid.uuid4().hex}")
+        if len(request_id) > MAX_REQUEST_ID or len(str(body.get("reference_id") or "")) > MAX_REFERENCE_ID:
+            return jsonify({
+                "error": f"request_id may be at most {MAX_REQUEST_ID} characters and reference_id at most "
+                         f"{MAX_REFERENCE_ID}; nothing is booked",
+            }), 400
         return_url = str(body.get("return_url") or "")
         cancel_url = str(body.get("cancel_url") or "")
         signed: dict[str, Any] | None = None
@@ -162,6 +174,10 @@ def register(
         order_id = data.get("id")
         if not isinstance(order_id, str) or not PAYPAL_ID.match(order_id):
             return _no_id("order id")
+        # An order id is not a secret and PayPal answers a replayed request id with the first order, so the order is
+        # claimed for this tenant here, and only the tenant that claimed it may authorize it.
+        if not run_async(payment_binding.record_order(order_id, str(body.get("reference_id") or ""), tenant_id=tenant())):
+            return jsonify({"error": "this PayPal order belongs to another tenant; nothing is booked"}), 409
         reply: dict[str, Any] = {"order_id": order_id, "paypal_status": data.get("status")}
         if signed is not None:
             run_async(mandate.record(signed, tenant_id=tenant()))
@@ -179,6 +195,10 @@ def register(
     def payments_authorize_order(order_id: str) -> Any:
         if not PAYPAL_ID.match(order_id):
             return jsonify({"error": "order_id is not a PayPal order id"}), 400
+        if run_async(payment_binding.find_order(order_id, tenant_id=tenant())) is None:
+            return jsonify({
+                "error": "not this tenant's order: authorize only an order created through this tenant's booking",
+            }), 404
         receipt = run_async(paypal_client.authorize_order(order_id, f"authorize-{order_id}"))
         if receipt["status"] != paypal_client.OK:
             return _refusal(receipt)

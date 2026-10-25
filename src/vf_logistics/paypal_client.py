@@ -54,6 +54,10 @@ def _receipt(
     return {"status": status, "http_status": http_status, "body": body, "error": error}
 
 
+# PayPal accepts far less; formatting an amount with an enormous exponent builds a string as long as the exponent.
+MAX_AMOUNT = Decimal(10) ** 9
+
+
 def _money(amount: Any, currency: str) -> dict[str, str] | None:
     # PayPal takes a decimal string. A non-positive, non-numeric or non-finite amount is
     # refused here rather than sent, so a malformed figure never reaches a payment API.
@@ -61,7 +65,7 @@ def _money(amount: Any, currency: str) -> dict[str, str] | None:
         value = Decimal(str(amount))
     except (InvalidOperation, ValueError):
         return None
-    if not value.is_finite() or value <= 0 or len(currency or "") != 3:
+    if not value.is_finite() or not 0 < value <= MAX_AMOUNT or len(currency or "") != 3:
         return None
     return {"currency_code": currency.upper(), "value": f"{value:.2f}"}
 

@@ -70,6 +70,8 @@ def issue(
         ceiling = Decimal(0)
     if not ceiling.is_finite() or ceiling <= 0:
         raise MandateError("max_payout_usd must be a number above zero", 400)
+    if ceiling > Decimal(10) ** 9:
+        raise MandateError("max_payout_usd is above the most a mandate may name (1000000000 USD)", 400)
     keys = sorted({carrier_registry.carrier_key(c) for c in carriers} - {""}) if isinstance(carriers, list) else []
     if not keys:
         raise MandateError("a mandate names the carriers that may be paid", 400)
