@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { AccountMenu } from "@/components/layout/AccountMenu";
 import { HelpModeToggle } from "@/components/layout/HelpModeToggle";
+import { PayPalLogo } from "@/components/ui/PayPalLogo";
 import { TenantSwitcher } from "@/components/layout/TenantSwitcher";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -45,6 +46,7 @@ export function Header({ display }: { display?: Tenant }) {
         </div>
 
         <div className="ml-auto flex min-w-0 items-center gap-2">
+          <PayPalBadge />
           <ModelsChip />
           <HelpModeToggle />
           {DEMO_MODE ? <DemoPill /> : <LivePill />}
@@ -124,5 +126,20 @@ function ModelsChip() {
         cases. Documents are read by MiniCPM-V, also on Token Factory.
       </TooltipContent>
     </Tooltip>
+  );
+}
+
+/**
+ * Who the payments run on, on every screen. The logo sits on a white pill because PayPal's rules
+ * allow the mark only unaltered on a clear background, and the header is dark.
+ */
+function PayPalBadge() {
+  return (
+    <span className="hidden h-7 shrink-0 items-center gap-2 text-[11px] text-dim sm:inline-flex">
+      <span className="whitespace-nowrap">Payments by</span>
+      <span className="inline-flex h-6 items-center rounded-md bg-white px-2">
+        <PayPalLogo height={14} />
+      </span>
+    </span>
   );
 }

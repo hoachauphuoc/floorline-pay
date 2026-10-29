@@ -1,13 +1,14 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { Loader2, Wallet } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PayPalLogo } from "@/components/ui/PayPalLogo";
 import { Label } from "@/components/ui/label";
 import { createPaymentOrder } from "@/lib/api";
 import {
@@ -87,15 +88,22 @@ export default function BookPage() {
           size="sm"
           disabled={pay.isPending || problem !== null}
           onClick={() => pay.mutate()}
-          className="mt-3 h-8 text-[12px]"
+          className="mt-3 h-8 bg-[#FFC439] text-[12px] font-semibold text-[#111111] hover:bg-[#f2b72f]"
         >
           {pay.isPending ? (
             <Loader2 className="mr-1.5 size-3.5 animate-spin" />
           ) : (
-            <Wallet className="mr-1.5 size-3.5" />
+            <PayPalLogo decorative height={14} className="mr-1.5" />
           )}
           Pay with PayPal
         </Button>
+
+        <p className="mt-2 flex items-center gap-2 text-[11px] text-dim">
+          <span className="inline-flex h-6 items-center rounded-md bg-white px-2">
+            <PayPalLogo height={14} />
+          </span>
+          Checkout runs on the PayPal sandbox: no real money moves.
+        </p>
 
         {pay.isError && (
           <div className="mt-3">

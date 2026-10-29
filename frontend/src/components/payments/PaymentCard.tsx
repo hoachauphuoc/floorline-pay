@@ -1,6 +1,7 @@
 "use client";
 
 import type { PaymentState } from "@/lib/api";
+import { PayPalLogo } from "@/components/ui/PayPalLogo";
 import { humaniseCode } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +43,12 @@ export function PaymentCard({ state }: { state: PaymentState }) {
   const ids = steps.filter(([, id]) => Boolean(id));
   return (
     <section className="bento-card p-4" aria-label="Payment">
-      <h2 className="text-[12px] font-medium text-white">Payment</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-[12px] font-medium text-white">Payment</h2>
+        <span className="inline-flex h-5 items-center rounded bg-white px-1.5">
+          <PayPalLogo height={12} />
+        </span>
+      </div>
       <p className={cn("mt-1 text-[13px] font-medium", TONE[state.state] ?? TONE.unknown)}>
         {LABEL[state.state] ?? LABEL.unknown}
       </p>
