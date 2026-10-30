@@ -1879,6 +1879,38 @@ HUMAN_ACTIONS = {
 }
 
 
+async def _publish_human_decision(
+    case_id: str, action: str, reviewer: str, outcome: str, tenant_id: str | None,
+) -> dict[str, Any]:
+    """Send a person's release or block of a booked payment to the case-decisions topic.
+
+    The settler captures or voids only from a published decision, never from the case state, so a decision that
+    stayed in the store left the PayPal hold open. The key is fixed per case and action, so a repeat is
+    deduplicated downstream. A failure never undoes the person's decision: it is returned, so the console can say
+    the money has not moved.
+    """
+    from vf_logistics.evidence import published_message_id
+
+    try:
+        receipt = await tools.publish_decision(
+            case_id,
+            {
+                "outcome": outcome,
+                "action": action,
+                "approver": reviewer,
+                "executor": "human_decide",
+                "idempotency_key": f"human-{case_id}-{action}",
+            },
+            tenant_id=tenant_id,
+        )
+    except Exception as exc:  # noqa: BLE001
+        return {"published": False, "publish_error": f"decision was not published: {type(exc).__name__}: {exc}"}
+    if published_message_id(receipt) is None:
+        detail = (receipt or {}).get("detail") or {}
+        return {"published": False, "publish_error": f"decision was not published: {detail.get('error') or 'no message id'}"}
+    return {"published": True}
+
+
 async def human_decide(
     case_id: str, action: str, reviewer: str, note: str,
     tenant_id: str | None = None,
@@ -2033,7 +2065,10 @@ async def human_decide(
     # derived tallies must be re-read rather than served from the stale cache.
     _invalidate_shipper_feedback()
 
-    return {"ok": True, "case_id": case_id, "state": new_state, "review": review}
+    result: dict[str, Any] = {"ok": True, "case_id": case_id, "state": new_state, "review": review}
+    if action in ("release", "block") and (case.get("shipment") or {}).get("paypal_authorization_id"):
+        result.update(await _publish_human_decision(case_id, action, reviewer, new_state, tenant_id))
+    return result
 
 
 # --------------------------------------------------------------------------
