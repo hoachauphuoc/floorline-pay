@@ -1,15 +1,29 @@
 # Floorline Pay — the agent pays the carrier the moment delivery is proven, and can never pay a shipment the rules held
 
-> **Work in progress for the PayPal AI Hackathon (submissions close 12 Nov 2026, 12:00 PT).** This repository starts from Floorline as submitted to the Nebius x NVIDIA Global AI Hackathon (tag `nebius-baseline`, commit `5690ea3`). Everything after that tag is the PayPal work; `git diff nebius-baseline` shows it.
+> **A proof of concept for the PayPal AI Hackathon, running on the PayPal sandbox: no real money moves.** It starts from Floorline as submitted to the Nebius x NVIDIA Global AI Hackathon (tag `nebius-baseline`, commit `5690ea3`). Everything after that tag is the PayPal work; `git diff nebius-baseline` shows it. What has run against the real sandbox and what has not is listed under [Limits, stated](#limits-stated).
 
 Freight payments run on trust. A shipper's money is **held** at booking with PayPal (`intent: AUTHORIZE`). The carrier is **paid** through PayPal Payouts only after a person has released the shipment. If the shipment is blocked, the hold is **voided** and the money goes back to the shipper.
 
 Deterministic checks set a risk **floor** for every shipment, including new payment checks: a payee changed just before payment, a payee that is not the one on file, a payout above the booked freight. AI agents may argue a case above that floor; nothing they say can take it below. A held shipment keeps its money held, and a person decides every disputed case. Around the money sit seven credit-security layers (below): the AI ones may only raise risk or tighten a limit, never lower or loosen one, and the settler, the only code that moves money, never calls a model.
 
 - **Hackathon:** PayPal AI Hackathon · **Targets:** Best Use of Agentic Commerce, Best Use of PayPal + AI
-- **Live demo:** pending (a separate Cloud Run service; the Nebius service `vf-app` is not changed)
+- **Live demo:** https://floorline-pay.onrender.com (the console on Render; the case store and the decision queue are Firestore and Pub/Sub in a separate Google Cloud project; the Nebius service `vf-app` is not changed)
 - **Demo video (under 3 minutes):** YOUTUBE_URL_PENDING
 - **Licence:** MIT · **Full reference of the inherited system:** [REFERENCE.md](REFERENCE.md) · **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · **Plan:** [docs/PAYPAL_PLAN.md](docs/PAYPAL_PLAN.md)
+
+## Try it in two minutes
+
+1. Open the live demo and choose **Continue as guest judge** (one click, no password). A guest can book and pay in the sandbox, look at every screen, and block a case; a guest cannot release or approve.
+2. **Book and pay** (`/book`): fill the booking, press *Pay with PayPal*, approve with a PayPal **sandbox** buyer account, and you come back to a case whose money is *held*, not taken.
+3. Open the case: the Payment card says *Funds held, awaiting a decision*, and the page lists every finding that raised the risk floor and why.
+4. A person decides. Releasing needs a password account, so a guest sees the held state and the refusal rather than a payment. A block returns the held money to the shipper.
+
+| Step | Status on the real PayPal sandbox |
+|---|---|
+| Create an order, approve it as a buyer, authorize (money held) | **Run for real** on 24 and 30 Oct 2026 (a 1,300 USD hold) |
+| Block, then void the hold | **RESULT PENDING**: a person's block was not being published to the settler until `0c7cebe`; the rerun is not done |
+| Release, then capture and pay the carrier with Payouts | **RESULT PENDING**: not run against the sandbox yet |
+| Webhook (payout, refund and dispute events) | **RESULT PENDING**: not registered yet |
 
 ## How the money moves
 
@@ -131,23 +145,27 @@ The console asks everyone to sign in. **Continue as guest judge** signs in with 
 ## Reproducible testing
 
 ```bash
-# Backend (2,667 passed, 47 skipped without the Firestore and Pub/Sub emulators)
+# Backend (2,894 passed, 47 skipped without the Firestore and Pub/Sub emulators)
 pip install "pytest>=8.0.0" "pytest-asyncio>=0.23.0" "pytest-cov>=4.1.0" "pytest-mock>=3.12.0"
 python -m pytest tests/ -q
 python -m mypy src/vf_logistics/ --ignore-missing-imports
 python -m ruff check src/ tests/ scripts/ --select E,F,W --ignore E501,E402,W291,W293
 
-# Frontend (1,855 passed) and build
+# Frontend (117 files, 1,903 passed) and build
 cd frontend && npm ci && npx tsc --noEmit && npx eslint src && npx vitest run && npm run build
 ```
 
-The figures are from the last full runs on the development machine, not from CI on this repository. Every PayPal call in the tests goes through a fake: no test has called PayPal.
+The figures are from full runs on the development machine on 30 Oct and 4 Nov 2026 (`ruff` clean; `mypy` clean on 70 files, run with `--python-version 3.13` locally because the numpy stubs there need it; `tsc` clean, `eslint` 0 errors). CI on this repository runs the same checks and passed on the commit before this text (`0c7cebe`). Every PayPal call in the tests goes through a fake or a recorded sandbox answer: no test calls PayPal.
 
 ## Limits, stated
 
-- **No real PayPal call has been tested yet**: the client, the booking routes and the settler are covered with fakes. The approval flow assumes PayPal's Orders v2 reply carries a `payer-action` link for an order made with `payment_source.paypal.experience_context`; it has not been run against the sandbox.
+- **Only the booking half has met the real sandbox.** Creating an order, approving it as a sandbox buyer and authorizing it (a 1,300 USD hold) ran for real on 24 and 30 Oct 2026. Capture, payout, void and the webhook are covered with fakes and with PayPal answers recorded from the sandbox in `tests/fixtures/paypal`; no capture, payout or void has run against the sandbox yet (see the status table above).
+- **A person's release or block used to stay in the store.** For a case booked through `/book` the decision was recorded and the shipment held or released, but nothing was published, so the settler never saw it and a block never voided the hold. Found on the first real booking and fixed in `0c7cebe`; `tests/test_human_decide_publishes.py` pins it. The fix has not yet been shown end to end on the live service.
+- **The agent starts suspended.** Until a person publishes a delegation boundary (Governance page) every protected action, including publishing a decision, is refused and the case goes to a person. The demo runs under `BOUNDARY-v1`, which does not allow the agent to release by itself.
 - **Settling depends on Pub/Sub delivery** to the receiver, as described above.
-- **The settlement layer is written and tested with fakes only.** The webhook receiver (`/api/v1/paypal/webhook`) is off until a public address exists and `PAYPAL_WEBHOOK_ID` is set; it assumes payout events carry `sender_batch_id` (our `<key>-payout`) and dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, and that renewing an authorization keeps its id. None of this has met the sandbox.
+- **The webhook receiver** (`/api/v1/paypal/webhook`) is off until `PAYPAL_WEBHOOK_ID` is set. It assumes payout events carry `sender_batch_id` (our `<key>-payout`), dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, and that renewing an authorization gives a new id the settler then uses. None of this has met the sandbox.
+- **Two settlements at the same moment can together pass the daily limit**: the check and the write are not one step. Known, not fixed.
+- **"Payout accepted" is not "money received".** The settler records a payout as settled when PayPal accepts the batch; the tracking that confirms the money arrived is best effort.
 - **There is no console screen yet for frozen parties or payout status**: they are API only (`GET /api/v1/payments/freezes`, `POST /api/v1/payments/freezes/lift`, `POST /api/v1/payments/cases/<id>/payout/refresh`; the payment state of a case carries `payout_status`).
 - **A new carrier's first payouts are capped** (credit standing C: 2,000 USD) and nothing but being paid without trouble raises the cap; there is no human override yet.
 - **The payment-risk analyst has not been measured.** The synthetic corpus shows what the deterministic checks and the carrier look-up catch (above); whether the model adds anything is the number `scripts/evaluate_payment_ai.py --live-analyst` produces, and it has not been run. The corpus is invented from the patterns the checks were written for, so its rates are not a forecast.
@@ -163,7 +181,7 @@ The figures are from the last full runs on the development machine, not from CI 
 | PayPal developer platform (sandbox) and an AI tool, with PayPal central | `paypal_client.py`, `settler.py`; Nemotron agents on Nebius Token Factory |
 | Significantly updated after 1 Oct 2026, with an explanation | the section above; `git diff nebius-baseline` |
 | Working demo | the hosted URL once deployed, or the local steps above |
-| Public repository with a detectable open source licence | MIT (the repository is private until submission) |
+| Public repository with a detectable open source licence | MIT (`LICENSE`); the repository is made public before submission |
 | Demo video under 3 minutes on YouTube | link at the top |
 | English | all materials |
 
