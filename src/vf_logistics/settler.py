@@ -232,7 +232,11 @@ async def _release(
     paused = await payment_controls.pause_state(tenant_id)
     if paused["paused"]:
         return _result(RETRY, f"payments are paused ({paused['reason']}); the decision is retried when they resume")
-    for kind, name in (("carrier", shipment.get("carrier_name")), ("shipper", shipment.get("shipper_name"))):
+    shippers = payment_freeze.shipper_names(shipment)
+    if not shippers:
+        # A freeze is kept under the shipper's name; a case that gives none cannot be checked, and an unchecked shipper is not a clear one.
+        return _result(HELD, "the case names no shipper (shipper_company or shipper_name), so a freeze on the shipper cannot be checked; nothing is paid")
+    for kind, name in (("carrier", shipment.get("carrier_name")), *(("shipper", shipper) for shipper in shippers)):
         frozen = await payment_freeze.frozen(kind, name, tenant_id)
         if frozen is not None:
             return _result(
@@ -269,28 +273,11 @@ async def _release(
         status = RETRY if capture_state == "PENDING" else FAILED
         return _result(status, f"PayPal reports the capture as {capture_state or 'unknown'}, not COMPLETED; nothing is paid",
                        capture=_step(captured))
-    paid = await paypal_client.create_payout(
-        payee, shipment.get("payout_amount"), currency, f"{key}-payout",
-        f"Floorline freight payment for {shipment.get('shipment_id') or case.get('case_id')}",
-    )
-    if paid["status"] != paypal_client.OK:
-        status = RETRY if _retryable(paid) else FAILED
-        return _result(status, "PayPal captured the funds but did not pay the carrier",
-                       capture=_step(captured), payout=_step(paid))
-    # PayPal's payout events name the batch "<key>-payout"; this row finds the settlement by its key, however many
-    # settlements came after it.
-    await get_store().add_audit_once({
-        "audit_id": f"payidx-{key}",
-        "case_id": f"PAYOUT-{key}",
-        "action": "settle_payout_index",
-        "status": "done",
-        "detail": {"settled_case_id": case.get("case_id")},
-        "at": utcnow(),
-    }, tenant_id=tenant_id)
+    # PayPal's refund, reversal and dispute events name the capture, and its payout events name the batch "<key>-payout". Both rows
+    # are written as soon as the money is captured, before the payout, so a payout that fails or is lost still leaves the capture
+    # findable; each finds the settlement by id, however many settlements came after it.
     capture_id = _step(captured).get("paypal_id")
     if capture_id:
-        # PayPal's refund, reversal and dispute events name the capture; this row finds the settlement by it, however many
-        # settlements came after it.
         await get_store().add_audit_once({
             "audit_id": f"capidx-{capture_id}",
             "case_id": f"CAPTURE-{capture_id}",
@@ -299,11 +286,54 @@ async def _release(
             "detail": {"settled_case_id": case.get("case_id"), "idempotency_key": key},
             "at": utcnow(),
         }, tenant_id=tenant_id)
+    await get_store().add_audit_once({
+        "audit_id": f"payidx-{key}",
+        "case_id": f"PAYOUT-{key}",
+        "action": "settle_payout_index",
+        "status": "done",
+        "detail": {"settled_case_id": case.get("case_id")},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    paid = await paypal_client.create_payout(
+        payee, shipment.get("payout_amount"), currency, f"{key}-payout",
+        f"Floorline freight payment for {shipment.get('shipment_id') or case.get('case_id')}",
+    )
+    if paid["status"] != paypal_client.OK:
+        paid = await _recovered_payout(paid, shipment.get("payout_amount"), currency, key) or paid
+    if paid["status"] != paypal_client.OK:
+        status = RETRY if _retryable(paid) else FAILED
+        return _result(status, "PayPal captured the funds but did not pay the carrier",
+                       capture=_step(captured), payout=_step(paid))
     return _result(
         SETTLED, "captured and paid", capture=_step(captured), payout=_step(paid),
         amount=str(_amount(shipment.get("payout_amount"))), carrier_key=carrier,
         **await _tracking(shipment, _step(captured), key, tenant_id),
     )
+
+
+async def _recovered_payout(refusal: dict[str, Any], amount: Any, currency: str, key: str) -> dict[str, Any] | None:
+    """PayPal's own record of this payout when it refused the request as a duplicate, or None.
+
+    A repeated delivery after a payout whose result was lost gets a duplicate-batch refusal although the carrier was paid. The
+    batch is read at PayPal and counts only when it carries this payout's sender_batch_id, amount and currency; anything else,
+    or a batch that cannot be read, leaves the refusal in force. No payout is ever created here.
+    """
+    batch_id = paypal_client.duplicate_batch_id(refusal)
+    if batch_id is None:
+        return None
+    found = await paypal_client.get_payout_batch(batch_id, f"{key}-recover")
+    body = found.get("body")
+    header = body.get("batch_header") if isinstance(body, dict) else None
+    if found.get("status") != paypal_client.OK or not isinstance(header, dict):
+        return None
+    sender = header.get("sender_batch_header")
+    money = header.get("amount")
+    if not isinstance(sender, dict) or sender.get("sender_batch_id") != f"{key}-payout" or not isinstance(money, dict):
+        return None
+    if _amount(money.get("value")) != _amount(amount) or money.get("currency", money.get("currency_code")) != currency:
+        return None
+    recovered: dict[str, Any] = found
+    return recovered
 
 
 async def _tracking(

@@ -27,6 +27,11 @@ services:
       # The demo must stay open until judging ends on 15 Dec 2026.
       - key: VF_ONE_CLICK_UNTIL
         value: "2026-12-16T00:00:00Z"
+      # Nobody reads the API or the console without signing in. The one-click guest session stays; it can neither release nor approve.
+      - key: ANONYMOUS_ROLE
+        value: none
+      - key: VF_PUBLIC_READS
+        value: "false"
       # The model spend a judge's visit can cause is capped; set the number you are willing to pay for.
       - key: VF_TENANT_SPEND_CEILING_USD
         value: "20"

@@ -37,6 +37,7 @@ from vf_logistics import payment_freeze, payout_tracking, paypal_client
 from vf_logistics.store import get_store, utcnow
 
 CASE = "PAYPAL-EVENTS"
+UNMATCHED = "PAYPAL-UNMATCHED"
 
 _HEADERS = (
     "paypal-auth-algo", "paypal-cert-url", "paypal-transmission-id",
@@ -49,6 +50,24 @@ _CAPTURE_TROUBLE = frozenset({
 _DISPUTE_OPENED = "CUSTOMER.DISPUTE.CREATED"
 _PAGE = 200
 _PAGES = 10
+
+
+def _slim(resource: dict[str, Any]) -> dict[str, Any]:
+    """Only the fields _apply reads, so a kept event holds no payer address, name or note."""
+    links = resource.get("links")
+    disputed = resource.get("disputed_transactions")
+    kept: dict[str, Any] = {
+        key: resource[key] for key in ("id", "sender_batch_id", "transaction_status", "dispute_id") if key in resource
+    }
+    kept["links"] = [
+        {"rel": link.get("rel"), "href": link.get("href")}
+        for link in (links if isinstance(links, list) else []) if isinstance(link, dict) and link.get("rel") == "up"
+    ]
+    if isinstance(disputed, list):
+        kept["disputed_transactions"] = [
+            {"seller_transaction_id": t.get("seller_transaction_id")} for t in disputed if isinstance(t, dict)
+        ]
+    return kept
 
 
 def _reply(status: int, outcome: str, reason: str, **more: Any) -> tuple[int, dict[str, Any]]:
@@ -86,10 +105,10 @@ async def _find(match: Callable[[dict[str, Any]], bool], tenant_id: str | None) 
     return None
 
 
-async def _parties(case_id: str, tenant_id: str | None) -> tuple[Any, Any]:
+async def _parties(case_id: str, tenant_id: str | None) -> tuple[Any, list[str]]:
     case = await get_store().get_case(case_id, tenant_id=tenant_id)
     shipment = (case or {}).get("shipment") or {}
-    return shipment.get("carrier_name"), shipment.get("shipper_name")
+    return shipment.get("carrier_name"), payment_freeze.shipper_names(shipment)
 
 
 async def _payout_item(
@@ -141,10 +160,10 @@ async def _freeze_for(
     if row is None:
         return {"matched": False}
     case_id = str(row.get("case_id") or "")
-    carrier, shipper = await _parties(case_id, tenant_id)
+    carrier, shippers = await _parties(case_id, tenant_id)
     frozen = []
-    for kind, name in (("carrier", carrier), ("shipper", shipper)):
-        if await payment_freeze.freeze(kind, name, reason, f"event-{event_id}", tenant_id):
+    for kind, name in (("carrier", carrier), *(("shipper", shipper) for shipper in shippers)):
+        if await payment_freeze.freeze(kind, name, reason, f"event-{event_id}", tenant_id) and kind not in frozen:
             frozen.append(kind)
     return {"matched": True, "case_id": case_id, "frozen": frozen}
 
@@ -230,6 +249,19 @@ async def receive(headers: Mapping[str, str], event: Any) -> tuple[int, dict[str
         event_id, event_type = str(event["id"]), str(event["event_type"])
         resource = event.get("resource")
         effect = await _apply(event_id, event_type, resource if isinstance(resource, dict) else {}, tenant_id)
+        if effect.get("matched") is False:
+            # Kept so reconcile() can apply it once its settlement can be found.
+            await get_store().add_audit_once({
+                "audit_id": f"ppunm-{event_id}",
+                "case_id": UNMATCHED,
+                "action": "paypal_event_pending",
+                "status": "pending",
+                "detail": {
+                    "event_id": event_id, "event_type": event_type,
+                    "resource": _slim(resource if isinstance(resource, dict) else {}),
+                },
+                "at": utcnow(),
+            }, tenant_id=tenant_id)
         await get_store().add_audit_once({
             "audit_id": f"ppevt-{event_id}",
             "case_id": CASE,
@@ -243,3 +275,44 @@ async def receive(headers: Mapping[str, str], event: Any) -> tuple[int, dict[str
     matched = effect.get("matched")
     outcome = "recorded" if matched is None else ("applied" if matched else "unmatched")
     return 200, {"outcome": outcome, "event_type": event_type, **effect}
+
+
+async def reconcile(tenant_id: str | None = None) -> dict[str, int]:
+    """Apply again the kept events whose settlement can now be found. Returns how many were applied and how many wait.
+
+    Each effect is idempotent and keyed by the event, so a second run changes nothing. This only freezes or records a payout
+    status: it never pays anyone and never loosens anything.
+    """
+    pending: list[dict[str, Any]] = []
+    done: set[str] = set()
+    cursor: str | None = None
+    for _ in range(_PAGES):
+        rows, cursor = await get_store().query_audit(case_id=UNMATCHED, cursor=cursor, limit=_PAGE, tenant_id=tenant_id)
+        for row in rows:
+            if row.get("action") == "paypal_event_applied":
+                done.add(str(_detail(row).get("event_id")))
+            elif row.get("action") == "paypal_event_pending":
+                pending.append(_detail(row))
+        if not cursor:
+            break
+    applied = 0
+    waiting = 0
+    for item in pending:
+        event_id = str(item.get("event_id") or "")
+        if not event_id or event_id in done:
+            continue
+        resource = item.get("resource")
+        effect = await _apply(event_id, str(item.get("event_type") or ""), resource if isinstance(resource, dict) else {}, tenant_id)
+        if effect.get("matched") is True:
+            await get_store().add_audit_once({
+                "audit_id": f"ppdone-{event_id}",
+                "case_id": UNMATCHED,
+                "action": "paypal_event_applied",
+                "status": "done",
+                "detail": {"event_id": event_id, "event_type": item.get("event_type"), **effect},
+                "at": utcnow(),
+            }, tenant_id=tenant_id)
+            applied += 1
+        else:
+            waiting += 1
+    return {"applied": applied, "pending": waiting}

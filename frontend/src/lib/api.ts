@@ -1209,6 +1209,7 @@ export type PaymentState = {
     | "unknown";
   reason?: string | null;
   findings?: string[];
+  decision_not_sent?: boolean;
   payout_status?: { state: "confirmed" | "failed" | "pending" | "unconfirmed"; status: string | null; at: string | null };
   capture?: PaymentStep | null;
   payout?: PaymentStep | null;
@@ -1305,6 +1306,11 @@ export async function fetchFrozenParties(): Promise<{ frozen: FrozenParty[] }> {
 export async function retrySettlement(caseId: string, reason: string): Promise<{ status: string; case_id: string }> {
   if (DEMO_MODE) liveOnly("Retrying a settlement");
   return postJson(`payments/cases/${encodeURIComponent(caseId)}/decision/redeliver`, { reason });
+}
+
+export async function refreshPayout(caseId: string): Promise<{ state: string; status: string | null; at: string | null }> {
+  if (DEMO_MODE) liveOnly("Checking a payout with PayPal");
+  return postJson(`payments/cases/${encodeURIComponent(caseId)}/payout/refresh`, {});
 }
 
 export async function liftFreeze(request: {

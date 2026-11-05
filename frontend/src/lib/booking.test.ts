@@ -17,6 +17,7 @@ function form(overrides: Partial<BookingForm> = {}): BookingForm {
     ...EMPTY_BOOKING,
     shipment_id: "SHP-PAY-1",
     shipping_cost: "1300",
+    shipper_company: "Saigon Plywood Co",
     carrier_payee_email: "payments@mekong-haulage.example",
     ...overrides,
   };
@@ -43,6 +44,10 @@ describe("bookingProblem", () => {
 
   it("asks for a shipment id", () => {
     expect(bookingProblem(form({ shipment_id: "  " }))).toContain("shipment id");
+  });
+
+  it.each(["", "   "])("asks for the shipper when it is %j, because a block on a shipper is looked up by its name", (value) => {
+    expect(bookingProblem(form({ shipper_company: value }))).toContain("shipper");
   });
 
   it.each(["", "abc", "0", "-5", "NaN"])("refuses a freight of %j", (value) => {

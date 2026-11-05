@@ -39,6 +39,7 @@ LIVE = {"status": "ok", "http_status": 200, "error": None, "body": {
 
 SHIPMENT = {
     "shipment_id": "SHP-PAY-1",
+    "shipper_company": "Saigon Plywood Co",
     "currency": "USD",
     "shipping_cost": 1300.0,
     "payout_amount": 1250.0,
@@ -70,6 +71,8 @@ def pp(monkeypatch):
     settler = importlib.import_module("vf_logistics.settler")
     monkeypatch.setenv("PAYPAL_CLIENT_ID", "sandbox-id")
     monkeypatch.setenv("PAYPAL_CLIENT_SECRET", "sandbox-secret")
+    # A freeze on a shipper outlives the test in the shared store: a name of its own keeps one test's dispute from holding another's release.
+    monkeypatch.setitem(SHIPMENT, "shipper_company", f"Saigon Plywood {uuid.uuid4().hex[:8]} Co")
     monkeypatch.setattr(settler.payment_binding, "find_authorization", AsyncMock(return_value=BOOKING))
     monkeypatch.setattr(settler.paypal_client, "get_authorization", AsyncMock(return_value=LIVE))
     monkeypatch.setattr(settler.carrier_registry, "enrich", AsyncMock(side_effect=lambda s, tenant_id=None: s))

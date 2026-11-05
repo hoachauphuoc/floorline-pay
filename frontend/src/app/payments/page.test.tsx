@@ -56,7 +56,7 @@ describe("PaymentsPage", () => {
     await waitFor(() => expect(screen.getByRole("link", { name: "CASE-A" })).toBeInTheDocument());
     expect(screen.getByRole("link", { name: "CASE-A" })).toHaveAttribute("href", "/cases/CASE-A");
     expect(screen.getByRole("link", { name: "CASE-B" })).toHaveAttribute("href", "/cases/CASE-B");
-    expect(screen.getAllByText("Paid to the carrier").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Payout accepted by PayPal, not confirmed yet").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Payout held").length).toBeGreaterThan(0);
     expect(screen.getByText("captured and paid")).toBeInTheDocument();
     expect(screen.getByText("CAP-1")).toBeInTheDocument();
@@ -77,6 +77,23 @@ describe("PaymentsPage", () => {
     const chips = await screen.findByRole("list", { name: "Payments by state" });
     expect(chips).toHaveTextContent("Payout held2");
     expect(chips).toHaveTextContent("Payment failed1");
+  });
+
+  it("counts a paid case as paid only when PayPal confirmed the payout", async () => {
+    vi.mocked(fetchPaymentLedger).mockResolvedValue({
+      items: [
+        { case_id: "CASE-1", state: "paid", payout_status: { state: "confirmed", status: "SUCCESS", at: null } },
+        { case_id: "CASE-2", state: "paid", payout_status: { state: "unconfirmed", status: null, at: null } },
+        { case_id: "CASE-3", state: "paid", payout_status: { state: "unconfirmed", status: null, at: null } },
+        { case_id: "CASE-4", state: "paid", payout_status: { state: "failed", status: "RETURNED", at: null } },
+      ],
+      counts: { paid: 4 },
+    });
+    renderPage();
+    const chips = await screen.findByRole("list", { name: "Payments by state" });
+    expect(chips).toHaveTextContent("Paid to the carrier, confirmed by PayPal1");
+    expect(chips).toHaveTextContent("Payout accepted by PayPal, not confirmed yet2");
+    expect(chips).toHaveTextContent("Payout failed at PayPal1");
   });
 
   it("never shows a state it does not know as a success", async () => {

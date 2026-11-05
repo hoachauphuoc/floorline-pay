@@ -20,6 +20,7 @@ from vf_logistics.store import get_store, utcnow
 ACTION = "retry_settlement"
 RELEASE = "RELEASED_BY_HUMAN"
 NOT_SENT = "the decision could not be sent again; nothing moved; try again"
+HUMAN_ACTION = {"RELEASED_BY_HUMAN": "release", "BLOCKED_BY_HUMAN": "block"}
 
 
 class RetryError(Exception):
@@ -39,6 +40,8 @@ async def retry(case_id: str, reason: Any, actor: str, tenant_id: str | None = N
     if not note:
         raise RetryError("a reason is required to retry a settlement: say what you checked", 400)
     rows, _ = await get_store().query_audit(case_id=case_id, action="settle_payment", limit=100, tenant_id=tenant_id)
+    if not rows:
+        return await _send_unsent(case_id, note, actor, tenant_id)
     newest = rows[0] if rows else None
     if (
         newest is None
@@ -63,6 +66,46 @@ async def retry(case_id: str, reason: Any, actor: str, tenant_id: str | None = N
     }
     try:
         receipt = await tools.publish_decision(case_id, decision, tenant_id=tenant_id, redeliver=True)
+    except Exception as exc:  # noqa: BLE001 - a publish that raised sent nothing the console can prove
+        raise RetryError(NOT_SENT, 503) from exc
+    if published_message_id(receipt) is None:
+        raise RetryError(NOT_SENT, 503)
+    return {"status": "redelivered", "case_id": case_id}
+
+
+async def unsent_decision(case: dict[str, Any], tenant_id: str | None = None) -> dict[str, Any] | None:
+    """The release or block a person saved on this case that no publish proves went out, or None.
+
+    A saved decision is only a decision once it reaches the topic: the settler captures or voids from the published message and never
+    from the case state. Only a case that holds a PayPal authorization has money waiting, and a publish that carries a message id
+    under the decision's first key shows it went out.
+    """
+    action = HUMAN_ACTION.get(str(case.get("state")))
+    case_id = str(case.get("case_id") or "")
+    if action is None or not case_id or not (case.get("shipment") or {}).get("paypal_authorization_id"):
+        return None
+    key = f"human-{case_id}-{action}"
+    if await tools._earlier_publish(case_id, key, tenant_id) is not None:
+        return None
+    return {"outcome": str(case["state"]), "action": action, "idempotency_key": key}
+
+
+async def _send_unsent(case_id: str, note: str, actor: str, tenant_id: str | None) -> dict[str, Any]:
+    """Publish the decision a person saved and that never went out, under its first key, and record who asked and why."""
+    case = await get_store().get_case(case_id, tenant_id=tenant_id)
+    unsent = await unsent_decision(case, tenant_id) if case else None
+    if unsent is None:
+        raise RetryError("only a settlement that ended failed can be retried; this case has none", 409)
+    await get_store().add_audit({
+        "case_id": case_id,
+        "action": ACTION,
+        "status": "requested",
+        "detail": {"reason": note, "retried_by": actor, "idempotency_key": unsent["idempotency_key"]},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    decision = {**unsent, "approver": actor, "executor": "settlement_retry"}
+    try:
+        receipt = await tools.publish_decision(case_id, decision, tenant_id=tenant_id, after_attempt=True)
     except Exception as exc:  # noqa: BLE001 - a publish that raised sent nothing the console can prove
         raise RetryError(NOT_SENT, 503) from exc
     if published_message_id(receipt) is None:

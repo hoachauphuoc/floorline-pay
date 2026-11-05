@@ -1,11 +1,10 @@
 """
 Payment code on a store that filters an audit query by one field only.
 
-The Firestore store applies one of case_id, action and status in an audit query (store.py:
-"At most one of case_id/action/status is expected per call"), where the memory store applies
-all three. Code that asks for a case id and an action therefore gets, on Firestore, the newest
-row of the case whatever its action. Every payment record that shares a case id with another
-kind of row has to be read by picking the action from the rows in code.
+The Firestore store used to apply only one of case_id, action and status in an audit query, where the memory store applies
+all three; it now checks the others itself (tests/test_firestore_audit_filters.py). The payment code below still reads
+each record by one field and picks the rest in code, so it also works on a store that filters by one field only, which
+is what these tests hold it to. A record that shares a case id with another kind of row has to be read that way.
 
 Pinned here, on a store that behaves like Firestore in that one respect: published limits are
 still read after a pause; a freeze and a lift written in the same instant are ordered by which

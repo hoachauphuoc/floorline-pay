@@ -52,6 +52,7 @@ class Booked:
         self.authorization = f"AUTH{uuid.uuid4().hex[:12].upper()}"
         self.shipment = {
             "shipment_id": "SHP-GATE-1", "currency": "USD", "shipping_cost": 1300.0,
+            "shipper_company": "Saigon Plywood Co",
             "payout_amount": 1250.0, "carrier_payee_email": PAYEE,
             "carrier_registered_payee_email": PAYEE,
             "carrier_payee_changed_at": "2026-08-01T08:00:00+07:00",

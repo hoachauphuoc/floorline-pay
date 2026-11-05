@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { fetchPaymentLedger, type PaymentState } from "@/lib/api";
 import { formatRelative } from "@/lib/format";
+import { paidLabel } from "@/lib/payout-label";
 import { useTenant } from "@/lib/tenant-context";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,11 @@ const LABEL: Record<PaymentState["state"], string> = {
   failed: "Payment failed",
   unknown: "Status not recognised",
 };
+
+function shownFor(item: { state: PaymentState["state"]; payout_status?: PaymentState["payout_status"] }) {
+  if (item.state === "paid") return paidLabel(item.payout_status);
+  return { text: LABEL[item.state] ?? LABEL.unknown, tone: TONE[item.state] ?? TONE.unknown };
+}
 
 const TONE: Record<PaymentState["state"], string> = {
   none: "text-faint",
@@ -83,8 +89,12 @@ export default function PaymentsPage() {
     );
   }
 
-  const { items, counts } = ledger.data;
-  const states = Object.keys(counts) as Array<PaymentState["state"]>;
+  const { items } = ledger.data;
+  const tally = new Map<string, { text: string; tone: string; n: number }>();
+  for (const item of items) {
+    const shown = shownFor(item);
+    tally.set(shown.text, { ...shown, n: (tally.get(shown.text)?.n ?? 0) + 1 });
+  }
 
   return (
     <>
@@ -97,15 +107,13 @@ export default function PaymentsPage() {
       ) : (
         <>
           <ul className="mb-4 flex flex-wrap gap-2" aria-label="Payments by state">
-            {states.map((state) => (
+            {[...tally.values()].map((entry) => (
               <li
-                key={state}
+                key={entry.text}
                 className="rounded-lg border border-white/[0.08] bg-black/25 px-3 py-1.5 text-[12px]"
               >
-                <span className={cn("font-medium", TONE[state] ?? TONE.unknown)}>
-                  {LABEL[state] ?? LABEL.unknown}
-                </span>
-                <span className="ml-2 font-mono tabular-nums text-dim">{counts[state]}</span>
+                <span className={cn("font-medium", entry.tone)}>{entry.text}</span>
+                <span className="ml-2 font-mono tabular-nums text-dim">{entry.n}</span>
               </li>
             ))}
           </ul>
@@ -134,8 +142,8 @@ export default function PaymentsPage() {
                         {item.case_id}
                       </Link>
                     </TableCell>
-                    <TableCell className={cn("text-[12px]", TONE[item.state] ?? TONE.unknown)}>
-                      {LABEL[item.state] ?? LABEL.unknown}
+                    <TableCell className={cn("text-[12px]", shownFor(item).tone)}>
+                      {shownFor(item).text}
                     </TableCell>
                     <TableCell className="max-w-[22rem] text-[12px] text-dim">
                       {item.reason ?? ""}

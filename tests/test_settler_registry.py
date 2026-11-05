@@ -62,6 +62,7 @@ def released(name, **shipment):
     authorization = f"AUTH{uuid.uuid4().hex[:12].upper()}"
     body = {
         "shipment_id": "SHP-SET-1", "currency": "USD", "shipping_cost": 1300.0, "payout_amount": 1250.0,
+        "shipper_company": "Saigon Plywood Co",
         "carrier_name": name, "paypal_authorization_id": authorization, **shipment,
     }
     run(binding.record_authorization(authorization, "SHP-SET-1", "1300.00", "USD", "ORDER-1"))

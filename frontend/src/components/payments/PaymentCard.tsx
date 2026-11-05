@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { PaymentState } from "@/lib/api";
 import { PayPalLogo } from "@/components/ui/PayPalLogo";
 import { humaniseCode } from "@/lib/format";
+import { paidLabel } from "@/lib/payout-label";
 import { cn } from "@/lib/utils";
 
 const LABEL: Record<PaymentState["state"], string> = {
@@ -46,14 +47,33 @@ const TONE: Record<PaymentState["state"], string> = {
 export function PaymentCard({
   state,
   onRetry,
+  onCheckPayout,
 }: {
   state: PaymentState;
   onRetry?: (reason: string) => Promise<unknown>;
+  onCheckPayout?: () => Promise<unknown>;
 }) {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [checkError, setCheckError] = useState<string | null>(null);
+  async function check() {
+    setChecking(true);
+    setCheckError(null);
+    setChecked(false);
+    try {
+      await onCheckPayout?.();
+      setChecked(true);
+    } catch (caught) {
+      setCheckError(caught instanceof Error ? caught.message : "PayPal could not be asked");
+    } finally {
+      setChecking(false);
+    }
+  }
+
   async function retry() {
     setBusy(true);
     setError(null);
@@ -74,6 +94,8 @@ export function PaymentCard({
     ["Voided", state.void?.paypal_id],
   ];
   const ids = steps.filter(([, id]) => Boolean(id));
+  const shown = state.state === "paid" ? paidLabel(state.payout_status) : null;
+  const notSent = state.decision_not_sent === true;
   return (
     <section className="bento-card p-4" aria-label="Payment">
       <div className="flex items-center justify-between gap-2">
@@ -82,8 +104,8 @@ export function PaymentCard({
           <PayPalLogo height={12} />
         </span>
       </div>
-      <p className={cn("mt-1 text-[13px] font-medium", TONE[state.state] ?? TONE.unknown)}>
-        {LABEL[state.state] ?? LABEL.unknown}
+      <p className={cn("mt-1 text-[13px] font-medium", shown?.tone ?? TONE[state.state] ?? TONE.unknown)}>
+        {shown?.text ?? LABEL[state.state] ?? LABEL.unknown}
       </p>
       {state.reason && (
         <p className="mt-1 text-[12px] leading-relaxed text-dim">{state.reason}</p>
@@ -110,7 +132,30 @@ export function PaymentCard({
           {PAYOUT_NOTE[state.payout_status?.state ?? "unconfirmed"] ?? "Payout status not recognised"}
         </p>
       )}
-      {state.state === "failed" && onRetry && (
+      {state.state === "paid" && state.payout?.paypal_id && state.payout_status?.state !== "confirmed" && onCheckPayout && (
+        <div className="mt-2 space-y-1">
+          <button
+            type="button"
+            disabled={checking}
+            onClick={check}
+            className="rounded border border-white/15 px-2 py-1 text-[12px] text-white disabled:opacity-40"
+          >
+            Check with PayPal
+          </button>
+          {checked && <p className="text-[12px] text-dim">PayPal answered. This card updates with what it said.</p>}
+          {checkError && (
+            <p role="alert" className="text-[12px] text-risk-critical">
+              {checkError}
+            </p>
+          )}
+        </div>
+      )}
+      {notSent && (
+        <p className="mt-2 text-[12px] leading-relaxed text-risk-warn">
+          The decision was saved but was never sent to the settler, so no money has moved. Send it again.
+        </p>
+      )}
+      {(state.state === "failed" || notSent) && onRetry && (
         <div className="mt-3 space-y-2">
           <label className="block text-[11.5px] text-dim" htmlFor={`retry-reason-${state.case_id}`}>
             Reason for the retry
@@ -128,7 +173,7 @@ export function PaymentCard({
             onClick={retry}
             className="rounded bg-white px-2 py-1 text-[12px] font-medium text-black disabled:opacity-40"
           >
-            Retry settlement
+            {notSent ? "Send the decision again" : "Retry settlement"}
           </button>
           {sent && (
             <p className="text-[12px] text-dim">Sent to the settler again. This card updates when it answers.</p>

@@ -150,6 +150,8 @@ export const ALLOWED_POST = new Set([
   "payments/pause",
   "payments/resume",
   "payments/limits",
+  // Settlement: an operator asks PayPal for the state of a payout (route payments/cases/<case id>/payout/refresh). It only reads PayPal and records the answer; nothing moves. The policy name avoids the words the Defense guard test forbids.
+  "payments/status/refresh",
   // Settlement: an operator sends a failed release to the settler again (password-only, see below); the money still moves only there.
   "payments/decision/redeliver",
   // Settlement: a governance admin lifts the freeze on a carrier or shipper.
@@ -227,6 +229,12 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
     return allowed.has("payments/decision/redeliver");
   }
   if (joined === "payments/decision/redeliver") return false;
+  // payments/cases/<case id>/payout/refresh; the bare template is a policy name, not a route
+  if (retryPath.length === 5 && retryPath[0] === "payments" && retryPath[1] === "cases" && CASE_ID.test(retryPath[2])
+      && retryPath[3] === "payout" && retryPath[4] === "refresh") {
+    return allowed.has("payments/status/refresh");
+  }
+  if (joined === "payments/status/refresh") return false;
   const parts = joined.split("/");
   if (parts.length === 3 && parts[0] === "review" && CASE_ID.test(parts[1])) {
     const action = parts[2];

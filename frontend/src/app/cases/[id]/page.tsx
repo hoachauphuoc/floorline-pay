@@ -14,7 +14,7 @@ import { useCaseActivity } from "@/components/operations/useCaseActivity";
 import { PaymentCard } from "@/components/payments/PaymentCard";
 import { ReviewPanel } from "@/components/review/ReviewPanel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchAuditTrail, fetchCase, fetchPaymentState, queryKeys, retrySettlement } from "@/lib/api";
+import { fetchAuditTrail, fetchCase, fetchPaymentState, queryKeys, refreshPayout, retrySettlement } from "@/lib/api";
 import { caseHref } from "@/lib/case-links";
 import { caseStateLabel, formatUsd } from "@/lib/format";
 import { holds, useIdentity } from "@/lib/identity";
@@ -167,6 +167,10 @@ export default function CasePage() {
             <div className="mb-3">
               <PaymentCard
                 state={payment.data}
+                onCheckPayout={async () => {
+                  await refreshPayout(caseId);
+                  await queryClient.invalidateQueries({ queryKey: ["payment", tenant.id] });
+                }}
                 onRetry={async (reason) => {
                   await retrySettlement(caseId, reason);
                   await queryClient.invalidateQueries({ queryKey: ["payment", tenant.id] });

@@ -17,7 +17,7 @@ from typing import Any
 
 from flask import Flask, jsonify
 
-from vf_logistics import carrier_registry, credit_profile, dual_approval, payment_checks, payout_tracking
+from vf_logistics import carrier_registry, credit_profile, dual_approval, payment_checks, payout_tracking, settlement_retry
 from vf_logistics.store import get_store
 
 _STATE = {
@@ -71,6 +71,7 @@ async def payment_state(case_id: str, tenant_id: str | None = None) -> dict[str,
             if has_authorization else "no PayPal authorization is held for this case"
         ),
         "findings": findings,
+        "decision_not_sent": await settlement_retry.unsent_decision(case, tenant_id) is not None,
     }
 
 

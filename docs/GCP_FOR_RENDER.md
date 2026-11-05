@@ -136,7 +136,7 @@ In the dashboard (see [RENDER_DEPLOY.md](RENDER_DEPLOY.md)):
 | `RECEIVER_PUSH_SA` | `floorline-render@floorline-pay-demo.iam.gserviceaccount.com` |
 | `RECEIVER_PUSH_AUDIENCE` | `https://<your Render address>/api/v1/receiver/decision` |
 
-Do not set `ANONYMOUS_ROLE`: with Firestore and a role that grants writes, the app refuses to start.
+Set `ANONYMOUS_ROLE` to `none` and `VF_PUBLIC_READS` to `false`: an anonymous caller then gets 401 from the API and the sign-in screen from the console. A role that grants writes would make the app refuse to start with Firestore, so never set one.
 
 ## 7. The push subscription
 

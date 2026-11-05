@@ -61,6 +61,7 @@ describe("BookPage", () => {
     });
     renderPage();
     type("Shipment id", "SHP-PAY-1");
+    type("Shipper", "Saigon Plywood Co");
     type("Freight to pay (USD)", "1300");
     type("Carrier PayPal account for this load", "payments@mekong-haulage.example");
     fireEvent.click(screen.getByRole("button", { name: /Pay with PayPal/ }));
@@ -85,6 +86,7 @@ describe("BookPage", () => {
     vi.mocked(createPaymentOrder).mockRejectedValue(new Error("PayPal is not configured"));
     renderPage();
     type("Freight to pay (USD)", "1300");
+    type("Shipper", "Saigon Plywood Co");
     fireEvent.click(screen.getByRole("button", { name: /Pay with PayPal/ }));
 
     await waitFor(() => expect(createPaymentOrder).toHaveBeenCalledTimes(1));

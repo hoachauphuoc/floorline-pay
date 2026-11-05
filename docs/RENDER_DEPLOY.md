@@ -62,6 +62,7 @@ Copy the webhook id into `PAYPAL_WEBHOOK_ID` and redeploy. The receiver answers 
 ## 5. Check it
 
 - `/health` answers 200.
+- Without signing in, `GET /api/v1/payments/ledger` and `/api/v1/auth/whoami` answer 401, because the blueprint sets `ANONYMOUS_ROLE=none` and `VF_PUBLIC_READS=false`. A service created before this was added keeps its old values: set both in the dashboard and redeploy, then try those two addresses without a session.
 - Sign in as the guest judge: Floorline Pay overview, Defense (ten attacks, none moves money), Settlement (the demo-frozen carrier).
 - Sign in as reviewer A: book freight on `/book` with the sandbox buyer account, release, see the payout.
 - Restart the service: the carrier and the frozen party come back.

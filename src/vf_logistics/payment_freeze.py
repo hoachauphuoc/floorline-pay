@@ -43,6 +43,16 @@ def _key(kind: str, name: Any) -> str | None:
     return key if kind in KINDS and key else None
 
 
+def shipper_names(shipment: Any) -> list[str]:
+    """Every name a case gives its shipper, once each: the booking form states a company, other intake paths a contact name.
+
+    A freeze is looked up under each of them, so a block put on one name holds the release however the case names the shipper.
+    """
+    fields = shipment if isinstance(shipment, dict) else {}
+    names = (str(fields.get(field) or "").strip() for field in ("shipper_company", "shipper_name"))
+    return list(dict.fromkeys(name for name in names if name))
+
+
 def _case(kind: str, key: str) -> str:
     return f"PAYMENT-FREEZE-{kind}-{key}"
 

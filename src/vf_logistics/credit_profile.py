@@ -23,7 +23,7 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
-from vf_logistics import carrier_registry, payment_freeze
+from vf_logistics import carrier_registry, payment_freeze, payout_tracking
 from vf_logistics.store import get_store
 
 TIERS = ("A", "B", "C", "D")
@@ -36,9 +36,13 @@ _PAGES = 10
 
 
 async def history(carrier_name: Any, tenant_id: str | None = None) -> dict[str, Any]:
-    """How many payouts Floorline has made to the carrier, and whether it is frozen now."""
+    """How many payouts to the carrier PayPal has confirmed, and whether it is frozen now.
+
+    A payment the settler recorded as settled counts only once PayPal confirms its payout: one PayPal only accepted, or later
+    returned, does not raise the standing.
+    """
     key = carrier_registry.carrier_key(carrier_name)
-    paid = 0
+    settled: list[str] = []
     cursor: str | None = None
     for _ in range(_PAGES if key else 0):
         # One filter only (Firestore applies just one of case_id, action and status), so the
@@ -49,9 +53,13 @@ async def history(carrier_name: Any, tenant_id: str | None = None) -> dict[str, 
         for row in rows:
             detail = row.get("detail")
             if row.get("status") == "settled" and isinstance(detail, dict) and detail.get("carrier_key") == key:
-                paid += 1
+                settled.append(str(row.get("case_id") or ""))
         if not cursor:
             break
+    paid = 0
+    for case_id in dict.fromkeys(settled):
+        if case_id and (await payout_tracking.confirmation(case_id, tenant_id))["state"] == payout_tracking.CONFIRMED:
+            paid += 1
     frozen = await payment_freeze.frozen("carrier", carrier_name, tenant_id) is not None
     return {"paid_count": paid, "frozen": frozen}
 

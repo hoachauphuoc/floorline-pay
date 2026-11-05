@@ -60,13 +60,14 @@ def big_decision(name, payout):
     run(store_mod.get_store().put_case({"case_id": case_id, "state": "RELEASED_BY_HUMAN", "shipment": {
         "shipment_id": "SHP-CRD-1", "currency": "USD", "shipping_cost": 3000.0,
         "payout_amount": payout, "carrier_name": name, "paypal_authorization_id": authorization,
+        "shipper_company": "Saigon Plywood Co",
     }, "verification": {"approvals": [{"approval_id": "apr-1", "requires_second": True,
                                        "second_approval": {"by": "second@example.com"}}]}}))
     return {"case_id": case_id, "outcome": "RELEASED_BY_HUMAN", "approval_id": "apr-1",
             "idempotency_key": f"exec-{uuid.uuid4().hex[:8]}"}
 
 
-def paid(name, times):
+def settle(name, times):
     key = mod("carrier_registry").carrier_key(name)
     for n in range(times):
         run(store_mod.get_store().add_audit({
@@ -74,6 +75,18 @@ def paid(name, times):
             "action": "settle_payment", "status": "settled",
             "detail": {"amount": "1000", "carrier_key": key, "idempotency_key": f"seed-{key}-{n}"},
             "at": utcnow(),
+        }))
+
+
+def paid(name, times):
+    """Settled payments whose payout PayPal confirmed: only these count toward the standing (review F06)."""
+    settle(name, times)
+    key = mod("carrier_registry").carrier_key(name)
+    for n in range(times):
+        run(store_mod.get_store().add_audit({
+            "audit_id": f"payout-seed-{key}-{n}-{uuid.uuid4().hex[:6]}", "case_id": f"CASE-{key}-{n}",
+            "action": "payout_status", "status": "done",
+            "detail": {"transaction_status": "SUCCESS", "source": f"seed-{n}"}, "at": utcnow(),
         }))
 
 
@@ -175,7 +188,7 @@ def test_the_profile_of_an_established_carrier_has_no_cap_of_its_own():
 ])
 def test_a_payout_must_pass_the_cap_of_the_standing(payout, cap, reason):
     controls = mod("payment_controls")
-    out = run(controls.check_payout("USD", payout, "somecarrier", tier_cap=cap, tier="C"))
+    out = run(controls.check_payout("USD", payout, "somecarrier", f"tenant-{uuid.uuid4().hex[:8]}", tier_cap=cap, tier="C"))
     if reason is None:
         assert out is None
     else:
@@ -191,7 +204,7 @@ def test_the_limit_a_person_published_is_named_when_it_is_the_one_exceeded():
 
 
 def test_a_cap_above_the_published_limit_changes_nothing():
-    out = run(mod("payment_controls").check_payout("USD", Decimal("4000"), "somecarrier", tier_cap=Decimal("9000"), tier="B"))
+    out = run(mod("payment_controls").check_payout("USD", Decimal("4000"), "somecarrier", f"tenant-{uuid.uuid4().hex[:8]}", tier_cap=Decimal("9000"), tier="B"))
     assert out is None
 
 

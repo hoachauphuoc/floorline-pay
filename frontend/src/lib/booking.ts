@@ -50,6 +50,9 @@ export function bookingProblem(form: BookingForm): string | null {
   if (!form.shipping_cost.trim() || !Number.isFinite(freight) || freight <= 0) {
     return "The freight to pay must be a number above zero.";
   }
+  if (!form.shipper_company.trim()) {
+    return "The shipper is needed: a block on a shipper is looked up by its name.";
+  }
   return null;
 }
 

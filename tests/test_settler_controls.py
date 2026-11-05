@@ -60,6 +60,7 @@ def decision(name, outcome="RELEASED_BY_HUMAN", payout=1250.0):
     run(store_mod.get_store().put_case({"case_id": case_id, "state": outcome, "shipment": {
         "shipment_id": "SHP-CTL-1", "currency": "USD", "shipping_cost": 1300.0,
         "payout_amount": payout, "carrier_name": name, "paypal_authorization_id": authorization,
+        "shipper_company": "Saigon Plywood Co",
     }}))
     return {"case_id": case_id, "outcome": outcome, "approval_id": "apr-1",
             "idempotency_key": f"exec-{uuid.uuid4().hex[:8]}"}

@@ -169,6 +169,22 @@ describe("policyKey", () => {
   });
 });
 
+describe("the payout check write", () => {
+  const path = "payments/cases/CASE-1/payout/refresh";
+
+  it("is forwarded and needs no password, because it only reads PayPal", () => {
+    expect(matchWrite(path, ALLOWED_POST)).toBe(true);
+    expect(PASSWORD_ONLY_POST.has(policyKey(path))).toBe(false);
+  });
+
+  it("refuses the bare template, an id that is not a case id, a path that climbs and a longer path", () => {
+    expect(matchWrite("payments/status/refresh", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/CASE 1/payout/refresh", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/../payout/refresh", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/CASE-1/payout/refresh/extra", ALLOWED_POST)).toBe(false);
+  });
+});
+
 describe("the settlement retry write", () => {
   const path = "payments/cases/CASE-1/decision/redeliver";
 
