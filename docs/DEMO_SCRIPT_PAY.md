@@ -49,7 +49,7 @@ Every claim below names where the evidence is: a section of `README.md`, or a li
 
 **Screen.** Case A: *Block*, then the Payment card changes to *returned to the shipper* with the PayPal void id, and `/payments` lists it. Case B: *Release* by a password account, then the card shows the capture id and the payout id, and `/payments` lists *paid*.
 **Narration.** "A published block voids the hold, and the money goes back to the shipper. A published release makes the settler check the payment rules once more, capture the money and pay the carrier with PayPal Payouts. Each PayPal call carries a request id built from the decision, so a repeat cannot pay twice."
-**Source.** README, *How the money moves*, step 4. A Block and a Release have each completed on the live service (`CASE-SHP-PAY-B1105A` voided, `CASE-SHP-PAY-R1105A` paid) and `/payments` shows them. Film fresh cases; say "accepted by PayPal", never "received by the carrier".
+**Source.** README, *How the money moves*, step 4. A Block and a Release have each completed on the live service (`CASE-SHP-PAY-B1105A` voided, `CASE-SHP-PAY-R1105A` paid) and `/payments` shows them. Film fresh cases. The payout shows `confirmed` only after PayPal's payout-item event arrives (about a minute on 5 Nov); until then say "accepted by PayPal", never "received by the carrier".
 
 ### 5. Measured limits (25s)
 
