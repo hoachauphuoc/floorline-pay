@@ -115,7 +115,7 @@ async def _payout_item(
     event_id: str, event_type: str, resource: dict[str, Any], tenant_id: str | None,
 ) -> dict[str, Any]:
     batch = str(resource.get("sender_batch_id") or "")
-    key = batch.removesuffix("-payout") if batch.endswith("-payout") else ""
+    key = batch.removesuffix("-2").removesuffix("-payout") if batch.endswith(("-payout", "-payout-2")) else ""
     # A settlement made before the index existed is still found by the scan of the newest ones.
     row = (await _indexed_payout(key, tenant_id) if key else None) or await _find(lambda d: bool(key) and d.get("idempotency_key") == key, tenant_id)
     if row is None:
@@ -305,7 +305,11 @@ async def reconcile(tenant_id: str | None = None, apply: bool = True) -> dict[st
         if not event_id or event_id in done:
             continue
         resource = item.get("resource")
-        effect = await _apply(event_id, str(item.get("event_type") or ""), resource if isinstance(resource, dict) else {}, tenant_id)
+        try:
+            effect = await _apply(event_id, str(item.get("event_type") or ""), resource if isinstance(resource, dict) else {}, tenant_id)
+        except Exception:  # noqa: BLE001 - a lookup PayPal cannot answer must not keep a refund beside it from freezing anyone
+            waiting += 1
+            continue
         if effect.get("matched") is True:
             await get_store().add_audit_once({
                 "audit_id": f"ppdone-{event_id}",

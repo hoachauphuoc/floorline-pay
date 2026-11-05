@@ -1214,6 +1214,7 @@ export type PaymentState = {
     | "held"
     | "pending"
     | "failed"
+    | "decision_not_sent"
     | "unknown";
   reason?: string | null;
   findings?: string[];
@@ -1309,6 +1310,13 @@ export type FrozenParty = {
 export async function fetchFrozenParties(): Promise<{ frozen: FrozenParty[] }> {
   if (DEMO_MODE) liveOnly("The frozen parties");
   return getJson<{ frozen: FrozenParty[] }>("payments/freezes");
+}
+
+export type UnboundOrder = { order_id: string; authorization_id: string; at: string | null };
+
+export async function fetchUnboundOrders(): Promise<{ orders: UnboundOrder[] }> {
+  if (DEMO_MODE) liveOnly("The holds with no case");
+  return getJson<{ orders: UnboundOrder[] }>("payments/orders/unbound");
 }
 
 export async function fetchPendingPayPalEvents(): Promise<{ pending: number }> {

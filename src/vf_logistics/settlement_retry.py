@@ -54,6 +54,11 @@ async def retry(case_id: str, reason: Any, actor: str, tenant_id: str | None = N
     key = str(detail.get("idempotency_key") or "")
     if detail.get("outcome") != RELEASE or not key:
         raise RetryError("only the settlement of a release can be retried; nothing is sent", 409)
+    first = await tools._earlier_publish(case_id, key, tenant_id)
+    original = first.get("detail") if first else None
+    approver = str(original.get("approver") or "") if isinstance(original, dict) else ""
+    if not isinstance(original, dict) or not approver:
+        raise RetryError("the first publish of this release does not name who approved it, so nothing was sent; check the case history with an admin", 409)
     await get_store().add_audit({
         "case_id": case_id,
         "action": ACTION,
@@ -61,9 +66,23 @@ async def retry(case_id: str, reason: Any, actor: str, tenant_id: str | None = N
         "detail": {"reason": note, "retried_by": actor, "idempotency_key": key},
         "at": utcnow(),
     }, tenant_id=tenant_id)
+    dead_batch = str(detail.get("dead_batch") or "")
+    if dead_batch:
+        # The settler sends a new payout only on this row, and only while PayPal still shows the batch as dead.
+        await get_store().add_audit_once({
+            "audit_id": f"paynew-{key}",
+            "case_id": f"PAYNEW-{key}",
+            "action": "payout_replacement",
+            "status": "requested",
+            "detail": {"dead_batch_id": dead_batch, "reason": note, "approved_by": actor},
+            "at": utcnow(),
+        }, tenant_id=tenant_id)
     decision = {
-        "outcome": RELEASE, "action": "release", "approver": actor, "executor": "settlement_retry", "idempotency_key": key,
+        "outcome": RELEASE, "action": "release", "approver": approver, "sent_by": actor, "executor": "settlement_retry", "idempotency_key": key,
     }
+    if original.get("approval_id"):
+        # The settler finds the approval by this id; a large release sent without it comes back held.
+        decision["approval_id"] = str(original["approval_id"])
     try:
         receipt = await tools.publish_decision(case_id, decision, tenant_id=tenant_id, redeliver=True)
     except Exception as exc:  # noqa: BLE001 - a publish that raised sent nothing the console can prove

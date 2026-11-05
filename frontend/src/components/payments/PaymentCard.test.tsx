@@ -104,11 +104,16 @@ describe("PaymentCard retry", () => {
 describe("PaymentCard headline for a paid case", () => {
   it.each([
     ["confirmed", "Paid to the carrier, confirmed by PayPal"],
-    ["pending", "Payout accepted by PayPal, not confirmed yet"],
+    ["pending", "Payout sent, the carrier has not received it yet"],
     ["failed", "Payout failed at PayPal"],
   ] as const)("shows a %s payout as its own wording", (state, words) => {
     render(<PaymentCard state={make({ state: "paid", payout_status: { state, status: null, at: null } })} />);
     expect(screen.getByText(words)).toBeInTheDocument();
+  });
+
+  it("says what to do next on a payout that failed", () => {
+    render(<PaymentCard state={make({ state: "paid", payout_status: { state: "failed", status: "FAILED", at: null } })} />);
+    expect(screen.getByText(/before a governance admin lifts the freeze/)).toBeInTheDocument();
   });
 
   it("never shows the bare success wording for a paid case PayPal has not confirmed", () => {

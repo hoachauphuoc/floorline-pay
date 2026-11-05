@@ -7,6 +7,7 @@ import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchPaymentControls, fetchPaymentLedger } from "@/lib/api";
+import { paidKind, type PaidKind } from "@/lib/payout-label";
 import { useTenant } from "@/lib/tenant-context";
 
 const STEPS = [
@@ -61,14 +62,17 @@ export default function PayPage() {
     }
     const counts = ledger.data.counts;
     const paid = ledger.data.items.filter((item) => item.state === "paid");
-    const confirmed = paid.filter((item) => item.payout_status?.state === "confirmed").length;
-    const failed = paid.filter((item) => item.payout_status?.state === "failed").length;
+    const kinds = paid.map((item) => paidKind(item.payout_status));
+    const count = (kind: PaidKind) => String(kinds.filter((found) => found === kind).length);
     const rows = [
-      ["Paid to carriers, confirmed by PayPal", String(confirmed)],
-      ["Payouts accepted, not confirmed yet", String(paid.length - confirmed - failed)],
-      ["Payouts failed at PayPal", String(failed)],
+      ["Paid to carriers, confirmed by PayPal", count("confirmed")],
+      ["Payouts accepted, not confirmed yet", count("accepted")],
+      ["Payouts sent, not received yet", count("waiting")],
+      ["Payouts failed at PayPal", count("failed")],
+      ["Payouts returned by PayPal", count("returned")],
       ["Returned to shippers", String(counts.voided ?? 0)],
       ["Held by the checks", String(counts.held ?? 0)],
+      ["Decisions not sent", String(counts.decision_not_sent ?? 0)],
       ["Sent for payout today in USD", controls.data.usage_today.tenant_usd],
     ];
     return (

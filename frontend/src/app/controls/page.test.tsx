@@ -182,7 +182,7 @@ describe("ControlsPage", () => {
     );
     renderPage();
     await waitFor(() => expect(screen.getByText("2500.10")).toBeInTheDocument());
-    const list = screen.getByRole("list", { name: "Paid today by carrier" });
+    const list = screen.getByRole("list", { name: "Sent for payout today by carrier" });
     expect(list).toHaveTextContent("mekonghaulageco 1250.10 USD in 1 payout");
     expect(list).toHaveTextContent("other 1250.00 USD in 2 payouts");
   });

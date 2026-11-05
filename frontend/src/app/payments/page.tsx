@@ -29,6 +29,7 @@ const LABEL: Record<PaymentState["state"], string> = {
   held: "Payout held",
   pending: "Waiting to retry",
   failed: "Payment failed",
+  decision_not_sent: "Decision not sent",
   unknown: "Status not recognised",
 };
 
@@ -46,6 +47,7 @@ const TONE: Record<PaymentState["state"], string> = {
   held: "text-risk-critical",
   pending: "text-risk-warn",
   failed: "text-risk-critical",
+  decision_not_sent: "text-risk-critical",
   unknown: "text-risk-warn",
 };
 

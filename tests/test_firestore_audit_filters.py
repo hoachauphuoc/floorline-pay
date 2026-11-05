@@ -182,6 +182,7 @@ def test_a_retry_finds_the_failed_settlement_under_a_newer_row_of_the_case(fs, m
     monkeypatch.setattr(settlement_retry.tools, "publish_decision", send)
     audit(store, "settle-k1-failed", "CASE-1", "settle_payment", "failed", 1, idempotency_key="k1", outcome="RELEASED_BY_HUMAN")
     audit(store, "retry-1", "CASE-1", "retry_settlement", "requested", 2, idempotency_key="k1")
+    monkeypatch.setattr(settlement_retry.tools, "_earlier_publish", AsyncMock(return_value={"detail": {"approver": "reviewer@forwarder.example"}}))
     result = run(settlement_retry.retry("CASE-1", "checked the PayPal activity", "ops@forwarder.example"))
     assert result == {"status": "redelivered", "case_id": "CASE-1"}
     send.assert_awaited_once()

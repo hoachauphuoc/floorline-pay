@@ -72,10 +72,13 @@ describe("PayPage", () => {
   it("shows the live figures and that payments are running", async () => {
     renderPage();
     expect(await screen.findByLabelText("Paid to carriers, confirmed by PayPal: 1")).toBeInTheDocument();
-    expect(screen.getByLabelText("Payouts accepted, not confirmed yet: 2")).toBeInTheDocument();
-    expect(screen.getByLabelText("Payouts failed at PayPal: 1")).toBeInTheDocument();
+    expect(screen.getByLabelText("Payouts accepted, not confirmed yet: 1")).toBeInTheDocument();
+    expect(screen.getByLabelText("Payouts sent, not received yet: 1")).toBeInTheDocument();
+    expect(screen.getByLabelText("Payouts failed at PayPal: 0")).toBeInTheDocument();
+    expect(screen.getByLabelText("Payouts returned by PayPal: 1")).toBeInTheDocument();
     expect(screen.getByLabelText("Returned to shippers: 1")).toBeInTheDocument();
     expect(screen.getByLabelText("Held by the checks: 2")).toBeInTheDocument();
+    expect(screen.getByLabelText("Decisions not sent: 0")).toBeInTheDocument();
     expect(screen.getByLabelText("Sent for payout today in USD: 1250.00")).toBeInTheDocument();
     expect(screen.getByText("Payments are running")).toBeInTheDocument();
   });

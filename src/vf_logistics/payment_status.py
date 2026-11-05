@@ -107,6 +107,18 @@ async def payment_ledger(tenant_id: str | None = None, limit: int = 100) -> dict
             "at": row.get("at"),
             "payout_status": payouts[case_id],
         })
+    decided, _ = await get_store().query_cases(states=tuple(settlement_retry.HUMAN_ACTION), limit=limit, tenant_id=tenant_id)
+    for case in decided:
+        case_id = str(case.get("case_id") or "")
+        if case_id in newest or await settlement_retry.unsent_decision(case, tenant_id) is None:
+            continue
+        counts["decision_not_sent"] = counts.get("decision_not_sent", 0) + 1
+        items.append({
+            "case_id": case_id,
+            "state": "decision_not_sent",
+            "reason": "a person's decision was saved but never reached the settler; send it again from the case",
+            "at": case.get("updated_at"),
+        })
     return {"items": items, "counts": counts}
 
 

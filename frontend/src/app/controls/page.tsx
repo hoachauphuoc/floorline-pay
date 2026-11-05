@@ -139,13 +139,13 @@ export default function ControlsPage() {
         <PublishLimits lock={adminLock} start={limits} onDone={refresh} />
       </section>
 
-      <section className="bento-card p-4" aria-label="Paid today">
-        <h2 className="text-[12px] font-medium text-white">Paid today (UTC)</h2>
+      <section className="bento-card p-4" aria-label="Sent for payout today">
+        <h2 className="text-[12px] font-medium text-white">Sent for payout today (UTC)</h2>
         <p className="mt-1 text-[12px] text-dim">
           All carriers <span className="font-mono text-white/90">{usage.tenant_usd}</span> USD
         </p>
         {carriers.length > 0 && (
-          <ul className="mt-2 space-y-0.5 text-[12px]" aria-label="Paid today by carrier">
+          <ul className="mt-2 space-y-0.5 text-[12px]" aria-label="Sent for payout today by carrier">
             {carriers.map(([key, used]) => (
               <li key={key} className="text-dim">
                 <span className="font-mono text-white/85">{key || "(no carrier)"}</span> {used.usd} USD in{" "}

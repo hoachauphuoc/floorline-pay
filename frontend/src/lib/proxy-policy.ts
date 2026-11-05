@@ -77,6 +77,8 @@ export const ALLOWED_GET = new Set([
   "defense/evaluation",
   "payments/freezes",
   "payments/events/pending",
+  // Holds with no case, for Settlement (payment_routes.py).
+  "payments/orders/unbound",
 ]);
 
 /**

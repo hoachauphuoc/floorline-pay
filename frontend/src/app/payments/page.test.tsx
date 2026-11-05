@@ -93,7 +93,17 @@ describe("PaymentsPage", () => {
     const chips = await screen.findByRole("list", { name: "Payments by state" });
     expect(chips).toHaveTextContent("Paid to the carrier, confirmed by PayPal1");
     expect(chips).toHaveTextContent("Payout accepted by PayPal, not confirmed yet2");
-    expect(chips).toHaveTextContent("Payout failed at PayPal1");
+    expect(chips).toHaveTextContent("Payout returned by PayPal1");
+  });
+
+  it("shows a decision that never went out", async () => {
+    vi.mocked(fetchPaymentLedger).mockResolvedValue({
+      items: [{ case_id: "CASE-U", state: "decision_not_sent", reason: "send it again from the case" }],
+      counts: { decision_not_sent: 1 },
+    });
+    renderPage();
+    const chips = await screen.findByRole("list", { name: "Payments by state" });
+    expect(chips).toHaveTextContent("Decision not sent1");
   });
 
   it("never shows a state it does not know as a success", async () => {

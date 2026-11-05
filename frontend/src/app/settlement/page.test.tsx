@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   liftFreeze: vi.fn(),
   fetchPendingPayPalEvents: vi.fn(),
   reconcilePayPalEvents: vi.fn(),
+  fetchUnboundOrders: vi.fn(),
   identity: { value: undefined as unknown },
 }));
 
@@ -21,6 +22,7 @@ vi.mock("@/lib/api", async (importOriginal) => ({
   liftFreeze: mocks.liftFreeze,
   fetchPendingPayPalEvents: mocks.fetchPendingPayPalEvents,
   reconcilePayPalEvents: mocks.reconcilePayPalEvents,
+  fetchUnboundOrders: mocks.fetchUnboundOrders,
 }));
 vi.mock("@/lib/tenant-context", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/tenant-context")>()),
@@ -93,8 +95,36 @@ describe("SettlementPage", () => {
     mocks.fetchPendingPayPalEvents.mockReset();
     mocks.reconcilePayPalEvents.mockReset();
     mocks.fetchPendingPayPalEvents.mockResolvedValue({ pending: 0 });
+    mocks.fetchUnboundOrders.mockReset();
+    mocks.fetchUnboundOrders.mockResolvedValue({ orders: [] });
     mocks.identity.value = person("governance_admin");
     mocks.fetchPaymentLedger.mockResolvedValue(LEDGER);
+  });
+
+  it("links an operator to each hold that has no case", async () => {
+    mocks.fetchFrozenParties.mockResolvedValue({ frozen: [] });
+    mocks.fetchUnboundOrders.mockResolvedValue({
+      orders: [{ order_id: "5O190127TN364715T", authorization_id: "AUTH-1", at: "2026-11-05T04:00:00+00:00" }],
+    });
+    mocks.identity.value = person("operator");
+    renderPage();
+    const link = await screen.findByRole("link", { name: "Finish booking 5O190127TN364715T" });
+    expect(link).toHaveAttribute("href", "/book/return?token=5O190127TN364715T");
+  });
+
+  it("says when every hold has its case", async () => {
+    mocks.fetchFrozenParties.mockResolvedValue({ frozen: [] });
+    mocks.identity.value = person("operator");
+    renderPage();
+    expect(await screen.findByText("Every hold has its case.")).toBeInTheDocument();
+  });
+
+  it("does not ask for the holds on behalf of someone who is not an operator", async () => {
+    mocks.fetchFrozenParties.mockResolvedValue({ frozen: [] });
+    mocks.identity.value = { ...person("operator"), role: "viewer", roles: ["viewer"], grants: ["viewer"] };
+    renderPage();
+    await screen.findByText("No PayPal event is waiting.");
+    expect(mocks.fetchUnboundOrders).not.toHaveBeenCalled();
   });
 
   it("says how many PayPal events wait and lets an operator apply them", async () => {

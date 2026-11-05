@@ -195,6 +195,12 @@ def register(
             reply["approval_url"] = approval
         return jsonify(reply), 201
 
+    @app.route("/api/v1/payments/orders/unbound", methods=["GET"])
+    @require_operator
+    @limiter.limit("30 per minute")
+    def payments_orders_unbound() -> Any:
+        return jsonify({"orders": run_async(payment_binding.unbound_orders(tenant_id=tenant()))}), 200
+
     @app.route("/api/v1/payments/orders/<order_id>/booking", methods=["GET"])
     @require_operator
     @limiter.limit("30 per minute")

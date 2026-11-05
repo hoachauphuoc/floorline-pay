@@ -175,6 +175,19 @@ async def find_order_authorization(order_id: str, tenant_id: str | None = None) 
     return str(value) if value else None
 
 
+async def unbound_orders(tenant_id: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
+    """Authorized orders no case holds: money on hold that only a return to the booking page can tie to a shipment."""
+    rows, _ = await get_store().query_audit(action="payment_order_authorized", limit=limit, tenant_id=tenant_id)
+    cases = await get_store().list_cases(limit=1000, tenant_id=tenant_id)
+    held = {str((case.get("shipment") or {}).get("paypal_authorization_id") or "") for case in cases}
+    orders: list[dict[str, Any]] = []
+    for row in rows:
+        detail = row.get("detail")
+        if isinstance(detail, dict) and str(detail.get("authorization_id") or "") not in held:
+            orders.append({"order_id": detail.get("order_id"), "authorization_id": detail.get("authorization_id"), "at": row.get("at")})
+    return orders
+
+
 async def record_renewal(old_id: str, new_id: str, tenant_id: str | None = None) -> bool:
     """Remember the id PayPal issued when it reauthorized `old_id`: every later capture or void must use it. True when this call wrote it."""
     written = await get_store().add_audit_once({

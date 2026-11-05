@@ -34,6 +34,11 @@ def retry_mod():
 class TestRetryingASettlement(Base):
     def settlement(self, status, outcome="RELEASED_BY_HUMAN"):
         run(self.store.add_audit({
+            "case_id": "CASE-R", "action": "publish_decision", "status": "done",
+            "detail": {"idempotency_key": KEY, "approver": "reviewer@forwarder.example", "message_id": "MSG-1"},
+            "at": "2026-11-05T04:02:00+00:00",
+        }))
+        run(self.store.add_audit({
             "case_id": "CASE-R", "action": "settle_payment", "status": status,
             "detail": {"status": status, "idempotency_key": KEY, "outcome": outcome}, "at": "2026-11-05T04:02:10+00:00",
         }))
@@ -57,7 +62,8 @@ class TestRetryingASettlement(Base):
         decision = publish.await_args.args[1]
         assert decision["idempotency_key"] == KEY
         assert decision["outcome"] == "RELEASED_BY_HUMAN"
-        assert decision["approver"] == "ops@forwarder.example"
+        assert decision["approver"] == "reviewer@forwarder.example"
+        assert decision["sent_by"] == "ops@forwarder.example"
         assert publish.await_args.kwargs["redeliver"] is True
 
     def test_the_person_and_the_reason_are_stored_even_when_the_send_fails(self):

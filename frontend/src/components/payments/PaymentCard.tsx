@@ -5,7 +5,7 @@ import { useState } from "react";
 import type { PaymentState } from "@/lib/api";
 import { PayPalLogo } from "@/components/ui/PayPalLogo";
 import { humaniseCode } from "@/lib/format";
-import { paidLabel } from "@/lib/payout-label";
+import { paidLabel, paidNext } from "@/lib/payout-label";
 import { cn } from "@/lib/utils";
 
 const LABEL: Record<PaymentState["state"], string> = {
@@ -17,6 +17,7 @@ const LABEL: Record<PaymentState["state"], string> = {
   held: "Payout held",
   pending: "Waiting to retry",
   failed: "Payment failed",
+  decision_not_sent: "Decision not sent",
   unknown: "Status not recognised",
 };
 
@@ -36,6 +37,7 @@ const TONE: Record<PaymentState["state"], string> = {
   held: "text-risk-critical",
   pending: "text-risk-warn",
   failed: "text-risk-critical",
+  decision_not_sent: "text-risk-critical",
   unknown: "text-risk-warn",
 };
 
@@ -107,6 +109,9 @@ export function PaymentCard({
       <p className={cn("mt-1 text-[13px] font-medium", shown?.tone ?? TONE[state.state] ?? TONE.unknown)}>
         {shown?.text ?? LABEL[state.state] ?? LABEL.unknown}
       </p>
+      {state.state === "paid" && paidNext(state.payout_status) && (
+        <p className="mt-1 text-[12px] text-dim">{paidNext(state.payout_status)}</p>
+      )}
       {state.reason && (
         <p className="mt-1 text-[12px] leading-relaxed text-dim">{state.reason}</p>
       )}

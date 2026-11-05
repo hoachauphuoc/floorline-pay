@@ -27,6 +27,7 @@ moving money a second time. settle() never raises.
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -63,6 +64,12 @@ _RETRYABLE = frozenset({paypal_client.TRANSPORT_ERROR, paypal_client.AUTH_FAILED
 _CAPTURABLE = frozenset({"CREATED", "CAPTURED"})
 # The batch states that mean PayPal took a payout. A batch it denied or cancelled paid nobody, and a state it does not name proves nothing.
 _TAKEN_BATCH = frozenset({"NEW", "PENDING", "PROCESSING", "SUCCESS"})
+# A batch in one of these states paid nobody, so a new payout cannot pay the carrier twice.
+_DEAD_BATCH = frozenset({"DENIED", "CANCELED"})
+# PayPal refuses a repeated sender_batch_id for 30 days. Past that a repeat could pay twice, so a day is kept in hand.
+_KEY_DAYS = 29
+_NOT_PAID = "batch_not_paid"
+_STALE_ATTEMPT = "stale_attempt"
 
 # A reauthorization can itself be reauthorized inside the 29 days; this many renewals are followed from the booking's own id.
 _RENEWALS = 5
@@ -296,24 +303,131 @@ async def _release(
         "detail": {"settled_case_id": case.get("case_id")},
         "at": utcnow(),
     }, tenant_id=tenant_id)
-    paid = await paypal_client.create_payout(
-        payee, shipment.get("payout_amount"), currency, f"{key}-payout",
-        f"Floorline freight payment for {shipment.get('shipment_id') or case.get('case_id')}",
+    name = f"{key}-payout"
+    dead_batch = await _replacement(key, tenant_id)
+    if dead_batch:
+        found = await paypal_client.get_payout_batch(dead_batch, f"{key}-dead")
+        header = _own_header(found, shipment.get("payout_amount"), currency, name)
+        if header is None or header.get("batch_status") not in _DEAD_BATCH:
+            return _result(
+                RETRY if _retryable(found) else FAILED,
+                "PayPal does not show the first payout batch as denied, so no second payout is sent; nothing more is paid",
+                capture=_step(captured),
+            )
+        name = f"{key}-payout-2"
+    paid = await _send_payout(
+        payee, shipment.get("payout_amount"), currency, name,
+        f"Floorline freight payment for {shipment.get('shipment_id') or case.get('case_id')}", tenant_id,
     )
     if paid["status"] != paypal_client.OK:
-        paid = await _recovered_payout(paid, shipment.get("payout_amount"), currency, key) or paid
+        paid = await _recovered_payout(paid, shipment.get("payout_amount"), currency, name, tenant_id) or paid
     if paid["status"] != paypal_client.OK:
+        if paid.get("dead_batch"):
+            return _result(
+                FAILED,
+                "PayPal captured the funds but did not pay the carrier: it denied the payout batch, so a person can send one new "
+                "payout from the case",
+                capture=_step(captured), payout=_step(paid), dead_batch=str(paid["dead_batch"]),
+            )
+        if paid["status"] == _STALE_ATTEMPT:
+            return _result(
+                HELD,
+                "the first payout attempt is older than PayPal keeps its key, so a new request could pay twice; "
+                "check the batch at PayPal; nothing more is paid",
+                capture=_step(captured),
+            )
         status = RETRY if _retryable(paid) else FAILED
         return _result(status, "PayPal captured the funds but did not pay the carrier",
                        capture=_step(captured), payout=_step(paid))
     return _result(
         SETTLED, "captured and paid", capture=_step(captured), payout=_step(paid),
+        **({"recovered_from": paid["recovered_from"]} if paid.get("recovered_from") else {}),
         amount=str(_amount(shipment.get("payout_amount"))), carrier_key=carrier,
         **await _tracking(shipment, _step(captured), key, tenant_id),
     )
 
 
-async def _recovered_payout(refusal: dict[str, Any], amount: Any, currency: str, key: str) -> dict[str, Any] | None:
+def _own_header(found: dict[str, Any], amount: Any, currency: str, name: str) -> dict[str, Any] | None:
+    """The header of this payout's own batch as PayPal reports it; None for a batch that cannot be read or is another payout."""
+    body = found.get("body")
+    header = body.get("batch_header") if isinstance(body, dict) else None
+    if found.get("status") != paypal_client.OK or not isinstance(header, dict):
+        return None
+    sender = header.get("sender_batch_header")
+    money = header.get("amount")
+    if not isinstance(sender, dict) or sender.get("sender_batch_id") != name or not isinstance(money, dict):
+        return None
+    if _amount(money.get("value")) != _amount(amount) or money.get("currency", money.get("currency_code")) != currency:
+        return None
+    return header
+
+
+async def _replacement(key: str, tenant_id: str | None) -> str:
+    """The dead batch a person asked to replace, from the row settlement_retry wrote, or an empty string."""
+    rows, _ = await get_store().query_audit(case_id=f"PAYNEW-{key}", limit=1, tenant_id=tenant_id)
+    detail = rows[0].get("detail") if rows else None
+    return str(detail.get("dead_batch_id") or "") if isinstance(detail, dict) else ""
+
+
+async def _keep_batch(name: str, batch_id: str, tenant_id: str | None) -> None:
+    await get_store().add_audit_once({
+        "audit_id": f"paybatch-{name}",
+        "case_id": f"PAYBATCH-{name}",
+        "action": "settle_payout_batch",
+        "status": "done",
+        "detail": {"batch_id": batch_id},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+
+
+def _past_key_life(started: str) -> bool:
+    """True when PayPal may have forgotten the key of an attempt made then; a date that cannot be read counts as past."""
+    try:
+        return datetime.now(timezone.utc) - datetime.fromisoformat(started) > timedelta(days=_KEY_DAYS)
+    except (TypeError, ValueError):
+        return True
+
+
+async def _send_payout(payee: str, amount: Any, currency: str, name: str, note: str, tenant_id: str | None) -> dict[str, Any]:
+    """PayPal's answer for this batch: from the batch id already kept, or from a request made now.
+
+    The attempt is written first and the batch id right after PayPal answers, so a later delivery knows what happened from this
+    record and not only from PayPal's refusal of a repeated key. A kept batch is never sent again.
+    """
+    rows, _ = await get_store().query_audit(case_id=f"PAYBATCH-{name}", limit=10, tenant_id=tenant_id)
+    details = {str(row.get("action")): row for row in rows}
+    batch = details.get("settle_payout_batch")
+    kept = str((batch.get("detail") or {}).get("batch_id") or "") if batch else ""
+    if kept:
+        found = await paypal_client.get_payout_batch(kept, f"{name}-read")
+        if found.get("status") != paypal_client.OK:
+            return found
+        header = _own_header(found, amount, currency, name)
+        if header is not None and header.get("batch_status") in _TAKEN_BATCH:
+            return {**found, "recovered_from": "kept_batch"}
+        dead = header is not None and header.get("batch_status") in _DEAD_BATCH
+        return {**found, "status": _NOT_PAID, **({"dead_batch": kept} if dead else {})}
+    attempt = details.get("settle_payout_started")
+    if attempt is not None and _past_key_life(str(attempt.get("at") or "")):
+        return {"status": _STALE_ATTEMPT, "http_status": None, "body": None, "error": None}
+    await get_store().add_audit_once({
+        "audit_id": f"payatt-{name}",
+        "case_id": f"PAYBATCH-{name}",
+        "action": "settle_payout_started",
+        "status": "done",
+        "detail": {},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    paid = await paypal_client.create_payout(payee, amount, currency, name, note)
+    batch_id = _step(paid).get("paypal_id")
+    if paid["status"] == paypal_client.OK and batch_id:
+        await _keep_batch(name, str(batch_id), tenant_id)
+    return paid
+
+
+async def _recovered_payout(
+    refusal: dict[str, Any], amount: Any, currency: str, name: str, tenant_id: str | None,
+) -> dict[str, Any] | None:
     """PayPal's own record of this payout when it refused the request as a duplicate, or None.
 
     A repeated delivery after a payout whose result was lost gets a duplicate-batch refusal although the carrier was paid. The
@@ -323,21 +437,16 @@ async def _recovered_payout(refusal: dict[str, Any], amount: Any, currency: str,
     batch_id = paypal_client.duplicate_batch_id(refusal)
     if batch_id is None:
         return None
-    found = await paypal_client.get_payout_batch(batch_id, f"{key}-recover")
-    body = found.get("body")
-    header = body.get("batch_header") if isinstance(body, dict) else None
-    if found.get("status") != paypal_client.OK or not isinstance(header, dict):
+    found = await paypal_client.get_payout_batch(batch_id, f"{name}-recover")
+    header = _own_header(found, amount, currency, name)
+    if header is None:
         return None
-    sender = header.get("sender_batch_header")
-    money = header.get("amount")
-    if not isinstance(sender, dict) or sender.get("sender_batch_id") != f"{key}-payout" or not isinstance(money, dict):
-        return None
-    if _amount(money.get("value")) != _amount(amount) or money.get("currency", money.get("currency_code")) != currency:
-        return None
+    await _keep_batch(name, batch_id, tenant_id)
+    if header.get("batch_status") in _DEAD_BATCH:
+        return {**found, "status": _NOT_PAID, "dead_batch": batch_id}
     if header.get("batch_status") not in _TAKEN_BATCH:
         return None
-    recovered: dict[str, Any] = found
-    return recovered
+    return {**found, "recovered_from": "duplicate_refusal"}
 
 
 async def _tracking(

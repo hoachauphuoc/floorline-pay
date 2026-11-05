@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 import { AgTable } from "@/components/grid/AgTable";
@@ -17,6 +18,7 @@ import {
   fetchFrozenParties,
   fetchPaymentLedger,
   fetchPendingPayPalEvents,
+  fetchUnboundOrders,
   liftFreeze,
   reconcilePayPalEvents,
   type FrozenParty,
@@ -113,6 +115,14 @@ export default function SettlementPage() {
     },
   });
   const reconcileLock = lockReason(identity, "operator");
+  const unbound = useQuery({
+    queryKey: ["unbound-orders", tenant.id],
+    queryFn: fetchUnboundOrders,
+    enabled: reconcileLock === null,
+    refetchInterval: 15_000,
+    retry: false,
+  });
+  const holds = unbound.data?.orders ?? [];
   const waiting = events.data?.pending ?? 0;
   const [selected, setSelected] = useState<FrozenParty | null>(null);
   const [reason, setReason] = useState("");
@@ -207,6 +217,26 @@ export default function SettlementPage() {
         </>
       )}
 
+      {reconcileLock === null && (
+        <section className="bento-card mt-8 max-w-3xl p-4" aria-label="Holds with no case">
+          <h2 className="text-[13px] font-medium text-white">Holds with no case</h2>
+          {unbound.isError ? (
+            <ErrorState error={unbound.error} />
+          ) : holds.length === 0 ? (
+            <p className="mt-1 text-[12px] text-dim">Every hold has its case.</p>
+          ) : (
+            <ul className="mt-2 space-y-1 text-[12px]" aria-label="Orders held with no case">
+              {holds.map((order) => (
+                <li key={order.order_id}>
+                  <Link href={`/book/return?token=${order.order_id}`} className="text-white underline">
+                    Finish booking {order.order_id}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
       <section className="bento-card mt-8 max-w-3xl p-4" aria-label="PayPal events waiting">
         <h2 className="text-[13px] font-medium text-white">PayPal events waiting</h2>
         {events.isError ? (

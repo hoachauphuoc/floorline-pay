@@ -188,6 +188,7 @@ describe("the payout check write", () => {
 describe("the kept PayPal events", () => {
   it("forwards the count and the reconcile; the reconcile needs no password, because it only freezes or records", () => {
     expect(matchRead("payments/events/pending")).toBe(true);
+    expect(matchRead("payments/orders/unbound")).toBe(true);
     expect(matchWrite("payments/events/reconcile", ALLOWED_POST)).toBe(true);
     expect(PASSWORD_ONLY_POST.has(policyKey("payments/events/reconcile"))).toBe(false);
   });
