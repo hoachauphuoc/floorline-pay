@@ -53,9 +53,9 @@ Every claim below names where the evidence is: a section of `README.md`, or a li
 
 ### 5. Measured limits (25s)
 
-**Screen.** The README table *What the AI layers add, measured on invented data*, with the last row (*payment-risk analyst: not measured*) highlighted.
-**Narration.** "On an invented set of eighty payouts, the deterministic checks catch twenty-four of thirty-six frauds and flag none of the forty-four honest ones. Adding a carrier look-up reaches thirty-two, at the cost of six false flags. Whether the AI analyst adds anything is not measured yet, and these rates are not a forecast."
-**Source.** README table in *What the AI layers add, measured on invented data* (24 of 36, 0 of 44; 32 of 36, 6 of 44; analyst not measured).
+**Screen.** The README table *What the AI layers add, measured on invented data*, with the last row (*payment-risk analyst: added nothing*) highlighted.
+**Narration.** "On an invented set of eighty payouts, the deterministic checks catch twenty-four of thirty-six frauds and flag none of the forty-four honest ones. Adding a carrier look-up reaches thirty-two, at the cost of six false flags. We also ran the AI analyst live: it added nothing on this set, and we say so. These rates are not a forecast."
+**Source.** README table in *What the AI layers add, measured on invented data* (24 of 36, 0 of 44; 32 of 36, 6 of 44; analyst: 32 of 36, 6 of 44, added nothing).
 
 ### 6. Close (15s)
 

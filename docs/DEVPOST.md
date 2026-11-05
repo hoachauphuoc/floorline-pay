@@ -36,7 +36,7 @@ This is a proof of concept on the PayPal sandbox: no real money moves.
 - **AI:** Nemotron 3 Nano and Super through Nebius Token Factory screen every case; Tavily gives live web search; a payment-risk analyst sees numbers and categories, never a name or an address. Each AI layer may only raise risk or tighten a limit.
 - **Credit security in seven layers:** booking-bound authorizations, a two-person carrier payee registry, limits and a pause switch, dual approval of a large release, settlement integrity (webhook, payout tracking, freezes), and the AI layers above.
 - **Console and API:** Python and Flask backend, Next.js console, Firestore for the case store. Hosted on Render, with Firestore and Pub/Sub in a separate Google Cloud project.
-- **Tests:** 2,894 backend tests pass (47 skipped without the Firestore and Pub/Sub emulators) and 1,903 frontend tests pass; `ruff`, `mypy` and `tsc` are clean. No test calls PayPal: they use fakes and recorded sandbox answers.
+- **Tests:** 2,902 backend tests pass (47 skipped without the Firestore and Pub/Sub emulators) and 1,903 frontend tests pass; `ruff`, `mypy` and `tsc` are clean. No test calls PayPal: they use fakes and recorded sandbox answers.
 
 ## What changed during the Submission Period
 
@@ -63,8 +63,8 @@ A payment agent is mostly a set of refusals. The useful work was deciding what i
 ## What's next
 
 - Get real refund and dispute events through the webhook against the sandbox.
-- Measure the payment-risk analyst (`scripts/evaluate_payment_ai.py --live-analyst`); it is not measured yet.
-- Close the known gap that two settlements at the same moment can together pass the daily limit.
+- Give the payment-risk analyst something to catch: measured live, it added nothing on the invented set (it missed all four impersonated-carrier cases), so it needs better inputs or a better corpus before we rely on it.
+- Exercise the daily-limit reservation (added so two settlements at the same moment cannot both pass a limit) against Firestore under real concurrency; today it is tested on the in-memory store.
 - Separate "payout accepted by PayPal" from "money received".
 
 ## Built with

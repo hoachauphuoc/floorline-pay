@@ -12,8 +12,8 @@ in US dollars. Until an admin publishes others, the defaults below are in force;
 published set that cannot be read back is treated as no limits at all being verifiable, and
 nothing is paid. A payout above the per-payout limit is held for a person. A payout that
 would pass a daily limit is retried, so it goes out when the day turns over, still
-inside the limits. A payout is counted once it has been paid, so two settlements at the very
-same moment could together pass a daily limit by one payout.
+inside the limits. A payout reserves its amount before it is paid (reserve_payout), and the
+reservation is counted with the paid ones, so two settlements at the same moment cannot both pass a daily limit.
 
 Pausing blocks money going out and not money going back: a block still voids the
 authorization. The switch and the limits are audit rows under the case id
@@ -43,6 +43,9 @@ DEFAULT_LIMITS: dict[str, float | int] = {
 
 _PAGE = 200
 _PAGES = 10
+RESERVED = "reserve_payout"
+CANCELLED = "release_payout"
+RESERVATIONS = "PAYOUT-RESERVATIONS"
 
 
 class ControlsError(Exception):
@@ -218,9 +221,112 @@ async def usage_today(tenant_id: str | None = None) -> dict[str, Any]:
     raise ControlsError("too many payments today to total them", 503)
 
 
+def _daily_refusal(
+    live: dict[str, float | int], used: dict[str, Any], carrier_key: str, payout: Decimal,
+) -> tuple[str, str] | None:
+    """("retry", reason) when the payout would pass a daily limit given what is already counted, else None."""
+    mine = used["carriers"].get(carrier_key, {"usd": Decimal(0), "count": 0})
+    if mine["count"] >= int(live["carrier_daily_count"]):
+        return "retry", (
+            f"this carrier has reached its limit of {live['carrier_daily_count']} payouts today; "
+            "the decision is retried when the day turns over"
+        )
+    if mine["usd"] + payout > Decimal(str(live["carrier_daily_usd"])):
+        return "retry", (
+            f"this payout would take the carrier past its daily limit of "
+            f"{live['carrier_daily_usd']} USD; the decision is retried when the day turns over"
+        )
+    if used["tenant_usd"] + payout > Decimal(str(live["tenant_daily_usd"])):
+        return "retry", (
+            f"this payout would take today's payments past the daily limit of "
+            f"{live['tenant_daily_usd']} USD; the decision is retried when the day turns over"
+        )
+    return None
+
+
+async def _rows_today(action: str, status: str, tenant_id: str | None) -> list[dict[str, Any]]:
+    start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    found: list[dict[str, Any]] = []
+    cursor: str | None = None
+    for _ in range(_PAGES):
+        rows, cursor = await get_store().query_audit(
+            action=action, status=status, cursor=cursor, limit=_PAGE, tenant_id=tenant_id,
+        )
+        found.extend(row for row in rows if str(row.get("at") or "") >= start)
+        if not cursor or (rows and str(rows[-1].get("at") or "") < start):
+            return found
+    raise ControlsError("too many payments today to total them", 503)
+
+
+async def _open_reservations(tenant_id: str | None) -> list[dict[str, Any]]:
+    """Today's reservations that are neither paid (the paid row counts them) nor given up."""
+    paid = {str(_detail(row).get("idempotency_key") or "") for row in await _rows_today("settle_payment", "settled", tenant_id)}
+    given_up = {str(_detail(row).get("reservation_id") or "") for row in await _rows_today(CANCELLED, "cancelled", tenant_id)}
+    return [
+        row for row in await _rows_today(RESERVED, "reserved", tenant_id)
+        if str(_detail(row).get("idempotency_key") or "") not in paid and str(row.get("audit_id") or "") not in given_up
+    ]
+
+
+async def cancel_reservations(key: str, tenant_id: str | None = None) -> None:
+    """Give up every open reservation of this decision, so its amount stops counting."""
+    for row in await _open_reservations(tenant_id):
+        if str(_detail(row).get("idempotency_key") or "") != key:
+            continue
+        await get_store().add_audit_once({
+            "audit_id": f"cancel-{row['audit_id']}",
+            "case_id": RESERVATIONS,
+            "action": CANCELLED,
+            "status": "cancelled",
+            "detail": {"reservation_id": row["audit_id"], "idempotency_key": key},
+            "at": utcnow(),
+        }, tenant_id=tenant_id)
+
+
+async def reserve_payout(
+    key: str, payout: Decimal, carrier_key: str, tenant_id: str | None = None,
+) -> tuple[str, str] | None:
+    """
+    Reserve this payout's amount, then check the daily limits against what is paid and what others have
+    reserved. None when it fits; else (status, reason) and the reservation is given up again. The reservation is
+    written before the totals are read, so of two settlements at the same moment the later one sees the earlier one.
+    """
+    if not key:
+        return "held", "the payout has no decision key to reserve it under; nothing is paid"
+    live = await limits(tenant_id)
+    if live is None:
+        return "held", "the published payment limits cannot be read; nothing is paid"
+    open_now = await _open_reservations(tenant_id)
+    if not any(str(_detail(row).get("idempotency_key") or "") == key for row in open_now):
+        await get_store().add_audit({
+            "audit_id": new_id("RSV"),
+            "case_id": RESERVATIONS,
+            "action": RESERVED,
+            "status": "reserved",
+            "detail": {"amount": str(payout), "carrier_key": carrier_key, "idempotency_key": key},
+            "at": utcnow(),
+        }, tenant_id=tenant_id)
+    used = await usage_today(tenant_id)
+    for row in await _open_reservations(tenant_id):
+        detail = _detail(row)
+        if str(detail.get("idempotency_key") or "") == key:
+            continue
+        amount = _amount(detail.get("amount"))
+        if amount is None:
+            continue
+        used["tenant_usd"] += amount
+        entry = used["carriers"].setdefault(str(detail.get("carrier_key") or ""), {"usd": Decimal(0), "count": 0})
+        entry["usd"] += amount
+        entry["count"] += 1
+    refusal = _daily_refusal(live, used, carrier_key, payout)
+    if refusal is not None:
+        await cancel_reservations(key, tenant_id)
+    return refusal
+
+
 async def check_payout(
     currency: str, payout: Decimal | None, carrier_key: str, tenant_id: str | None = None,
-    tier_cap: Decimal | None = None, tier: str = "",
+    tier_cap: Decimal | None = None, tier: str = "", key: str = "",
 ) -> tuple[str, str] | None:
     """
     None when the payout fits the limits, else (status, reason): "held" for one that no
@@ -243,21 +349,9 @@ async def check_payout(
             f"the payout of {payout} USD is above the {tier_cap} USD that credit tier {tier} allows this carrier; "
             "it is paid once the carrier has a record of being paid without trouble; nothing is paid"
         )
-    used = await usage_today(tenant_id)
-    mine = used["carriers"].get(carrier_key, {"usd": Decimal(0), "count": 0})
-    if mine["count"] >= int(live["carrier_daily_count"]):
-        return "retry", (
-            f"this carrier has reached its limit of {live['carrier_daily_count']} payouts today; "
-            "the decision is retried when the day turns over"
-        )
-    if mine["usd"] + payout > Decimal(str(live["carrier_daily_usd"])):
-        return "retry", (
-            f"this payout would take the carrier past its daily limit of "
-            f"{live['carrier_daily_usd']} USD; the decision is retried when the day turns over"
-        )
-    if used["tenant_usd"] + payout > Decimal(str(live["tenant_daily_usd"])):
-        return "retry", (
-            f"this payout would take today's payments past the daily limit of "
-            f"{live['tenant_daily_usd']} USD; the decision is retried when the day turns over"
-        )
-    return None
+    refusal = _daily_refusal(live, await usage_today(tenant_id), carrier_key, payout)
+    if refusal is not None or not key:
+        return refusal
+    # A payout that fits is reserved under its decision key before any money moves, so a settlement running at the same
+    # moment counts it; the settler gives the reservation up when nothing was paid.
+    return await reserve_payout(key, payout, carrier_key, tenant_id)

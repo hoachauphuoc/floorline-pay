@@ -248,7 +248,7 @@ async def _release(
     profile = await credit_profile.profile(shipment.get("carrier_name"), case.get("payment_ai"), tenant_id)
     limited = await payment_controls.check_payout(
         str(shipment.get("currency") or "USD"), _amount(shipment.get("payout_amount")), carrier, tenant_id,
-        tier_cap=profile["cap_usd"], tier=profile["tier"],
+        tier_cap=profile["cap_usd"], tier=profile["tier"], key=key,
     )
     if limited is not None:
         return _result(limited[0], limited[1])
@@ -365,6 +365,15 @@ async def _stored_result(case_id: str, key: str, tenant_id: str | None) -> dict[
     return None
 
 
+async def _give_up_reservation(key: str, tenant_id: str | None) -> None:
+    """Drop this decision's reservation after a settlement that stopped on an error. If the drop itself fails the
+    reservation stays and keeps counting, which only tightens the day's limit until the redelivery settles it."""
+    try:
+        await payment_controls.cancel_reservations(key, tenant_id)
+    except Exception:  # noqa: BLE001
+        return
+
+
 async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict[str, Any]:
     """Move the money for one applied decision, or say why it did not move."""
     case_id = str(decision.get("case_id") or "")
@@ -387,7 +396,10 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
             result = await _block(case, shipment, key, tenant_id)
         else:
             result = await _release(case, shipment, key, tenant_id, str(decision.get("approval_id") or ""))
+            if result["status"] != SETTLED:
+                await payment_controls.cancel_reservations(key, tenant_id)
     except Exception as exc:  # noqa: BLE001 - settle never raises; the status says what happened
+        await _give_up_reservation(key, tenant_id)
         return _result(RETRY, f"settlement stopped on {type(exc).__name__}; deliver the decision again")
     try:
         await get_store().add_audit_once({

@@ -67,9 +67,9 @@ Paying a carrier is a credit decision made on paperwork, so each layer below tak
 |---|---|---|
 | Deterministic payment checks and the request screen | 24 of 36 (66.7%, 95% CI 50.3-79.8%) | 0 of 44 (0%, 95% CI 0-8.0%) |
 | + carrier look-up | 32 of 36 (88.9%, 74.7-95.6%) | 6 of 44 (13.6%, 6.4-26.7%) |
-| + payment-risk analyst | **not measured**: it needs a model key and is run with `--live-analyst` | not measured |
+| + payment-risk analyst | 32 of 36 (88.9%, 74.7-95.6%): **added nothing** to the look-up (run live on 5 Nov 2026) | 6 of 44 (13.6%, 6.4-26.7%): no change |
 
-The look-up's 8 extra catches are shell carriers that have no web presence by construction in the corpus, and its 6 false flags are small real carriers with none: it trades one for the other. The four impersonated-carrier cases (a real carrier whose registered payee is a free-mail account) are caught by none of the measured arms; they are what the analyst is for, and whether it catches them is the number to measure before relying on it. If it adds nothing, the report says "added nothing".
+The look-up's 8 extra catches are shell carriers that have no web presence by construction in the corpus, and its 6 false flags are small real carriers with none: it trades one for the other. The four impersonated-carrier cases (a real carrier whose registered payee is a free-mail account) are caught by none of the measured arms; they were what the analyst was for, and it caught none of them either (0 of 4): on this corpus the analyst added nothing, and the report says so.
 
 ## PayPal and AI in the project
 
@@ -105,7 +105,7 @@ cd floorline-pay
 git diff --stat nebius-baseline HEAD
 ```
 
-The inherited Floorline measurements (synthetic corpus, 95% intervals) are in [REFERENCE.md](REFERENCE.md#measured-results). They measure fraud detection, not payments; the payment checks are measured only on the invented corpus described under Credit security, and the analyst model not at all yet.
+The inherited Floorline measurements (synthetic corpus, 95% intervals) are in [REFERENCE.md](REFERENCE.md#measured-results). They measure fraud detection, not payments; the payment checks are measured only on the invented corpus described under Credit security, and the analyst model added nothing on it.
 
 ## Run it locally
 
@@ -145,7 +145,7 @@ The console asks everyone to sign in. **Continue as guest judge** signs in with 
 ## Reproducible testing
 
 ```bash
-# Backend (2,894 passed, 47 skipped without the Firestore and Pub/Sub emulators)
+# Backend (2,902 passed, 47 skipped without the Firestore and Pub/Sub emulators)
 pip install "pytest>=8.0.0" "pytest-asyncio>=0.23.0" "pytest-cov>=4.1.0" "pytest-mock>=3.12.0"
 python -m pytest tests/ -q
 python -m mypy src/vf_logistics/ --ignore-missing-imports
@@ -163,12 +163,12 @@ The figures are from full runs on the development machine on 30 Oct and 4 Nov 20
 - **A person's release or block used to stay in the store.** For a case booked through `/book` the decision was recorded and the shipment held or released, but nothing was published, so the settler never saw it and a block never voided the hold. Found on the first real booking and fixed in `0c7cebe`; `tests/test_human_decide_publishes.py` pins it. It has been shown end to end on the live service: a block voided a hold and a release captured and paid (5 Nov 2026).
 - **The agent starts suspended.** Until a person publishes a delegation boundary (Governance page) every protected action, including publishing a decision, is refused and the case goes to a person. The demo runs under `BOUNDARY-v1`, which does not allow the agent to release by itself.
 - **Settling depends on Pub/Sub delivery** to the receiver, as described above.
-- **The webhook receiver** (`/api/v1/paypal/webhook`) is off until `PAYPAL_WEBHOOK_ID` is set. It assumes payout events carry `sender_batch_id` (our `<key>-payout`), dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, and that renewing an authorization gives a new id the settler then uses. The signature check and the authorization, capture and payout events have met the sandbox; the dispute lookup and the renewal have not.
-- **Two settlements at the same moment can together pass the daily limit**: the check and the write are not one step. Known, not fixed.
+- **The webhook receiver** (`/api/v1/paypal/webhook`) is off until `PAYPAL_WEBHOOK_ID` is set. Confirmed on the sandbox on 5 Nov 2026: the signature check, and that payout events carry `sender_batch_id` (our `<key>-payout`), since a real payout item event moved its payout to `confirmed`. Still assumed, never run against the sandbox: that dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, that renewing an authorization gives a new id the settler then uses, and that the `payer-action` link works as the booking flow expects (the booking flow itself ran).
+- **Daily limits and concurrent settlements.** A payout writes a reservation before it is paid and counts the other open reservations, so of two settlements at the same moment the later one gives way (retried the next day) instead of both passing the limit. A reservation is given up when nothing was paid. Pinned by `tests/test_payment_reservation.py` and `tests/test_settler_reservation.py` against the in-memory store; it has not been exercised against Firestore under real concurrency. If a settlement fails after money moved and its reservation is dropped, that amount is uncounted until the decision is delivered again.
 - **"Payout accepted" is not "money received".** The settler records a payout as settled when PayPal accepts the batch; the tracking that confirms the money arrived is best effort.
 - **There is no console screen yet for frozen parties or payout status**: they are API only (`GET /api/v1/payments/freezes`, `POST /api/v1/payments/freezes/lift`, `POST /api/v1/payments/cases/<id>/payout/refresh`; the payment state of a case carries `payout_status`).
 - **A new carrier's first payouts are capped** (credit standing C: 2,000 USD) and nothing but being paid without trouble raises the cap; there is no human override yet.
-- **The payment-risk analyst has not been measured.** The synthetic corpus shows what the deterministic checks and the carrier look-up catch (above); whether the model adds anything is the number `scripts/evaluate_payment_ai.py --live-analyst` produces, and it has not been run. The corpus is invented from the patterns the checks were written for, so its rates are not a forecast.
+- **The payment-risk analyst added nothing on the synthetic corpus.** Run live on 5 Nov 2026 (`scripts/evaluate_payment_ai.py --live-analyst`): it flagged exactly what the carrier look-up flagged (32 of 36, 6 of 44 false) and missed all four impersonated-carrier cases. It stays in the design as a layer that may only raise risk, but this corpus gives no evidence that it helps. The corpus is invented from the patterns the checks were written for, so its rates are not a forecast.
 - **The carrier look-up trades one error for another**: it catches carriers with no web presence and flags small real carriers that have none.
 - The settler captures the whole authorization and pays `payout_amount`; if the shipper authorized more than the payout, the difference stays with the merchant account.
 - A decision made by the pipeline itself (an auto-cleared case) does not start a payment; only a person's release or block does.
