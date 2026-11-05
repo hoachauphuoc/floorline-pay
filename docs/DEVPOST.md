@@ -54,7 +54,7 @@ The baseline is the Nebius submission (tag `nebius-baseline`), which had no paym
 - A real sandbox booking: an order created, approved by a sandbox buyer and authorized, holding 1,300 USD.
 - Measured, with the limits stated. On an invented set of 80 payouts (36 fraudulent, 44 honest), the deterministic checks catch 24 of 36 with 0 of 44 false flags; adding a carrier look-up reaches 32 of 36 with 6 of 44 false flags. These rates describe that invented set only and are not a forecast.
 
-- Run for real on the live service on 5 Nov 2026, sandbox money only: a Block voided a 1,300 USD hold (PayPal answered 204), and a Release captured it (201) and paid the carrier through Payouts (201). The webhook is registered and verified real signed events from PayPal (authorization created, capture completed, payout batch, payout item succeeded), and the second payout moved from `unconfirmed` to `confirmed` from the payout-item event. A capture refund in the sandbox also arrived as a signed event and froze the carrier; no dispute event has arrived yet. The daily-limit reservation ran live too: a release wrote its reservation row before capture and paid, and a payout PayPal refused (insufficient sandbox balance) gave its reservation up.
+- Run for real on the live service on 5 Nov 2026, sandbox money only: a Block voided a 1,300 USD hold (PayPal answered 204), and a Release captured it (201) and paid the carrier through Payouts (201). The webhook is registered and verified real signed events from PayPal (authorization created, capture completed, payout batch, payout item succeeded), and the second payout moved from `unconfirmed` to `confirmed` from the payout-item event. A capture refund in the sandbox also arrived as a signed event and froze the carrier; no dispute event has arrived yet. The daily-limit reservation ran live too: a release wrote its reservation row before capture and paid, and a payout PayPal refused (insufficient sandbox balance) gave its reservation up. After the balance was topped up, a person sent that failed release to the settler again from the case page; it reused the capture, paid the carrier and was confirmed by the webhook.
 
 ## What we learned
 
@@ -65,7 +65,7 @@ A payment agent is mostly a set of refusals. The useful work was deciding what i
 - Get a real dispute event through the webhook against the sandbox (a refund already came through and froze the carrier).
 - Give the payment-risk analyst something to catch: measured live, it added nothing on the invented set (it missed all four impersonated-carrier cases), so it needs better inputs or a better corpus before we rely on it.
 - Exercise the daily-limit reservation (added so two settlements at the same moment cannot both pass a limit) against Firestore under real concurrency. It is tested on the in-memory store and ran once end to end on the live service, one settlement at a time.
-- Separate "payout accepted by PayPal" from "money received".
+- Show "payout accepted by PayPal" and "money received" as two states on the case page. The ledger already keeps them apart (`unconfirmed`, then `confirmed` from PayPal's payout-item event); only the page does not.
 
 ## Built with
 
