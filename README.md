@@ -21,8 +21,8 @@ Deterministic checks set a risk **floor** for every shipment, including new paym
 | Step | Status on the real PayPal sandbox |
 |---|---|
 | Create an order, approve it as a buyer, authorize (money held) | **Run for real** on 24 and 30 Oct 2026 (a 1,300 USD hold) |
-| Block, then void the hold | **RESULT PENDING**: a person's block was not being published to the settler until `0c7cebe`; the rerun is not done |
-| Release, then capture and pay the carrier with Payouts | **RESULT PENDING**: not run against the sandbox yet |
+| Block, then void the hold | **Run for real** on 5 Nov 2026 on the live service: the block was published, the settler voided the hold (PayPal answered 204), the ledger shows *voided* (case `CASE-SHP-PAY-B1105A`) |
+| Release, then capture and pay the carrier with Payouts | **Run for real** on 5 Nov 2026 on the live service: capture `4BD95385NJ6449936` and payout `9835DKGHAFN3A` both answered 201, the ledger shows *paid* (case `CASE-SHP-PAY-R1105A`). The payout is *accepted* by PayPal; receipt by the carrier is not confirmed (ledger state `unconfirmed`) |
 | Webhook (payout, refund and dispute events) | **RESULT PENDING**: not registered yet |
 
 ## How the money moves
@@ -159,8 +159,8 @@ The figures are from full runs on the development machine on 30 Oct and 4 Nov 20
 
 ## Limits, stated
 
-- **Only the booking half has met the real sandbox.** Creating an order, approving it as a sandbox buyer and authorizing it (a 1,300 USD hold) ran for real on 24 and 30 Oct 2026. Capture, payout, void and the webhook are covered with fakes and with PayPal answers recorded from the sandbox in `tests/fixtures/paypal`; no capture, payout or void has run against the sandbox yet (see the status table above).
-- **A person's release or block used to stay in the store.** For a case booked through `/book` the decision was recorded and the shipment held or released, but nothing was published, so the settler never saw it and a block never voided the hold. Found on the first real booking and fixed in `0c7cebe`; `tests/test_human_decide_publishes.py` pins it. The fix has not yet been shown end to end on the live service.
+- **Webhook not run against the sandbox.** Booking, authorization, void, capture and payout have each run for real (see the status table above). The webhook is covered with fakes and with PayPal answers recorded from the sandbox in `tests/fixtures/paypal`; it is not registered yet, so a payout stays `unconfirmed` and "accepted by PayPal" is not yet separated from "money received".
+- **A person's release or block used to stay in the store.** For a case booked through `/book` the decision was recorded and the shipment held or released, but nothing was published, so the settler never saw it and a block never voided the hold. Found on the first real booking and fixed in `0c7cebe`; `tests/test_human_decide_publishes.py` pins it. It has been shown end to end on the live service: a block voided a hold and a release captured and paid (5 Nov 2026).
 - **The agent starts suspended.** Until a person publishes a delegation boundary (Governance page) every protected action, including publishing a decision, is refused and the case goes to a person. The demo runs under `BOUNDARY-v1`, which does not allow the agent to release by itself.
 - **Settling depends on Pub/Sub delivery** to the receiver, as described above.
 - **The webhook receiver** (`/api/v1/paypal/webhook`) is off until `PAYPAL_WEBHOOK_ID` is set. It assumes payout events carry `sender_batch_id` (our `<key>-payout`), dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, and that renewing an authorization gives a new id the settler then uses. None of this has met the sandbox.

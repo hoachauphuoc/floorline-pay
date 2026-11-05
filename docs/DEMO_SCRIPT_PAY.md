@@ -20,7 +20,7 @@ Every claim below names where the evidence is: a section of `README.md`, or a li
 | 1 | Book, approve on PayPal, money held | 25s | can record now |
 | 2 | The risk floor: findings that only raise | 30s | can record now |
 | 3 | A person decides; the agent starts suspended | 30s | can record now |
-| 4 | Settle: block voids, release captures and pays | 35s | **TO RECORD** (needs the real run) |
+| 4 | Settle: block voids, release captures and pays | 35s | can record now (real run done 5 Nov) |
 | 5 | What was measured, and what was not | 25s | can record now |
 | 6 | Close | 15s | after scene 4 |
 | | | **160s** | |
@@ -45,11 +45,11 @@ Every claim below names where the evidence is: a section of `README.md`, or a li
 **Narration.** "The agent starts suspended. It can analyse and propose; it cannot act until a person publishes what it may do, and ours may not release anything on its own. A person decides every disputed case, and releasing needs a password, so a guest can look but cannot pay."
 **Source.** README, *Limits, stated* (the agent starts suspended) and *Signing in*; the refusal text is in `orchestrator.human_decide`.
 
-### 4. Settle only what a person decided (35s) · TO RECORD
+### 4. Settle only what a person decided (35s) · run for real 5 Nov 2026, still to film
 
 **Screen.** Case A: *Block*, then the Payment card changes to *returned to the shipper* with the PayPal void id, and `/payments` lists it. Case B: *Release* by a password account, then the card shows the capture id and the payout id, and `/payments` lists *paid*.
 **Narration.** "A published block voids the hold, and the money goes back to the shipper. A published release makes the settler check the payment rules once more, capture the money and pay the carrier with PayPal Payouts. Each PayPal call carries a request id built from the decision, so a repeat cannot pay twice."
-**Source.** README, *How the money moves*, step 4. **Do not record until** a Block and a Release have each completed on the live service and `/payments` shows them; the README status table says RESULT PENDING until then.
+**Source.** README, *How the money moves*, step 4. A Block and a Release have each completed on the live service (`CASE-SHP-PAY-B1105A` voided, `CASE-SHP-PAY-R1105A` paid) and `/payments` shows them. Film fresh cases; say "accepted by PayPal", never "received by the carrier".
 
 ### 5. Measured limits (25s)
 

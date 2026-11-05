@@ -45,7 +45,7 @@ The baseline is the Nebius submission (tag `nebius-baseline`), which had no paym
 ## Challenges
 
 - **Never paying by accident.** Every release path fails closed: a missing, unreadable or placeholder value means "not verified", never "fine". Each refusal is a named status and pays nothing.
-- **The first real booking found a gap.** A person's release or block, for a case booked through the console, was recorded but not published, so the settler never saw it and a block could not void the hold. We fixed it and pinned it with tests. The fix still has to be shown end to end on the live service.
+- **The first real booking found a gap.** A person's release or block, for a case booked through the console, was recorded but not published, so the settler never saw it and a block could not void the hold. We fixed it and pinned it with tests. The fix is now shown end to end on the live service.
 - **An agent that starts suspended.** Until a person publishes what the agent may do, it can analyse and propose but not act. That is the safe default, and it caught us out when nothing was being published.
 
 ## Accomplishments we are proud of
@@ -54,7 +54,7 @@ The baseline is the Nebius submission (tag `nebius-baseline`), which had no paym
 - A real sandbox booking: an order created, approved by a sandbox buyer and authorized, holding 1,300 USD.
 - Measured, with the limits stated. On an invented set of 80 payouts (36 fraudulent, 44 honest), the deterministic checks catch 24 of 36 with 0 of 44 false flags; adding a carrier look-up reaches 32 of 36 with 6 of 44 false flags. These rates describe that invented set only and are not a forecast.
 
-**RESULT PENDING:** a Block that voided a hold and a Release that captured and paid, run on the live service. Add them here only after `/payments` shows them.
+- Run for real on the live service on 5 Nov 2026, sandbox money only: a Block voided a 1,300 USD hold (PayPal answered 204), and a Release captured it (201) and paid the carrier through Payouts (201). The payout is accepted by PayPal; receipt is not yet confirmed, because the webhook is not registered.
 
 ## What we learned
 
@@ -62,7 +62,7 @@ A payment agent is mostly a set of refusals. The useful work was deciding what i
 
 ## What's next
 
-- Run and record the capture, payout, void and webhook paths against the sandbox.
+- Register the webhook and run its payout, refund and dispute events against the sandbox.
 - Measure the payment-risk analyst (`scripts/evaluate_payment_ai.py --live-analyst`); it is not measured yet.
 - Close the known gap that two settlements at the same moment can together pass the daily limit.
 - Separate "payout accepted by PayPal" from "money received".
