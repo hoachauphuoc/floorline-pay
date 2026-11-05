@@ -255,7 +255,7 @@ async def _earlier_publish(
 
 async def publish_decision(
     case_id: str, decision: dict[str, Any], tenant_id: str | None = None,
-    *, after_attempt: bool = False,
+    *, after_attempt: bool = False, redeliver: bool = False,
 ) -> dict[str, Any]:
     """
     Emit the final decision to Pub/Sub so ERP / WMS / billing can react.
@@ -272,7 +272,8 @@ async def publish_decision(
     intended outcome rather than something to work around.
     """
     key = decision.get("idempotency_key")
-    if key:
+    # A person's retry of a failed settlement sends a key that already went out, on purpose (settlement_retry).
+    if key and not redeliver:
         earlier = await _earlier_publish(case_id, str(key), tenant_id)
         if earlier is not None:
             return earlier

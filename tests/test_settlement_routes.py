@@ -159,3 +159,51 @@ class TestTheSettlementRoutes(Base):
     def test_a_reviewer_cannot_ask_paypal_for_a_payout_state(self):
         r = self.client.post("/api/v1/payments/cases/CASE-1/payout/refresh", headers=as_person(REVIEWER))
         assert r.status_code == 403
+
+
+class TestRetryingASettlementFromTheConsole(Base):
+    def setup_method(self):
+        super().setup_method()
+        self.people = patch.dict(os.environ, {
+            "ADMIN_EMAILS": ADMIN, "OPERATOR_EMAILS": OPERATOR, "REVIEWER_EMAILS": REVIEWER,
+            "VF_ONE_CLICK_JUDGE": "true", "VF_ONE_CLICK_EMAIL": ADMIN,
+        })
+        self.people.start()
+        self.client = app.test_client()
+
+    def teardown_method(self):
+        self.people.stop()
+        super().teardown_method()
+
+    def test_an_operator_signed_in_with_a_password_sends_a_failed_release_again(self):
+        again = AsyncMock(return_value={"status": "redelivered", "case_id": "CASE-1"})
+        with patch("vf_logistics.settlement_retry.retry", again):
+            r = self.client.post(
+                "/api/v1/payments/cases/CASE-1/decision/redeliver", headers=as_person(OPERATOR),
+                json={"reason": "topped up the balance", "retried_by": "someone-else@x.example"},
+            )
+        assert r.status_code == 200
+        assert r.get_json()["status"] == "redelivered"
+        assert again.await_args.args[:3] == ("CASE-1", "topped up the balance", OPERATOR)
+
+    def test_a_reviewer_and_the_one_click_guest_session_cannot_send_it_again(self):
+        again = AsyncMock(return_value={"status": "redelivered"})
+        with patch("vf_logistics.settlement_retry.retry", again):
+            for headers in (as_person(REVIEWER), as_person(ADMIN, amr="one_click")):
+                r = self.client.post(
+                    "/api/v1/payments/cases/CASE-1/decision/redeliver", headers=headers, json={"reason": "checked"},
+                )
+                assert r.status_code == 403
+        again.assert_not_awaited()
+
+    def test_a_refusal_comes_back_with_its_status_and_reason(self):
+        r = self.client.post(
+            "/api/v1/payments/cases/CASE-NEVER-PAID/decision/redeliver", headers=as_person(OPERATOR), json={"reason": "checked"},
+        )
+        assert r.status_code == 409
+        assert "only a settlement that ended failed" in r.get_json()["error"]
+        r = self.client.post(
+            "/api/v1/payments/cases/CASE-NEVER-PAID/decision/redeliver", headers=as_person(OPERATOR), json={"reason": " "},
+        )
+        assert r.status_code == 400
+        assert "reason is required" in r.get_json()["error"]

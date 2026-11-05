@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import type { PaymentState } from "@/lib/api";
 import { PayPalLogo } from "@/components/ui/PayPalLogo";
 import { humaniseCode } from "@/lib/format";
@@ -34,7 +36,31 @@ const TONE: Record<PaymentState["state"], string> = {
  * person released it, or returned to the shipper after a block. Drawn from the settler's
  * own record. A state this card does not know is shown as not recognised, never as a success.
  */
-export function PaymentCard({ state }: { state: PaymentState }) {
+export function PaymentCard({
+  state,
+  onRetry,
+}: {
+  state: PaymentState;
+  onRetry?: (reason: string) => Promise<unknown>;
+}) {
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+  async function retry() {
+    setBusy(true);
+    setError(null);
+    setSent(false);
+    try {
+      await onRetry?.(reason.trim());
+      setReason("");
+      setSent(true);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "The retry failed");
+    } finally {
+      setBusy(false);
+    }
+  }
   const steps: Array<[string, string | null | undefined]> = [
     ["Captured", state.capture?.paypal_id],
     ["Paid out", state.payout?.paypal_id],
@@ -71,6 +97,36 @@ export function PaymentCard({ state }: { state: PaymentState }) {
             </div>
           ))}
         </dl>
+      )}
+      {state.state === "failed" && onRetry && (
+        <div className="mt-3 space-y-2">
+          <label className="block text-[11.5px] text-dim" htmlFor={`retry-reason-${state.case_id}`}>
+            Reason for the retry
+          </label>
+          <input
+            id={`retry-reason-${state.case_id}`}
+            value={reason}
+            onChange={(event) => setReason(event.target.value)}
+            placeholder="What you checked and what you concluded"
+            className="w-full rounded border border-white/10 bg-transparent px-2 py-1 text-[12px] text-white"
+          />
+          <button
+            type="button"
+            disabled={busy || reason.trim() === ""}
+            onClick={retry}
+            className="rounded bg-white px-2 py-1 text-[12px] font-medium text-black disabled:opacity-40"
+          >
+            Retry settlement
+          </button>
+          {sent && (
+            <p className="text-[12px] text-dim">Sent to the settler again. This card updates when it answers.</p>
+          )}
+          {error && (
+            <p role="alert" className="text-[12px] text-risk-critical">
+              {error}
+            </p>
+          )}
+        </div>
       )}
     </section>
   );

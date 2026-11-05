@@ -16,7 +16,7 @@ from typing import Any
 
 from flask import Flask, jsonify, request
 
-from vf_logistics import payment_freeze, paypal_webhook, payout_tracking
+from vf_logistics import payment_freeze, paypal_webhook, payout_tracking, settlement_retry
 
 
 def register(
@@ -81,3 +81,15 @@ def register(
         except payout_tracking.PayoutError as exc:
             return jsonify({"error": exc.message}), exc.status
         return jsonify(state), 200
+
+    @app.route("/api/v1/payments/cases/<case_id>/decision/redeliver", methods=["POST"])
+    @require_operator
+    @require_password_session
+    @limiter.limit("5 per minute")
+    def payments_decision_redeliver(case_id: str) -> Any:
+        actor, _ = person()
+        try:
+            result = run_async(settlement_retry.retry(case_id, body().get("reason"), actor, tenant_id=tenant()))
+        except settlement_retry.RetryError as exc:
+            return jsonify({"error": exc.message}), exc.status
+        return jsonify(result), 200

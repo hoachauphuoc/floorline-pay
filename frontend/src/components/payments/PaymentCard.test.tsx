@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import type { PaymentState } from "@/lib/api";
 
@@ -67,5 +67,36 @@ describe("PaymentCard", () => {
     render(<PaymentCard state={make({ state: "voided", void: voided })} />);
     expect(screen.getByText("Voided")).toBeInTheDocument();
     expect(screen.getByText("VOID-1")).toBeInTheDocument();
+  });
+});
+
+describe("PaymentCard retry", () => {
+  const failed = make({ state: "failed", reason: "PayPal captured the funds but did not pay the carrier" });
+
+  it("offers no retry unless the payment failed and the page can retry", () => {
+    const { rerender } = render(<PaymentCard state={failed} />);
+    expect(screen.queryByRole("button", { name: "Retry settlement" })).not.toBeInTheDocument();
+    rerender(<PaymentCard state={make({ state: "paid" })} onRetry={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: "Retry settlement" })).not.toBeInTheDocument();
+  });
+
+  it("keeps the button off until a reason is written, then sends the trimmed reason", async () => {
+    const onRetry = vi.fn().mockResolvedValue({});
+    render(<PaymentCard state={failed} onRetry={onRetry} />);
+    const button = screen.getByRole("button", { name: "Retry settlement" });
+    expect(button).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Reason for the retry"), { target: { value: "  topped up the balance " } });
+    expect(button).toBeEnabled();
+    fireEvent.click(button);
+    await waitFor(() => expect(onRetry).toHaveBeenCalledWith("topped up the balance"));
+    expect(await screen.findByText(/Sent to the settler again/)).toBeInTheDocument();
+  });
+
+  it("shows why a retry was refused", async () => {
+    const onRetry = vi.fn().mockRejectedValue(new Error("only a settlement that ended failed can be retried"));
+    render(<PaymentCard state={failed} onRetry={onRetry} />);
+    fireEvent.change(screen.getByLabelText("Reason for the retry"), { target: { value: "checked" } });
+    fireEvent.click(screen.getByRole("button", { name: "Retry settlement" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("only a settlement that ended failed");
   });
 });

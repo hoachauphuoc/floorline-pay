@@ -1301,6 +1301,11 @@ export async function fetchFrozenParties(): Promise<{ frozen: FrozenParty[] }> {
   return getJson<{ frozen: FrozenParty[] }>("payments/freezes");
 }
 
+export async function retrySettlement(caseId: string, reason: string): Promise<{ status: string; case_id: string }> {
+  if (DEMO_MODE) liveOnly("Retrying a settlement");
+  return postJson(`payments/cases/${encodeURIComponent(caseId)}/decision/redeliver`, { reason });
+}
+
 export async function liftFreeze(request: {
   kind: string;
   name: string;

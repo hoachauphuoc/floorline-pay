@@ -14,7 +14,7 @@ import { useCaseActivity } from "@/components/operations/useCaseActivity";
 import { PaymentCard } from "@/components/payments/PaymentCard";
 import { ReviewPanel } from "@/components/review/ReviewPanel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchAuditTrail, fetchCase, fetchPaymentState, queryKeys } from "@/lib/api";
+import { fetchAuditTrail, fetchCase, fetchPaymentState, queryKeys, retrySettlement } from "@/lib/api";
 import { caseHref } from "@/lib/case-links";
 import { caseStateLabel, formatUsd } from "@/lib/format";
 import { holds, useIdentity } from "@/lib/identity";
@@ -66,7 +66,7 @@ export default function CasePage() {
     enabled: caseId !== "",
     retry: false,
     refetchInterval: (query) =>
-      ["awaiting_decision", "pending"].includes(query.state.data?.state ?? "") ? 5000 : false,
+      ["awaiting_decision", "pending", "failed"].includes(query.state.data?.state ?? "") ? 5000 : false,
   });
 
   const c = detail.data;
@@ -162,7 +162,14 @@ export default function CasePage() {
           )}
           {payment.data?.payment_case === true && (
             <div className="mb-3">
-              <PaymentCard state={payment.data} />
+              <PaymentCard
+                state={payment.data}
+                onRetry={async (reason) => {
+                  await retrySettlement(caseId, reason);
+                  await queryClient.invalidateQueries({ queryKey: ["payment", tenant.id] });
+                  await queryClient.invalidateQueries({ queryKey: ["audit-trail", tenant.id] });
+                }}
+              />
             </div>
           )}
           <CaseTimeline events={events} />

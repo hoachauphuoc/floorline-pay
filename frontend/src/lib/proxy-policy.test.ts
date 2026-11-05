@@ -99,6 +99,7 @@ describe("matchWrite", () => {
       "governance/publish",
       "governance/revoke",
       "orchestrator/reset",
+      "payments/decision/redeliver",
       "payments/freezes/lift",
       "payments/limits",
       "payments/pause",
@@ -165,5 +166,22 @@ describe("policyKey", () => {
   it("leaves a path that is not an id-carrying form alone", () => {
     expect(policyKey("review/../orchestrator/reset")).toBe("review/../orchestrator/reset");
     expect(policyKey("review/approve")).toBe("review/approve");
+  });
+});
+
+describe("the settlement retry write", () => {
+  const path = "payments/cases/CASE-1/decision/redeliver";
+
+  it("is forwarded, mapped to its policy key, and needs a password sign-in", () => {
+    expect(matchWrite(path, ALLOWED_POST)).toBe(true);
+    expect(policyKey(path)).toBe("payments/decision/redeliver");
+    expect(PASSWORD_ONLY_POST.has(policyKey(path))).toBe(true);
+  });
+
+  it("refuses the bare template, an id that is not a case id, a path that climbs and a longer path", () => {
+    expect(matchWrite("payments/decision/redeliver", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/CASE 1/decision/redeliver", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/../decision/redeliver", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/CASE-1/decision/redeliver/extra", ALLOWED_POST)).toBe(false);
   });
 });
