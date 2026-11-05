@@ -95,7 +95,7 @@ def test_the_history_gives_the_standing(times, expected):
     cp, name = mod(), carrier()
     paid(name, times)
     record = run(cp.history(name))
-    assert record == {"paid_count": times, "frozen": False}
+    assert record == {"paid_count": times, "largest_paid": Decimal("1000") if times else Decimal("0"), "frozen": False}
     assert cp.baseline(record) == expected
 
 
@@ -142,7 +142,7 @@ def test_the_worse_of_two_standings_applies(first, second, expected):
 
 
 @pytest.mark.parametrize("tier, expected", [
-    ("A", None), ("B", Decimal("5000")), ("C", Decimal("2000")), ("D", Decimal("500")), ("Z", Decimal("500")),
+    ("A", Decimal("5000")), ("B", Decimal("5000")), ("C", Decimal("2000")), ("D", Decimal("500")), ("Z", Decimal("500")),
 ])
 def test_each_standing_has_its_cap_and_an_unknown_one_has_the_lowest(tier, expected):
     assert mod().cap(tier) == expected
@@ -171,12 +171,12 @@ def test_a_suggestion_lowers_an_established_carrier_and_cannot_raise_a_new_one()
     assert raised["cap_usd"] == Decimal("2000")
 
 
-def test_the_profile_of_an_established_carrier_has_no_cap_of_its_own():
+def test_the_profile_of_an_established_carrier_starts_at_the_floor_of_a():
     cp, name = mod(), carrier()
     paid(name, 3)
     out = run(cp.profile(name, None))
     assert out["tier"] == "A"
-    assert out["cap_usd"] is None
+    assert out["cap_usd"] == Decimal("5000")
     assert out["paid_count"] == 3
 
 
@@ -206,6 +206,75 @@ def test_the_limit_a_person_published_is_named_when_it_is_the_one_exceeded():
 def test_a_cap_above_the_published_limit_changes_nothing():
     out = run(mod("payment_controls").check_payout("USD", Decimal("4000"), "somecarrier", f"tenant-{uuid.uuid4().hex[:8]}", tier_cap=Decimal("9000"), tier="B"))
     assert out is None
+
+
+def confirmed(name, amounts):
+    """Settled payments of these amounts, each confirmed by PayPal."""
+    key = mod("carrier_registry").carrier_key(name)
+    for n, amount in enumerate(amounts):
+        run(store_mod.get_store().add_audit({
+            "audit_id": f"settle-{key}-{n}-{uuid.uuid4().hex[:6]}", "case_id": f"CASE-{key}-{n}",
+            "action": "settle_payment", "status": "settled",
+            "detail": {"amount": amount, "carrier_key": key, "idempotency_key": f"seed-{key}-{n}"}, "at": utcnow(),
+        }))
+        run(store_mod.get_store().add_audit({
+            "audit_id": f"payout-seed-{key}-{n}-{uuid.uuid4().hex[:6]}", "case_id": f"CASE-{key}-{n}",
+            "action": "payout_status", "status": "done",
+            "detail": {"transaction_status": "SUCCESS", "source": f"seed-{n}"}, "at": utcnow(),
+        }))
+
+
+@pytest.mark.parametrize("largest, expected", [
+    ("0", "5000"), ("2500", "5000"), ("2600", "5200"), ("40000", "80000"),
+])
+def test_the_cap_of_a_is_twice_the_largest_confirmed_payout_and_never_below_the_floor(largest, expected):
+    assert mod().cap("A", Decimal(largest)) == Decimal(expected)
+
+
+@pytest.mark.parametrize("tier, expected", [("B", "5000"), ("C", "2000"), ("D", "500"), ("Z", "500")])
+def test_a_large_payout_raises_no_other_standing(tier, expected):
+    assert mod().cap(tier, Decimal("40000")) == Decimal(expected)
+
+
+def test_three_small_payouts_reach_a_but_do_not_unlock_a_large_payout():
+    cp, name = mod(), carrier()
+    confirmed(name, ["1", "1", "1"])
+    out = run(cp.profile(name, None))
+    assert out["tier"] == "A"
+    assert out["cap_usd"] == Decimal("5000")
+
+
+def test_the_largest_confirmed_payout_sets_the_cap_of_a():
+    cp, name = mod(), carrier()
+    confirmed(name, ["1000", "6000", "1000"])
+    assert run(cp.profile(name, None))["cap_usd"] == Decimal("12000")
+
+
+def test_a_large_payout_nobody_confirmed_does_not_raise_the_cap():
+    cp, name = mod(), carrier()
+    confirmed(name, ["1000", "1000", "1000"])
+    key = mod("carrier_registry").carrier_key(name)
+    run(store_mod.get_store().add_audit({
+        "audit_id": f"settle-{key}-big", "case_id": f"CASE-{key}-big", "action": "settle_payment", "status": "settled",
+        "detail": {"amount": "50000", "carrier_key": key, "idempotency_key": f"seed-{key}-big"}, "at": utcnow(),
+    }))
+    assert run(cp.profile(name, None))["cap_usd"] == Decimal("5000")
+
+
+def test_an_amount_that_cannot_be_read_raises_no_cap():
+    cp, name = mod(), carrier()
+    confirmed(name, ["1000", "not a number", "NaN"])
+    out = run(cp.profile(name, None))
+    assert out["paid_count"] == 3
+    assert out["cap_usd"] == Decimal("5000")
+
+
+def test_the_analyst_still_lowers_a_carrier_with_a_large_history():
+    cp, name = mod(), carrier()
+    confirmed(name, ["40000", "40000", "40000"])
+    out = run(cp.profile(name, {"analyst": {"suggested_tier": "C"}}))
+    assert out["tier"] == "C"
+    assert out["cap_usd"] == Decimal("2000")
 
 
 def test_the_settler_holds_a_new_carriers_large_payout(pp):  # noqa: F811
