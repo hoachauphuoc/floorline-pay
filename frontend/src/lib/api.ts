@@ -1209,6 +1209,7 @@ export type PaymentState = {
     | "unknown";
   reason?: string | null;
   findings?: string[];
+  payout_status?: { state: "confirmed" | "failed" | "pending" | "unconfirmed"; status: string | null; at: string | null };
   capture?: PaymentStep | null;
   payout?: PaymentStep | null;
   void?: PaymentStep | null;

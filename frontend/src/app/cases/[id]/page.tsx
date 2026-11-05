@@ -66,7 +66,10 @@ export default function CasePage() {
     enabled: caseId !== "",
     retry: false,
     refetchInterval: (query) =>
-      ["awaiting_decision", "pending", "failed"].includes(query.state.data?.state ?? "") ? 5000 : false,
+      ["awaiting_decision", "pending", "failed"].includes(query.state.data?.state ?? "") ||
+      (query.state.data?.state === "paid" && query.state.data.payout_status?.state !== "confirmed")
+        ? 5000
+        : false,
   });
 
   const c = detail.data;

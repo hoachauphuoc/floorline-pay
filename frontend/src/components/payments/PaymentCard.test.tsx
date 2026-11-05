@@ -100,3 +100,43 @@ describe("PaymentCard retry", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("only a settlement that ended failed");
   });
 });
+
+describe("PaymentCard payout confirmation", () => {
+  const step = { status: "ok", http_status: 201, error: null };
+  const paid = (payout_status?: PaymentState["payout_status"]) =>
+    make({
+      state: "paid",
+      capture: { ...step, paypal_id: "CAP-1" },
+      payout: { ...step, paypal_id: "PAYOUT-1" },
+      payout_status,
+    });
+  const waiting = "Payout accepted by PayPal, waiting for its confirmation";
+
+  it.each([
+    ["confirmed", "Payout confirmed by PayPal"],
+    ["unconfirmed", waiting],
+    ["pending", waiting],
+    ["failed", "PayPal reports the payout failed"],
+  ] as const)("says a %s payout in words", (state, words) => {
+    render(<PaymentCard state={paid({ state, status: null, at: null })} />);
+    expect(screen.getByText(words)).toBeInTheDocument();
+  });
+
+  it("treats a payout with no status as waiting, not as confirmed", () => {
+    render(<PaymentCard state={paid()} />);
+    expect(screen.getByText(waiting)).toBeInTheDocument();
+    expect(screen.queryByText("Payout confirmed by PayPal")).not.toBeInTheDocument();
+  });
+
+  it("never shows a status it does not know as confirmed", () => {
+    const stranger = { state: "settled" as "confirmed", status: null, at: null };
+    render(<PaymentCard state={paid(stranger)} />);
+    expect(screen.getByText("Payout status not recognised")).toBeInTheDocument();
+    expect(screen.queryByText("Payout confirmed by PayPal")).not.toBeInTheDocument();
+  });
+
+  it("says nothing about a payout when none was made", () => {
+    render(<PaymentCard state={make({ state: "voided" })} />);
+    expect(screen.queryByText(/Payout/)).not.toBeInTheDocument();
+  });
+});

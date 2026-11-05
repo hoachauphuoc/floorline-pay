@@ -42,6 +42,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from test_document_store import FakeGcs  # noqa: E402
 from vf_logistics import store as store_mod  # noqa: E402
 from vf_logistics import tenant  # noqa: E402
+from vf_logistics import app as _app  # noqa: E402,F401
 from vf_logistics.store import (  # noqa: E402
     TENANT_FIELD,
     FirestoreStore,

@@ -19,6 +19,13 @@ const LABEL: Record<PaymentState["state"], string> = {
   unknown: "Status not recognised",
 };
 
+const PAYOUT_NOTE: Record<string, string> = {
+  confirmed: "Payout confirmed by PayPal",
+  unconfirmed: "Payout accepted by PayPal, waiting for its confirmation",
+  pending: "Payout accepted by PayPal, waiting for its confirmation",
+  failed: "PayPal reports the payout failed",
+};
+
 const TONE: Record<PaymentState["state"], string> = {
   none: "text-faint",
   awaiting_decision: "text-dim",
@@ -97,6 +104,11 @@ export function PaymentCard({
             </div>
           ))}
         </dl>
+      )}
+      {state.payout?.paypal_id && (
+        <p className="mt-1 text-[11.5px] text-dim">
+          {PAYOUT_NOTE[state.payout_status?.state ?? "unconfirmed"] ?? "Payout status not recognised"}
+        </p>
       )}
       {state.state === "failed" && onRetry && (
         <div className="mt-3 space-y-2">
