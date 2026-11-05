@@ -23,7 +23,7 @@ Deterministic checks set a risk **floor** for every shipment, including new paym
 | Create an order, approve it as a buyer, authorize (money held) | **Run for real** on 24 and 30 Oct 2026 (a 1,300 USD hold) |
 | Block, then void the hold | **Run for real** on 5 Nov 2026 on the live service: the block was published, the settler voided the hold (PayPal answered 204), the ledger shows *voided* (case `CASE-SHP-PAY-B1105A`) |
 | Release, then capture and pay the carrier with Payouts | **Run for real** on 5 Nov 2026 on the live service: capture `4BD95385NJ6449936` and payout `9835DKGHAFN3A` both answered 201, the ledger shows *paid* (case `CASE-SHP-PAY-R1105A`). The payout is *accepted* by PayPal; receipt by the carrier is not confirmed (ledger state `unconfirmed`) |
-| Webhook (payout, refund and dispute events) | **RESULT PENDING**: not registered yet |
+| Webhook (payout, refund and dispute events) | **Partly run for real** on 5 Nov 2026: registered in the sandbox app, and two signed events from PayPal (`PAYMENT.AUTHORIZATION.CREATED`, `PAYMENT.CAPTURE.COMPLETED`) were verified and recorded on the live service. **RESULT PENDING**: no payout-item, refund or dispute event has arrived yet, so a payout still shows `unconfirmed` |
 
 ## How the money moves
 
@@ -159,11 +159,11 @@ The figures are from full runs on the development machine on 30 Oct and 4 Nov 20
 
 ## Limits, stated
 
-- **Webhook not run against the sandbox.** Booking, authorization, void, capture and payout have each run for real (see the status table above). The webhook is covered with fakes and with PayPal answers recorded from the sandbox in `tests/fixtures/paypal`; it is not registered yet, so a payout stays `unconfirmed` and "accepted by PayPal" is not yet separated from "money received".
+- **The webhook has met the sandbox only for two event types.** Booking, authorization, void, capture and payout have each run for real, and the webhook verified and recorded a real authorization and a real capture event (see the status table above). Payout-item, refund and dispute events are covered with fakes and with PayPal answers recorded in `tests/fixtures/paypal`; none has arrived from PayPal yet, so a payout stays `unconfirmed` and "accepted by PayPal" is not yet separated from "money received".
 - **A person's release or block used to stay in the store.** For a case booked through `/book` the decision was recorded and the shipment held or released, but nothing was published, so the settler never saw it and a block never voided the hold. Found on the first real booking and fixed in `0c7cebe`; `tests/test_human_decide_publishes.py` pins it. It has been shown end to end on the live service: a block voided a hold and a release captured and paid (5 Nov 2026).
 - **The agent starts suspended.** Until a person publishes a delegation boundary (Governance page) every protected action, including publishing a decision, is refused and the case goes to a person. The demo runs under `BOUNDARY-v1`, which does not allow the agent to release by itself.
 - **Settling depends on Pub/Sub delivery** to the receiver, as described above.
-- **The webhook receiver** (`/api/v1/paypal/webhook`) is off until `PAYPAL_WEBHOOK_ID` is set. It assumes payout events carry `sender_batch_id` (our `<key>-payout`), dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, and that renewing an authorization gives a new id the settler then uses. None of this has met the sandbox.
+- **The webhook receiver** (`/api/v1/paypal/webhook`) is off until `PAYPAL_WEBHOOK_ID` is set. It assumes payout events carry `sender_batch_id` (our `<key>-payout`), dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, and that renewing an authorization gives a new id the settler then uses. None of this has met the sandbox yet; only the signature check and the authorization and capture events have.
 - **Two settlements at the same moment can together pass the daily limit**: the check and the write are not one step. Known, not fixed.
 - **"Payout accepted" is not "money received".** The settler records a payout as settled when PayPal accepts the batch; the tracking that confirms the money arrived is best effort.
 - **There is no console screen yet for frozen parties or payout status**: they are API only (`GET /api/v1/payments/freezes`, `POST /api/v1/payments/freezes/lift`, `POST /api/v1/payments/cases/<id>/payout/refresh`; the payment state of a case carries `payout_status`).
