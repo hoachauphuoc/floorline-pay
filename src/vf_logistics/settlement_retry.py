@@ -87,13 +87,17 @@ async def unsent_decision(case: dict[str, Any], tenant_id: str | None = None) ->
     key = f"human-{case_id}-{action}"
     if await tools._earlier_publish(case_id, key, tenant_id) is not None:
         return None
-    return {"outcome": str(case["state"]), "action": action, "idempotency_key": key}
+    reviews = [r for r in case.get("reviews") or [] if isinstance(r, dict) and r.get("action") == action]
+    approver = str(reviews[-1].get("reviewer") or "") if reviews else ""
+    return {"outcome": str(case["state"]), "action": action, "idempotency_key": key, "approver": approver}
 
 
 async def _send_unsent(case_id: str, note: str, actor: str, tenant_id: str | None) -> dict[str, Any]:
     """Publish the decision a person saved and that never went out, under its first key, and record who asked and why."""
     case = await get_store().get_case(case_id, tenant_id=tenant_id)
     unsent = await unsent_decision(case, tenant_id) if case else None
+    if unsent is not None and not unsent["approver"]:
+        raise RetryError("the case does not name who made this decision, so nothing was sent; check the case history with an admin", 409)
     if unsent is None:
         raise RetryError("only a settlement that ended failed can be retried; this case has none", 409)
     await get_store().add_audit({
@@ -103,7 +107,7 @@ async def _send_unsent(case_id: str, note: str, actor: str, tenant_id: str | Non
         "detail": {"reason": note, "retried_by": actor, "idempotency_key": unsent["idempotency_key"]},
         "at": utcnow(),
     }, tenant_id=tenant_id)
-    decision = {**unsent, "approver": actor, "executor": "settlement_retry"}
+    decision = {**unsent, "sent_by": actor, "executor": "settlement_retry"}
     try:
         receipt = await tools.publish_decision(case_id, decision, tenant_id=tenant_id, after_attempt=True)
     except Exception as exc:  # noqa: BLE001 - a publish that raised sent nothing the console can prove

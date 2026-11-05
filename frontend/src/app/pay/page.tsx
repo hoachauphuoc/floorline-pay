@@ -60,11 +60,16 @@ export default function PayPage() {
       return <Skeleton className="h-20 rounded-xl bg-white/[0.04]" />;
     }
     const counts = ledger.data.counts;
+    const paid = ledger.data.items.filter((item) => item.state === "paid");
+    const confirmed = paid.filter((item) => item.payout_status?.state === "confirmed").length;
+    const failed = paid.filter((item) => item.payout_status?.state === "failed").length;
     const rows = [
-      ["Paid to carriers", String(counts.paid ?? 0)],
+      ["Paid to carriers, confirmed by PayPal", String(confirmed)],
+      ["Payouts accepted, not confirmed yet", String(paid.length - confirmed - failed)],
+      ["Payouts failed at PayPal", String(failed)],
       ["Returned to shippers", String(counts.voided ?? 0)],
       ["Held by the checks", String(counts.held ?? 0)],
-      ["Paid today in USD", controls.data.usage_today.tenant_usd],
+      ["Sent for payout today in USD", controls.data.usage_today.tenant_usd],
     ];
     return (
       <>

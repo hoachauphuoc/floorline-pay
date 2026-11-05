@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   fetchFrozenParties: vi.fn(),
   fetchPaymentLedger: vi.fn(),
   liftFreeze: vi.fn(),
+  fetchPendingPayPalEvents: vi.fn(),
+  reconcilePayPalEvents: vi.fn(),
   identity: { value: undefined as unknown },
 }));
 
@@ -17,6 +19,8 @@ vi.mock("@/lib/api", async (importOriginal) => ({
   fetchFrozenParties: mocks.fetchFrozenParties,
   fetchPaymentLedger: mocks.fetchPaymentLedger,
   liftFreeze: mocks.liftFreeze,
+  fetchPendingPayPalEvents: mocks.fetchPendingPayPalEvents,
+  reconcilePayPalEvents: mocks.reconcilePayPalEvents,
 }));
 vi.mock("@/lib/tenant-context", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/tenant-context")>()),
@@ -86,8 +90,38 @@ describe("SettlementPage", () => {
     mocks.fetchFrozenParties.mockReset();
     mocks.fetchPaymentLedger.mockReset();
     mocks.liftFreeze.mockReset();
+    mocks.fetchPendingPayPalEvents.mockReset();
+    mocks.reconcilePayPalEvents.mockReset();
+    mocks.fetchPendingPayPalEvents.mockResolvedValue({ pending: 0 });
     mocks.identity.value = person("governance_admin");
     mocks.fetchPaymentLedger.mockResolvedValue(LEDGER);
+  });
+
+  it("says how many PayPal events wait and lets an operator apply them", async () => {
+    mocks.fetchFrozenParties.mockResolvedValue({ frozen: [] });
+    mocks.fetchPendingPayPalEvents.mockResolvedValue({ pending: 2 });
+    mocks.reconcilePayPalEvents.mockResolvedValue({ applied: 1, pending: 1 });
+    mocks.identity.value = person("operator");
+    renderPage();
+    expect(await screen.findByText(/2 PayPal events arrived before/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Apply waiting events" }));
+    await waitFor(() => expect(mocks.reconcilePayPalEvents).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText("Applied 1; 1 still waiting.")).toBeInTheDocument();
+  });
+
+  it("offers nothing to apply when no event waits", async () => {
+    mocks.fetchFrozenParties.mockResolvedValue({ frozen: [] });
+    renderPage();
+    expect(await screen.findByText("No PayPal event is waiting.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Apply waiting events" })).not.toBeInTheDocument();
+  });
+
+  it("keeps the page when the count cannot be read", async () => {
+    mocks.fetchFrozenParties.mockResolvedValue({ frozen: [] });
+    mocks.fetchPendingPayPalEvents.mockRejectedValue(new Error("down"));
+    renderPage();
+    expect(await screen.findByText("Nobody is frozen")).toBeInTheDocument();
+    expect(await screen.findByText("That request failed")).toBeInTheDocument();
   });
 
   it("says so when nobody is frozen", async () => {

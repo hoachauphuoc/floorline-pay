@@ -13,10 +13,11 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/api", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/api")>()),
   authorizePaymentOrder: vi.fn(),
+  fetchBookingDraft: vi.fn(),
   submitShipmentEvent: vi.fn(),
 }));
 
-import { authorizePaymentOrder, submitShipmentEvent } from "@/lib/api";
+import { ApiError, authorizePaymentOrder, fetchBookingDraft, submitShipmentEvent } from "@/lib/api";
 
 import BookReturnPage from "./page";
 
@@ -34,11 +35,32 @@ describe("BookReturnPage", () => {
     window.sessionStorage.clear();
     vi.mocked(authorizePaymentOrder).mockReset();
     vi.mocked(submitShipmentEvent).mockReset();
+    vi.mocked(fetchBookingDraft).mockReset();
+    vi.mocked(fetchBookingDraft).mockRejectedValue(new ApiError("no booking", 404, "http"));
     vi.mocked(authorizePaymentOrder).mockResolvedValue({
       order_id: ORDER,
       authorization_id: "0VF52814937998046",
     });
     vi.mocked(submitShipmentEvent).mockResolvedValue({ case_id: "CASE-9", state: "INGESTED" });
+  });
+
+  it("finishes from the booking the server kept when this tab lost its own", async () => {
+    vi.mocked(fetchBookingDraft).mockResolvedValue({ order_id: ORDER, booking: FORM });
+    render(<BookReturnPage />);
+
+    await waitFor(() => expect(screen.getByText(/Booked\./)).toBeInTheDocument());
+    expect(fetchBookingDraft).toHaveBeenCalledWith(ORDER);
+    expect(authorizePaymentOrder).toHaveBeenCalledWith(ORDER);
+    expect(vi.mocked(submitShipmentEvent).mock.calls[0][0]).toMatchObject({ shipment_id: "SHP-PAY-1", paypal_order_id: ORDER });
+  });
+
+  it("offers a reload, and does not say nothing waits, when the kept booking cannot be read", async () => {
+    vi.mocked(fetchBookingDraft).mockRejectedValue(new ApiError("down", 503, "http"));
+    render(<BookReturnPage />);
+
+    expect(await screen.findByText(/Reload this page to try again/)).toBeInTheDocument();
+    expect(screen.queryByText(/No booking is waiting/)).not.toBeInTheDocument();
+    expect(authorizePaymentOrder).not.toHaveBeenCalled();
   });
 
   it("authorizes the approved order, submits the shipment with the authorization, and links the case", async () => {

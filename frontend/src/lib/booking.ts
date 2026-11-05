@@ -84,6 +84,7 @@ export function orderRequest(form: BookingForm, origin: string) {
     reference_id: form.shipment_id.trim(),
     return_url: `${origin}/book/return`,
     cancel_url: `${origin}/book`,
+    booking: { ...form, shipment_id: form.shipment_id.trim() },
   };
 }
 

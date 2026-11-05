@@ -136,6 +136,10 @@ def register(
                 "error": f"request_id may be at most {MAX_REQUEST_ID} characters and reference_id at most "
                          f"{MAX_REFERENCE_ID}; nothing is booked",
             }), 400
+        if body.get("booking") is not None:
+            problem = payment_binding.booking_problem(body["booking"], str(body.get("reference_id") or ""))
+            if problem:
+                return jsonify({"error": problem}), 400
         return_url = str(body.get("return_url") or "")
         cancel_url = str(body.get("cancel_url") or "")
         signed: dict[str, Any] | None = None
@@ -178,6 +182,8 @@ def register(
         # claimed for this tenant here, and only the tenant that claimed it may authorize it.
         if not run_async(payment_binding.record_order(order_id, str(body.get("reference_id") or ""), tenant_id=tenant())):
             return jsonify({"error": "this PayPal order belongs to another tenant; nothing is booked"}), 409
+        if body.get("booking") is not None:
+            run_async(payment_binding.record_booking(order_id, body["booking"], tenant_id=tenant()))
         reply: dict[str, Any] = {"order_id": order_id, "paypal_status": data.get("status")}
         if signed is not None:
             run_async(mandate.record(signed, tenant_id=tenant()))
@@ -189,6 +195,17 @@ def register(
             reply["approval_url"] = approval
         return jsonify(reply), 201
 
+    @app.route("/api/v1/payments/orders/<order_id>/booking", methods=["GET"])
+    @require_operator
+    @limiter.limit("30 per minute")
+    def payments_order_booking(order_id: str) -> Any:
+        if not PAYPAL_ID.match(order_id):
+            return jsonify({"error": "order_id is not a PayPal order id"}), 400
+        booking = run_async(payment_binding.find_booking(order_id, tenant_id=tenant()))
+        if booking is None:
+            return jsonify({"error": "no booking is kept for this order; start again from Book and pay"}), 404
+        return jsonify({"order_id": order_id, "booking": booking}), 200
+
     @app.route("/api/v1/payments/orders/<order_id>/authorize", methods=["POST"])
     @require_operator
     @limiter.limit("30 per minute")
@@ -199,6 +216,9 @@ def register(
             return jsonify({
                 "error": "not this tenant's order: authorize only an order created through this tenant's booking",
             }), 404
+        earlier = run_async(payment_binding.find_order_authorization(order_id, tenant_id=tenant()))
+        if earlier is not None:
+            return jsonify({"order_id": order_id, "authorization_id": earlier}), 200
         receipt = run_async(paypal_client.authorize_order(order_id, f"authorize-{order_id}"))
         if receipt["status"] != paypal_client.OK:
             return _refusal(receipt)
@@ -215,4 +235,5 @@ def register(
         mandate_id = _mandate_id(receipt["body"])
         if mandate_id:
             run_async(payment_binding.record_mandate(authorization_id, mandate_id, tenant_id=tenant()))
+        run_async(payment_binding.record_order_authorization(order_id, authorization_id, tenant_id=tenant()))
         return jsonify({"order_id": order_id, "authorization_id": authorization_id}), 200

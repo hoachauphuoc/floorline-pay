@@ -28,9 +28,10 @@ DUPLICATE = {
 }
 
 
-def batch(key, sender=None, value="1250.00", currency="USD"):
+def batch(key, sender=None, value="1250.00", currency="USD", status="SUCCESS"):
     return {"status": "ok", "http_status": 200, "error": None, "body": {"batch_header": {
         "payout_batch_id": "BATCH-DUP",
+        "batch_status": status,
         "sender_batch_header": {"sender_batch_id": sender or f"{key}-payout"},
         "amount": {"currency": currency, "value": value},
     }}}
@@ -102,3 +103,22 @@ def test_a_plain_refusal_never_asks_for_a_batch(pp, monkeypatch):  # noqa: F811
     monkeypatch.setattr(settler.paypal_client, "get_payout_batch", read)
     assert run(settler.settle(decision(new_case())))["status"] == "failed"
     read.assert_not_awaited()
+
+
+def test_a_duplicate_whose_original_batch_paid_nobody_stays_failed(pp, monkeypatch):  # noqa: F811
+    settler, capture, payout, void = pp
+    payout.return_value = DUPLICATE
+    for status in ("DENIED", "CANCELED", "", None, "SOMETHING_NEW"):
+        d = decision(new_case())
+        monkeypatch.setattr(settler.paypal_client, "get_payout_batch", AsyncMock(return_value=batch(d["idempotency_key"], status=status)))
+        result = run(settler.settle(d))
+        assert result["status"] == "failed", status
+        assert "did not pay the carrier" in result["reason"]
+
+
+def test_a_duplicate_whose_original_batch_is_still_pending_is_settled(pp, monkeypatch):  # noqa: F811
+    settler, capture, payout, void = pp
+    payout.return_value = DUPLICATE
+    d = decision(new_case())
+    monkeypatch.setattr(settler.paypal_client, "get_payout_batch", AsyncMock(return_value=batch(d["idempotency_key"], status="PENDING")))
+    assert run(settler.settle(d))["status"] == "settled"

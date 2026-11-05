@@ -76,6 +76,10 @@ describe("BookPage", () => {
       reference_id: "SHP-PAY-1",
       return_url: `${ORIGIN}/book/return`,
       cancel_url: `${ORIGIN}/book`,
+      booking: expect.objectContaining({
+        shipment_id: "SHP-PAY-1",
+        carrier_payee_email: "payments@mekong-haulage.example",
+      }),
     });
     const stored = JSON.parse(window.sessionStorage.getItem(BOOKING_KEY) ?? "{}");
     expect(stored.order_id).toBe("5O190127TN364715T");

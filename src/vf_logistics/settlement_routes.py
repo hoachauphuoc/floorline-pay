@@ -72,6 +72,12 @@ def register(
             return jsonify({"error": exc.message}), exc.status
         return jsonify({"frozen": run_async(payment_freeze.frozen_parties(tenant_id=tenant()))}), 200
 
+    @app.route("/api/v1/payments/events/pending", methods=["GET"])
+    @require_viewer
+    def payments_events_pending() -> Any:
+        waiting = run_async(paypal_webhook.reconcile(tenant_id=tenant(), apply=False))
+        return jsonify({"pending": waiting["pending"]}), 200
+
     @app.route("/api/v1/payments/events/reconcile", methods=["POST"])
     @require_operator
     @limiter.limit("10 per minute")

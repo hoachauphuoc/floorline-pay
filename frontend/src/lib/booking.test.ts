@@ -90,6 +90,7 @@ describe("orderRequest", () => {
       reference_id: "SHP-PAY-1",
       return_url: "https://floorline-pay.example/book/return",
       cancel_url: "https://floorline-pay.example/book",
+      booking: form({ shipment_id: "SHP-PAY-1" }),
     });
   });
 });

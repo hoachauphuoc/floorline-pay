@@ -20,6 +20,11 @@ from typing import Any
 from vf_logistics.store import get_store, utcnow
 
 ACTION = "payment_authorized"
+BOOKING_FIELDS = frozenset({
+    "shipment_id", "shipper_company", "shipper_tax_id", "origin", "destination", "cargo_description", "hs_code",
+    "weight_kg", "declared_value", "shipping_cost", "carrier_name", "carrier_payee_email", "payout_amount",
+})
+MAX_BOOKING_VALUE = 500
 
 
 def _key(authorization_id: str) -> str:
@@ -113,6 +118,61 @@ async def find_order(order_id: str, tenant_id: str | None = None) -> dict[str, A
     rows, _ = await get_store().query_audit(case_id=f"ORDER-{order_id}", limit=1, tenant_id=tenant_id)
     detail = rows[0].get("detail") if rows else None
     return dict(detail) if isinstance(detail, dict) else None
+
+
+def booking_problem(booking: Any, reference_id: str) -> str | None:
+    """Why this form cannot be kept with an order for this shipment, or None."""
+    if not isinstance(booking, dict):
+        return "booking must be a JSON object; nothing is booked"
+    if set(booking) - BOOKING_FIELDS:
+        return "booking has an unknown field; send only the booking form; nothing is booked"
+    if any(not isinstance(value, str) or len(value) > MAX_BOOKING_VALUE for value in booking.values()):
+        return f"every booking value must be text of at most {MAX_BOOKING_VALUE} characters; nothing is booked"
+    if booking.get("shipment_id") != reference_id:
+        return "booking shipment_id must equal reference_id; nothing is booked"
+    return None
+
+
+async def record_booking(order_id: str, booking: dict[str, str], tenant_id: str | None = None) -> bool:
+    """Keep the form under its order, so a closed tab cannot leave a hold with no case. The first booking stands. True when this call wrote it."""
+    written = await get_store().add_audit_once({
+        "audit_id": f"payorderb-{order_id}",
+        "case_id": f"ORDERBOOK-{order_id}",
+        "action": "payment_booking_kept",
+        "status": "done",
+        "detail": {"order_id": order_id, "booking": booking},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    return bool(written)
+
+
+async def find_booking(order_id: str, tenant_id: str | None = None) -> dict[str, Any] | None:
+    """The form this tenant kept under the order, or None."""
+    rows, _ = await get_store().query_audit(case_id=f"ORDERBOOK-{order_id}", limit=1, tenant_id=tenant_id)
+    detail = rows[0].get("detail") if rows else None
+    booking = detail.get("booking") if isinstance(detail, dict) else None
+    return dict(booking) if isinstance(booking, dict) else None
+
+
+async def record_order_authorization(order_id: str, authorization_id: str, tenant_id: str | None = None) -> bool:
+    """Remember which authorization this order produced, so a reload answers with it. True when this call wrote it."""
+    written = await get_store().add_audit_once({
+        "audit_id": f"payorderauth-{order_id}",
+        "case_id": f"ORDERAUTH-{order_id}",
+        "action": "payment_order_authorized",
+        "status": "done",
+        "detail": {"order_id": order_id, "authorization_id": authorization_id},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    return bool(written)
+
+
+async def find_order_authorization(order_id: str, tenant_id: str | None = None) -> str | None:
+    """The authorization this tenant recorded for the order, or None."""
+    rows, _ = await get_store().query_audit(case_id=f"ORDERAUTH-{order_id}", limit=1, tenant_id=tenant_id)
+    detail = rows[0].get("detail") if rows else None
+    value = detail.get("authorization_id") if isinstance(detail, dict) else None
+    return str(value) if value else None
 
 
 async def record_renewal(old_id: str, new_id: str, tenant_id: str | None = None) -> bool:

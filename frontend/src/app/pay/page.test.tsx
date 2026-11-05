@@ -19,7 +19,15 @@ vi.mock("@/lib/tenant-context", async (importOriginal) => ({
 
 import PayPage from "./page";
 
-const LEDGER = { items: [], counts: { paid: 3, voided: 1, held: 2 } };
+const LEDGER = {
+  items: [
+    { case_id: "C1", state: "paid", payout_status: { state: "confirmed", status: "SUCCESS", at: null } },
+    { case_id: "C2", state: "paid", payout_status: { state: "unconfirmed", status: null, at: null } },
+    { case_id: "C3", state: "paid", payout_status: { state: "pending", status: "PENDING", at: null } },
+    { case_id: "C4", state: "paid", payout_status: { state: "failed", status: "RETURNED", at: null } },
+  ],
+  counts: { paid: 4, voided: 1, held: 2 },
+};
 
 function controls(paused: boolean) {
   return {
@@ -63,10 +71,12 @@ describe("PayPage", () => {
 
   it("shows the live figures and that payments are running", async () => {
     renderPage();
-    expect(await screen.findByLabelText("Paid to carriers: 3")).toBeInTheDocument();
+    expect(await screen.findByLabelText("Paid to carriers, confirmed by PayPal: 1")).toBeInTheDocument();
+    expect(screen.getByLabelText("Payouts accepted, not confirmed yet: 2")).toBeInTheDocument();
+    expect(screen.getByLabelText("Payouts failed at PayPal: 1")).toBeInTheDocument();
     expect(screen.getByLabelText("Returned to shippers: 1")).toBeInTheDocument();
     expect(screen.getByLabelText("Held by the checks: 2")).toBeInTheDocument();
-    expect(screen.getByLabelText("Paid today in USD: 1250.00")).toBeInTheDocument();
+    expect(screen.getByLabelText("Sent for payout today in USD: 1250.00")).toBeInTheDocument();
     expect(screen.getByText("Payments are running")).toBeInTheDocument();
   });
 

@@ -16,7 +16,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   fetchFrozenParties,
   fetchPaymentLedger,
+  fetchPendingPayPalEvents,
   liftFreeze,
+  reconcilePayPalEvents,
   type FrozenParty,
   type PaymentLedger,
 } from "@/lib/api";
@@ -96,6 +98,22 @@ export default function SettlementPage() {
     refetchInterval: 15_000,
     retry: false,
   });
+  const events = useQuery({
+    queryKey: ["paypal-events-pending", tenant.id],
+    queryFn: fetchPendingPayPalEvents,
+    refetchInterval: 15_000,
+    retry: false,
+  });
+  const reconcile = useMutation({
+    mutationFn: () => reconcilePayPalEvents(),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["paypal-events-pending", tenant.id] });
+      void queryClient.invalidateQueries({ queryKey: ["frozen-parties", tenant.id] });
+      void queryClient.invalidateQueries({ queryKey: ["payment-ledger", tenant.id] });
+    },
+  });
+  const reconcileLock = lockReason(identity, "operator");
+  const waiting = events.data?.pending ?? 0;
   const [selected, setSelected] = useState<FrozenParty | null>(null);
   const [reason, setReason] = useState("");
   const lift = useMutation({
@@ -189,6 +207,41 @@ export default function SettlementPage() {
         </>
       )}
 
+      <section className="bento-card mt-8 max-w-3xl p-4" aria-label="PayPal events waiting">
+        <h2 className="text-[13px] font-medium text-white">PayPal events waiting</h2>
+        {events.isError ? (
+          <ErrorState error={events.error} />
+        ) : (
+          <p className="mt-1 text-[12px] text-dim">
+            {waiting === 0
+              ? "No PayPal event is waiting."
+              : `${waiting} PayPal event${waiting === 1 ? "" : "s"} arrived before the settlement could be found. A refund or dispute among them has frozen nobody yet.`}
+          </p>
+        )}
+        {waiting > 0 && (
+          <Gated reason={reconcileLock}>
+            <Button
+              size="sm"
+              disabled={reconcile.isPending || reconcileLock !== null}
+              onClick={() => reconcile.mutate()}
+              className="mt-2 h-8 text-[12px]"
+            >
+              {reconcile.isPending && <Loader2 className="mr-1.5 size-3.5 animate-spin" />}
+              Apply waiting events
+            </Button>
+          </Gated>
+        )}
+        {reconcile.data && (
+          <p className="mt-2 text-[12px] text-dim">
+            {`Applied ${reconcile.data.applied}; ${reconcile.data.pending} still waiting.`}
+          </p>
+        )}
+        {reconcile.isError && (
+          <div className="mt-2">
+            <ErrorState error={reconcile.error} />
+          </div>
+        )}
+      </section>
       <h2 className="mb-2 mt-8 text-[13px] font-medium text-white">Payouts</h2>
       {ledger.data.items.length === 0 ? (
         <EmptyState title="No payments yet">

@@ -26,6 +26,8 @@ from test_payment_status import SHIPMENT  # noqa: E402
 CASE = "CASE-U"
 SENT = {"status": "done", "detail": {"message_id": "MSG-9"}}
 ACTOR = "ops@forwarder.example"
+DECIDER = "reviewer@forwarder.example"
+ACTIONS = {"RELEASED_BY_HUMAN": "release", "BLOCKED_BY_HUMAN": "block"}
 
 
 def run(coro):
@@ -44,7 +46,10 @@ def _shipment_fields_stand(monkeypatch):
 
 class TestSendingASavedDecision(Base):
     def decide(self, state="RELEASED_BY_HUMAN", shipment=None):
-        self.put(CASE, shipment=dict(SHIPMENT if shipment is None else shipment), state=state)
+        self.put(
+            CASE, shipment=dict(SHIPMENT if shipment is None else shipment), state=state,
+            reviews=[{"action": ACTIONS.get(state), "reviewer": DECIDER}],
+        )
 
     def published(self, key):
         run(self.store.add_audit({
@@ -71,7 +76,8 @@ class TestSendingASavedDecision(Base):
         assert decision["idempotency_key"] == f"human-{CASE}-release"
         assert decision["outcome"] == "RELEASED_BY_HUMAN"
         assert decision["action"] == "release"
-        assert decision["approver"] == ACTOR
+        assert decision["approver"] == DECIDER
+        assert decision["sent_by"] == ACTOR
         assert decision["executor"] == "settlement_retry"
         assert publish.await_args.kwargs.get("after_attempt") is True
         assert publish.await_args.kwargs.get("redeliver") is not True
@@ -96,6 +102,14 @@ class TestSendingASavedDecision(Base):
         assert rows[0]["detail"]["retried_by"] == ACTOR
         assert rows[0]["detail"]["reason"] == "the topic was down"
         assert rows[0]["detail"]["idempotency_key"] == f"human-{CASE}-release"
+
+    def test_a_saved_decision_that_names_nobody_is_not_sent(self):
+        self.put(CASE, shipment=dict(SHIPMENT), state="RELEASED_BY_HUMAN")
+        with patch("vf_logistics.tools.publish_decision", AsyncMock(return_value=SENT)) as publish:
+            exc = self.refusal()
+        assert exc.status == 409
+        assert "does not name who made" in exc.message
+        publish.assert_not_awaited()
 
     def test_a_decision_whose_publish_went_out_is_not_sent_again(self):
         self.decide()

@@ -1,5 +1,6 @@
 import { DEMO_MODE } from "./config";
 import { demoAudits, demoUsage } from "./demo-data";
+import type { BookingForm } from "./booking";
 import type {
   AgentReadiness,
   AuditRecord,
@@ -699,6 +700,7 @@ export interface PaymentOrderRequest {
   reference_id: string;
   return_url: string;
   cancel_url: string;
+  booking?: BookingForm;
 }
 
 export async function createPaymentOrder(
@@ -714,6 +716,12 @@ export async function authorizePaymentOrder(
 ): Promise<{ order_id: string; authorization_id: string }> {
   if (DEMO_MODE) liveOnly("Authorizing a PayPal payment");
   return postJson(`payments/orders/${encodeURIComponent(orderId)}/authorize`);
+}
+
+/** The form the server kept with this order; a 404 means it kept none. */
+export async function fetchBookingDraft(orderId: string): Promise<{ order_id: string; booking: Partial<BookingForm> }> {
+  if (DEMO_MODE) liveOnly("Reading a kept booking");
+  return getJson<{ order_id: string; booking: Partial<BookingForm> }>(`payments/orders/${encodeURIComponent(orderId)}/booking`);
 }
 
 /** A payee as the carrier registry reports it: registered by one person, verified by another. */
@@ -1301,6 +1309,16 @@ export type FrozenParty = {
 export async function fetchFrozenParties(): Promise<{ frozen: FrozenParty[] }> {
   if (DEMO_MODE) liveOnly("The frozen parties");
   return getJson<{ frozen: FrozenParty[] }>("payments/freezes");
+}
+
+export async function fetchPendingPayPalEvents(): Promise<{ pending: number }> {
+  if (DEMO_MODE) liveOnly("The waiting PayPal events");
+  return getJson<{ pending: number }>("payments/events/pending");
+}
+
+export async function reconcilePayPalEvents(): Promise<{ applied: number; pending: number }> {
+  if (DEMO_MODE) liveOnly("Applying the waiting PayPal events");
+  return postJson("payments/events/reconcile", {});
 }
 
 export async function retrySettlement(caseId: string, reason: string): Promise<{ status: string; case_id: string }> {

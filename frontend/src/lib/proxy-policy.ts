@@ -76,6 +76,7 @@ export const ALLOWED_GET = new Set([
   "defense/scenarios",
   "defense/evaluation",
   "payments/freezes",
+  "payments/events/pending",
 ]);
 
 /**
@@ -91,6 +92,7 @@ export const ALLOWED_GET_BY_ID: ReadonlyArray<readonly [string, string]> = [
   ["compliance/audit", ""], // one B2B audit record
   ["payments/cases", ""], // the payment state of one case (payment_status.py)
   ["payments/cases", "risk"], // what the payment layers say about one case
+  ["payments/orders", "booking"], // the form the server kept with a PayPal order, for a return page that lost its tab
 ];
 
 /**
@@ -154,6 +156,8 @@ export const ALLOWED_POST = new Set([
   "payments/status/refresh",
   // Settlement: an operator sends a failed release to the settler again (password-only, see below); the money still moves only there.
   "payments/decision/redeliver",
+  // Settlement: an operator applies the PayPal events that arrived before their settlement could be found. It only freezes or records a status; nothing moves.
+  "payments/events/reconcile",
   // Settlement: a governance admin lifts the freeze on a carrier or shipper.
   "payments/freezes/lift",
   // Carrier payee registry: register a payee, and verify one as a different person.

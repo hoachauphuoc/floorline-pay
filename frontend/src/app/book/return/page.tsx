@@ -6,14 +6,25 @@ import { Suspense, useEffect, useRef, useState } from "react";
 
 import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
-import { authorizePaymentOrder, submitShipmentEvent } from "@/lib/api";
-import { clearBooking, loadBooking, shipmentFromForm } from "@/lib/booking";
+import { ApiError, authorizePaymentOrder, fetchBookingDraft, submitShipmentEvent } from "@/lib/api";
+import { type BookingForm, clearBooking, EMPTY_BOOKING, loadBooking, shipmentFromForm } from "@/lib/booking";
 
 type Outcome =
   | { kind: "working" }
   | { kind: "done"; caseId: string | null }
   | { kind: "stopped"; message: string }
   | { kind: "failed"; error: unknown };
+
+/** The form the server kept with this order, or null when it kept none; any other failure of the read is thrown. */
+async function keptBooking(orderId: string): Promise<BookingForm | null> {
+  try {
+    const kept = await fetchBookingDraft(orderId);
+    return { ...EMPTY_BOOKING, ...kept.booking };
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
+}
 
 function Finish() {
   const token = useSearchParams()?.get("token") ?? "";
@@ -28,7 +39,15 @@ function Finish() {
     started.current = true;
 
     (async () => {
-      const form = token ? loadBooking(token) : null;
+      let form = token ? loadBooking(token) : null;
+      if (token && !form) {
+        try {
+          form = await keptBooking(token);
+        } catch (error) {
+          setOutcome({ kind: "failed", error });
+          return;
+        }
+      }
       if (!form) {
         setOutcome({
           kind: "stopped",
@@ -86,7 +105,7 @@ function Finish() {
           <>
             <ErrorState error={outcome.error} />
             <p className="mt-3 text-[13px] text-dim">
-              Your booking is still kept in this browser tab. Reload this page to try again with the same order.
+              Your booking is still kept. Reload this page to try again with the same order.
             </p>
           </>
         )}

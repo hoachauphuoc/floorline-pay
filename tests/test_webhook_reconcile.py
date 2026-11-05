@@ -119,3 +119,30 @@ class TestReconcilingFromTheConsole(Base):
     def test_a_reviewer_cannot_reconcile(self):
         r = self.client.post("/api/v1/payments/events/reconcile", headers=as_person(REVIEWER))
         assert r.status_code == 403
+
+    def _keep(self, action="paypal_event_pending", prefix="ppunm"):
+        event_id = f"WH-{uuid.uuid4().hex[:8]}"
+        run(get_store().add_audit_once({
+            "audit_id": f"{prefix}-{event_id}", "case_id": QUEUE, "action": action, "status": "pending",
+            "detail": {"event_id": event_id, "event_type": "PAYMENT.CAPTURE.REFUNDED", "resource": {"id": "REF-1", "links": []}},
+            "at": utcnow(),
+        }))
+        return event_id
+
+    def test_the_count_of_waiting_events_applies_nothing(self):
+        event_id = self._keep()
+        r = self.client.get("/api/v1/payments/events/pending", headers=as_person(REVIEWER))
+        assert r.status_code == 200
+        assert r.get_json() == {"pending": 1}
+        rows, _ = run(get_store().query_audit(case_id=QUEUE, action="paypal_event_applied", limit=10))
+        assert rows == []
+        assert len(kept(event_id)) == 1
+
+    def test_an_event_already_applied_is_not_counted(self):
+        event_id = self._keep()
+        run(get_store().add_audit_once({
+            "audit_id": f"ppdone-{event_id}", "case_id": QUEUE, "action": "paypal_event_applied", "status": "done",
+            "detail": {"event_id": event_id}, "at": utcnow(),
+        }))
+        r = self.client.get("/api/v1/payments/events/pending", headers=as_person(REVIEWER))
+        assert r.get_json() == {"pending": 0}

@@ -277,11 +277,12 @@ async def receive(headers: Mapping[str, str], event: Any) -> tuple[int, dict[str
     return 200, {"outcome": outcome, "event_type": event_type, **effect}
 
 
-async def reconcile(tenant_id: str | None = None) -> dict[str, int]:
+async def reconcile(tenant_id: str | None = None, apply: bool = True) -> dict[str, int]:
     """Apply again the kept events whose settlement can now be found. Returns how many were applied and how many wait.
 
     Each effect is idempotent and keyed by the event, so a second run changes nothing. This only freezes or records a payout
     status: it never pays anyone and never loosens anything.
+    With apply=False nothing is applied: the answer only says how many events wait, for the console to show.
     """
     pending: list[dict[str, Any]] = []
     done: set[str] = set()
@@ -295,6 +296,8 @@ async def reconcile(tenant_id: str | None = None) -> dict[str, int]:
                 pending.append(_detail(row))
         if not cursor:
             break
+    if not apply:
+        return {"applied": 0, "pending": sum(1 for item in pending if str(item.get("event_id") or "") not in done)}
     applied = 0
     waiting = 0
     for item in pending:

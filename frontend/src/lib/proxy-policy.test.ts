@@ -185,6 +185,27 @@ describe("the payout check write", () => {
   });
 });
 
+describe("the kept PayPal events", () => {
+  it("forwards the count and the reconcile; the reconcile needs no password, because it only freezes or records", () => {
+    expect(matchRead("payments/events/pending")).toBe(true);
+    expect(matchWrite("payments/events/reconcile", ALLOWED_POST)).toBe(true);
+    expect(PASSWORD_ONLY_POST.has(policyKey("payments/events/reconcile"))).toBe(false);
+  });
+
+  it("refuses a longer path", () => {
+    expect(matchRead("payments/events/pending/extra")).toBe(false);
+    expect(matchWrite("payments/events/reconcile/extra", ALLOWED_POST)).toBe(false);
+  });
+});
+
+describe("the kept booking read", () => {
+  it("forwards the booking of an order and nothing around it", () => {
+    expect(matchRead("payments/orders/5O190127TN364715T/booking")).toBe(true);
+    expect(matchRead("payments/orders/../booking")).toBe(false);
+    expect(matchRead("payments/orders/booking")).toBe(false);
+  });
+});
+
 describe("the settlement retry write", () => {
   const path = "payments/cases/CASE-1/decision/redeliver";
 

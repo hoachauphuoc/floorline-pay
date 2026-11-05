@@ -61,6 +61,8 @@ _RETRYABLE = frozenset({paypal_client.TRANSPORT_ERROR, paypal_client.AUTH_FAILED
 # An authorization PayPal reports in one of these states can be captured. CAPTURED is
 # there for a redelivery after the capture succeeded and the payout did not.
 _CAPTURABLE = frozenset({"CREATED", "CAPTURED"})
+# The batch states that mean PayPal took a payout. A batch it denied or cancelled paid nobody, and a state it does not name proves nothing.
+_TAKEN_BATCH = frozenset({"NEW", "PENDING", "PROCESSING", "SUCCESS"})
 
 # A reauthorization can itself be reauthorized inside the 29 days; this many renewals are followed from the booking's own id.
 _RENEWALS = 5
@@ -315,7 +317,7 @@ async def _recovered_payout(refusal: dict[str, Any], amount: Any, currency: str,
     """PayPal's own record of this payout when it refused the request as a duplicate, or None.
 
     A repeated delivery after a payout whose result was lost gets a duplicate-batch refusal although the carrier was paid. The
-    batch is read at PayPal and counts only when it carries this payout's sender_batch_id, amount and currency; anything else,
+    batch is read at PayPal and counts only when it carries this payout's sender_batch_id, amount, currency and a state PayPal took it in; anything else,
     or a batch that cannot be read, leaves the refusal in force. No payout is ever created here.
     """
     batch_id = paypal_client.duplicate_batch_id(refusal)
@@ -331,6 +333,8 @@ async def _recovered_payout(refusal: dict[str, Any], amount: Any, currency: str,
     if not isinstance(sender, dict) or sender.get("sender_batch_id") != f"{key}-payout" or not isinstance(money, dict):
         return None
     if _amount(money.get("value")) != _amount(amount) or money.get("currency", money.get("currency_code")) != currency:
+        return None
+    if header.get("batch_status") not in _TAKEN_BATCH:
         return None
     recovered: dict[str, Any] = found
     return recovered
