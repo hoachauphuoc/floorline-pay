@@ -120,6 +120,24 @@ class TestThePaymentLayersInThePipeline(unittest.TestCase):
         self.assertGreaterEqual(case["validation"]["risk_floor"], 65)
         self.assertTrue(case["validation"]["payment_ai_checked"])
 
+    def test_the_analysts_tokens_are_added_to_the_cost_of_the_case(self):
+        without, _ = drive({**SHIPMENT, **PAYMENT}, ELEVATED)
+        metered = {**ELEVATED, "usage": {"model": "nano", "tokens_in": 1000, "tokens_out": 200}}
+        case, _ = drive({**SHIPMENT, **PAYMENT}, metered)
+        extra = orchestrator.lineage.cost_usd("nano", 1000, 200)
+        self.assertGreater(extra, 0)
+        self.assertAlmostEqual(case["_estimated_cost_usd"] - without["_estimated_cost_usd"], extra, places=8)
+        self.assertEqual(case["_input_tokens"] - without["_input_tokens"], 1000)
+        self.assertEqual(case["_output_tokens"] - without["_output_tokens"], 200)
+        self.assertEqual(case["_agent_calls"] - without["_agent_calls"], 1)
+
+    def test_an_answer_that_used_no_tokens_adds_no_cost(self):
+        without, _ = drive({**SHIPMENT, **PAYMENT}, ELEVATED)
+        none_used = {**ELEVATED, "usage": {"model": "nano", "tokens_in": 0, "tokens_out": 0}}
+        case, _ = drive({**SHIPMENT, **PAYMENT}, none_used)
+        self.assertEqual(case["_estimated_cost_usd"], without["_estimated_cost_usd"])
+        self.assertEqual(case["_agent_calls"], without["_agent_calls"])
+
     def test_a_fine_answer_adds_no_finding_and_leaves_the_floor_alone(self):
         without, _ = drive({**SHIPMENT, **PAYMENT}, {"analyst": {"verdict": "unknown"}, "identity": {"status": "found"}})
         case, _ = drive({**SHIPMENT, **PAYMENT}, FINE)

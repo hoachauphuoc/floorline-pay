@@ -27,6 +27,7 @@ moving money a second time. settle() never raises.
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from typing import Any
@@ -42,8 +43,11 @@ from vf_logistics import (
     payment_controls,
     payment_freeze,
     paypal_client,
+    paypal_webhook,
 )
 from vf_logistics.store import get_store, utcnow
+
+log = logging.getLogger(__name__)
 
 SKIPPED = "skipped"
 HELD = "held"
@@ -303,6 +307,12 @@ async def _release(
         "detail": {"settled_case_id": case.get("case_id")},
         "at": utcnow(),
     }, tenant_id=tenant_id)
+    # An event PayPal sent before these two rows existed was kept as waiting; apply it now that it can be matched. It only freezes
+    # or records a payout status, so a failure here is logged and never changes what is paid.
+    try:
+        await paypal_webhook.reconcile(tenant_id)
+    except Exception:  # noqa: BLE001
+        log.exception("applying the waiting PayPal events failed for %s", case.get("case_id"))
     name = f"{key}-payout"
     dead_batch = await _replacement(key, tenant_id)
     if dead_batch:

@@ -142,18 +142,23 @@ def interpret(parsed: Any, error: str | None = None) -> dict[str, Any]:
     }
 
 
-async def analyst(feature_set: dict[str, Any], complete: Complete | None = None) -> dict[str, Any]:
-    """Ask the model. Never raises: a model that cannot be reached is "unknown"."""
+async def _ask(feature_set: dict[str, Any], complete: Complete | None = None) -> tuple[dict[str, Any], int, int]:
+    """Ask the model. Returns the reading and the tokens spent. Never raises: a model that cannot be reached is "unknown"."""
     try:
-        text, _tokens_in, _tokens_out = await (complete or nebius_client.complete_json)(
+        text, tokens_in, tokens_out = await (complete or nebius_client.complete_json)(
             model=get_model_id(), system_prompt=SYSTEM_PROMPT,
             user_text=json.dumps(feature_set, sort_keys=True), temperature=0.1,
             max_tokens=MAX_OUTPUT_TOKENS,
         )
     except Exception as exc:  # noqa: BLE001 - an unavailable analyst adds nothing and removes nothing
-        return _unknown(f"the analyst could not be reached ({type(exc).__name__})")
+        return _unknown(f"the analyst could not be reached ({type(exc).__name__})"), 0, 0
     parsed, error = parse_model_json(text)
-    return interpret(parsed, error)
+    return interpret(parsed, error), tokens_in, tokens_out
+
+
+async def analyst(feature_set: dict[str, Any], complete: Complete | None = None) -> dict[str, Any]:
+    """The model's reading of a payout. Never raises: a model that cannot be reached is "unknown"."""
+    return (await _ask(feature_set, complete))[0]
 
 
 async def identity(carrier_name: Any, search: Search | None = None) -> dict[str, Any]:
@@ -192,5 +197,11 @@ async def assess(
         history = await credit_profile.history(carrier, tenant_id)
     except Exception:  # noqa: BLE001 - context for the analyst; the floor does not depend on it
         history = {}
-    verdict, who = await asyncio.gather(analyst(features(shipment, history), complete), identity(carrier, search))
-    return {"analyst": verdict, "identity": who}
+    (verdict, tokens_in, tokens_out), who = await asyncio.gather(
+        _ask(features(shipment, history), complete), identity(carrier, search),
+    )
+    # The usage lets the pipeline count the analyst's tokens in the case cost, so the tenant budget sees this model call too.
+    return {
+        "analyst": verdict, "identity": who,
+        "usage": {"model": get_model_id(), "tokens_in": tokens_in, "tokens_out": tokens_out},
+    }

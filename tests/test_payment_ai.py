@@ -207,6 +207,28 @@ class TestTheCarrierLookUp:
         assert "query" not in seen
 
 
+class TestUsage:
+    def test_assess_reports_the_tokens_the_analyst_used(self):
+        complete, _ = model(reply())
+        find, _ = search([])
+        out = run(mod().assess(shipment(), None, complete, find))
+        assert out["usage"] == {"model": mod().get_model_id(), "tokens_in": 10, "tokens_out": 20}
+
+    def test_a_model_that_could_not_be_reached_used_no_tokens_and_stays_unknown(self):
+        complete, _ = model(RuntimeError("no route"))
+        find, _ = search([])
+        out = run(mod().assess(shipment(), None, complete, find))
+        assert out["usage"]["tokens_in"] == 0
+        assert out["usage"]["tokens_out"] == 0
+        assert out["analyst"]["verdict"] == "unknown"
+
+    def test_the_analyst_alone_still_returns_just_the_reading(self):
+        complete, _ = model(reply())
+        out = run(mod().analyst({}, complete))
+        assert out["verdict"] == "elevated"
+        assert "usage" not in out
+
+
 class TestAssessing:
     def test_both_answers_are_returned(self):
         complete, _ = model(reply())

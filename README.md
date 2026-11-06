@@ -145,17 +145,17 @@ The console asks everyone to sign in. **Continue as guest judge** signs in with 
 ## Reproducible testing
 
 ```bash
-# Backend (2,902 passed, 47 skipped without the Firestore and Pub/Sub emulators)
+# Backend (3,053 passed, 49 skipped without the Firestore and Pub/Sub emulators)
 pip install "pytest>=8.0.0" "pytest-asyncio>=0.23.0" "pytest-cov>=4.1.0" "pytest-mock>=3.12.0"
 python -m pytest tests/ -q
 python -m mypy src/vf_logistics/ --ignore-missing-imports
 python -m ruff check src/ tests/ scripts/ --select E,F,W --ignore E501,E402,W291,W293
 
-# Frontend (117 files, 1,903 passed) and build
+# Frontend (118 files, 1,956 passed) and build
 cd frontend && npm ci && npx tsc --noEmit && npx eslint src && npx vitest run && npm run build
 ```
 
-The figures are from full runs on the development machine on 30 Oct and 4 Nov 2026 (`ruff` clean; `mypy` clean on 70 files, run with `--python-version 3.13` locally because the numpy stubs there need it; `tsc` clean, `eslint` 0 errors). CI on this repository runs the same checks and passed on the commit before this text (`0c7cebe`). Every PayPal call in the tests goes through a fake or a recorded sandbox answer: no test calls PayPal.
+The figures are from full runs on the development machine on 6 Nov 2026 (`ruff` clean; `mypy` clean, run with `--python-version 3.13` locally because the numpy stubs there need it; `tsc` clean, `eslint` 0 errors). CI on this repository runs the same checks and passed on the commit before this text (`0c7cebe`). Every PayPal call in the tests goes through a fake or a recorded sandbox answer: no test calls PayPal.
 
 ## Limits, stated
 
@@ -163,6 +163,7 @@ The figures are from full runs on the development machine on 30 Oct and 4 Nov 20
 - **A person's release or block used to stay in the store.** For a case booked through `/book` the decision was recorded and the shipment held or released, but nothing was published, so the settler never saw it and a block never voided the hold. Found on the first real booking and fixed in `0c7cebe`; `tests/test_human_decide_publishes.py` pins it. It has been shown end to end on the live service: a block voided a hold and a release captured and paid (5 Nov 2026).
 - **The agent starts suspended.** Until a person publishes a delegation boundary (Governance page) every protected action, including publishing a decision, is refused and the case goes to a person. The demo runs under `BOUNDARY-v1`, which does not allow the agent to release by itself.
 - **Settling depends on Pub/Sub delivery** to the receiver, as described above.
+- **The booking form is kept on the server under the PayPal order**, so a reload or a new tab on the return page finishes the booking; the browser tab no longer holds the only copy. Until the shipment is accepted a failure leaves the booking in place for a second try, which the server takes without a second hold or a second case.
 - **The webhook receiver** (`/api/v1/paypal/webhook`) is off until `PAYPAL_WEBHOOK_ID` is set. Confirmed on the sandbox on 5 Nov 2026: the signature check, and that payout events carry `sender_batch_id` (our `<key>-payout`), since a real payout item event moved its payout to `confirmed`. Still assumed, never run against the sandbox: that dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, that renewing an authorization gives a new id the settler then uses, and that the `payer-action` link works as the booking flow expects (the booking flow itself ran).
 - **Daily limits and concurrent settlements.** A payout writes a reservation before it is paid and counts the other open reservations, so of two settlements at the same moment the later one gives way (retried the next day) instead of both passing the limit. A reservation is given up when nothing was paid. Pinned by `tests/test_payment_reservation.py` and `tests/test_settler_reservation.py` against the in-memory store. On the live service (5 Nov 2026) one release wrote the reservation, captured and paid (`CASE-SHP-PAY-R1105E`), and one payout PayPal refused for lack of balance gave its reservation up (`CASE-SHP-PAY-R1105D`); it has not been exercised against Firestore under real concurrency. If a settlement fails after money moved and its reservation is dropped, that amount is uncounted until the decision is delivered again.
 - **"Payout accepted" is not "money received".** The settler records a payout as settled when PayPal accepts the batch; the tracking that confirms the money arrived is best effort. The ledger keeps the two apart: a payout starts `unconfirmed` and moves to `confirmed` only when PayPal's payout-item event arrives through the webhook (seen on the live sandbox on 5 Nov 2026 for `CASE-SHP-PAY-R1105E` and `CASE-SHP-PAY-R1105D`). The case page does not show that second state yet.

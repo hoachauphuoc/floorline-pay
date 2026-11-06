@@ -1214,6 +1214,17 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
         if payment_checks.is_payment_case(shipment):
             payment_ai_verdict = await payment_ai.assess(shipment, tenant)
             case["payment_ai"] = payment_ai_verdict
+            # The analyst is a model call like any other: its tokens go into the case cost, and the tenant budget sees them.
+            usage = payment_ai_verdict.get("usage") or {}
+            ai_in, ai_out = int(usage.get("tokens_in") or 0), int(usage.get("tokens_out") or 0)
+            if ai_in or ai_out:
+                case["_agent_calls"] = case.get("_agent_calls", 0) + 1
+                case["_input_tokens"] = case.get("_input_tokens", 0) + ai_in
+                case["_output_tokens"] = case.get("_output_tokens", 0) + ai_out
+                case["_estimated_cost_usd"] = case.get("_estimated_cost_usd", 0.0) + lineage.cost_usd(
+                    str(usage.get("model") or ""), ai_in, ai_out,
+                )
+                budget.forget(_case_tenant(case))
 
         # Re-derived so the two model findings take part in the ordinary floor and
         # corroboration arithmetic rather than being merged in afterwards. One code

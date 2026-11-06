@@ -483,9 +483,8 @@ def health() -> Any:
         "service": "VF Logistics Fraud Detection",
         "version": "2.0.0",
         "timestamp": utcnow(),
-        "hackathon": "Nebius x NVIDIA Global AI Hackathon",
-        "track": "Best Apps and Agents",
-        "revision": os.getenv("K_REVISION") or None,
+        "hackathon": "PayPal AI Hackathon",
+        "revision": os.getenv("K_REVISION") or os.getenv("RENDER_GIT_COMMIT") or None,
         "sent_ledger": bool(tools.SENT_LEDGER_SUBSCRIPTION),
         "store": store_status(),
         "worker": orchestrator.worker_status()

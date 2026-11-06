@@ -23,10 +23,10 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   // Floorline: the product's central rule is a risk floor the agents may raise
   // and never lower. VF Logistics is the operator in the demo, not the product.
-  title: "Floorline",
+  title: "Floorline Pay",
   description:
-    "Shipment-fraud agents on NVIDIA Nemotron 3 via Nebius Token Factory: " +
-    "sanctions, dual-use classification and adverse media, with a risk floor " +
+    "Shipment-fraud agents that hold the shipper's funds with PayPal and pay the carrier only after a " +
+    "published release, with a risk floor " +
     "the agents may raise but never lower.",
 };
 
