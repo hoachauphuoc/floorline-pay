@@ -120,6 +120,18 @@ describe("Pipeline page", () => {
     expect(mocks.fetchSnapshot).toHaveBeenCalledWith({ drain: true });
   });
 
+  it("does not ask for the snapshot again by itself, so a tab left open does not spend the Firestore read quota", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      renderPage();
+      await screen.findByTestId("board");
+      await vi.advanceTimersByTimeAsync(30_000);
+      expect(mocks.fetchSnapshot).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("shows no board while the first snapshot is still loading", () => {
     mocks.fetchSnapshot.mockReturnValue(new Promise(() => {}));
     renderPage();

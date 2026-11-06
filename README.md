@@ -155,7 +155,7 @@ python -m pytest tests/ -q
 python -m mypy src/vf_logistics/ --ignore-missing-imports
 python -m ruff check src/ tests/ scripts/ --select E,F,W --ignore E501,E402,W291,W293
 
-# Frontend (122 files, 1,988 passed) and build
+# Frontend (123 files, 1,991 passed) and build
 cd frontend && npm ci && npx tsc --noEmit && npx eslint src && npx vitest run && npm run build
 ```
 

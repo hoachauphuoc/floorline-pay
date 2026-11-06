@@ -15,10 +15,8 @@ import { StartHere } from "@/components/pipeline/StartHere";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchSnapshot, queryKeys } from "@/lib/api";
 import {
-  POLL_BUSY_MS,
-  POLL_IDLE_MS,
+  boardRefetchMs,
   bucketCases,
-  hasWorkInFlight,
   type PriorityFilter,
   type SortKey,
 } from "@/lib/pipeline";
@@ -66,7 +64,7 @@ export default function PipelinePage() {
     queryKey: queryKeys.snapshot(tenant.id, true),
     queryFn: () => fetchSnapshot({ drain: true }),
     refetchInterval: (query) =>
-      hasWorkInFlight(query.state.data?.in_flight) ? POLL_BUSY_MS : POLL_IDLE_MS,
+      boardRefetchMs(query.state.data?.in_flight),
     // Keep showing the last good board while a refetch is in flight. Without
     // this the board blanks every 250ms while work is moving, which is the
     // moment it most needs to be readable.
