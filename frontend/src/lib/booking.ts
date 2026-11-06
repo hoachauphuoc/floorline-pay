@@ -14,6 +14,7 @@ export interface BookingForm {
   shipper_company: string;
   shipper_tax_id: string;
   shipper_country: string;
+  receiver_company: string;
   receiver_country: string;
   origin: string;
   destination: string;
@@ -32,6 +33,7 @@ export const EMPTY_BOOKING: BookingForm = {
   shipper_company: "",
   shipper_tax_id: "",
   shipper_country: "",
+  receiver_company: "",
   receiver_country: "",
   origin: "",
   destination: "",

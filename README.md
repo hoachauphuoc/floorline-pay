@@ -149,13 +149,13 @@ The console asks everyone to sign in. **Continue as guest judge** signs in with 
 ## Reproducible testing
 
 ```bash
-# Backend (3,248 passed, 49 skipped without the Firestore and Pub/Sub emulators)
+# Backend (3,249 passed, 49 skipped without the Firestore and Pub/Sub emulators)
 pip install "pytest>=8.0.0" "pytest-asyncio>=0.23.0" "pytest-cov>=4.1.0" "pytest-mock>=3.12.0"
 python -m pytest tests/ -q
 python -m mypy src/vf_logistics/ --ignore-missing-imports
 python -m ruff check src/ tests/ scripts/ --select E,F,W --ignore E501,E402,W291,W293
 
-# Frontend (125 files, 1,994 passed) and build
+# Frontend (127 files, 1,997 passed) and build
 cd frontend && npm ci && npx tsc --noEmit && npx eslint src && npx vitest run && npm run build
 ```
 

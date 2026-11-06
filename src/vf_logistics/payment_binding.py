@@ -21,7 +21,7 @@ from vf_logistics.store import get_store, utcnow
 
 ACTION = "payment_authorized"
 BOOKING_FIELDS = frozenset({
-    "shipment_id", "shipper_company", "shipper_tax_id", "shipper_country", "receiver_country", "origin", "destination", "cargo_description", "hs_code",
+    "shipment_id", "shipper_company", "shipper_tax_id", "shipper_country", "receiver_company", "receiver_country", "origin", "destination", "cargo_description", "hs_code",
     "weight_kg", "declared_value", "shipping_cost", "carrier_name", "carrier_payee_email", "payout_amount",
 })
 MAX_BOOKING_VALUE = 500
