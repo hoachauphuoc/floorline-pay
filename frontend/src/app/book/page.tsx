@@ -23,6 +23,8 @@ const FIELDS: Array<[keyof BookingForm, string, string]> = [
   ["shipment_id", "Shipment id", "SHP-PAY-1"],
   ["shipper_company", "Shipper", "Acme Trading Ltd"],
   ["shipper_tax_id", "Shipper tax ID", "0301234567"],
+  ["shipper_country", "Shipper country", "Vietnam"],
+  ["receiver_country", "Receiver country", "Vietnam"],
   ["origin", "Origin", "ho chi minh city"],
   ["destination", "Destination", "hanoi"],
   ["cargo_description", "Goods", "plywood"],
