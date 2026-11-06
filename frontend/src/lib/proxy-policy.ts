@@ -66,6 +66,19 @@ export const ALLOWED_GET = new Set([
   // The committed benchmark and HS-classifier reports (evaluation.py), for the
   // Evaluation panel. Aggregates only.
   "evaluation",
+  // What the settler did with the money on each case (payment_status.py).
+  "payments/ledger",
+  // The carrier payee registry (carrier_registry.py).
+  "carriers",
+  // Payment controls: the pause switch, the limits in force, what was paid today.
+  "payments/controls",
+  // The attack replay and the evaluation table of the Defense page; who is frozen and why (Settlement).
+  "defense/scenarios",
+  "defense/evaluation",
+  "payments/freezes",
+  "payments/events/pending",
+  // Holds with no case, for Settlement (payment_routes.py).
+  "payments/orders/unbound",
 ]);
 
 /**
@@ -79,6 +92,9 @@ export const ALLOWED_GET_BY_ID: ReadonlyArray<readonly [string, string]> = [
   ["orchestrator/case", ""], // full case trace, for the Case screen
   ["orchestrator/case", "dossier"], // the case as a due-diligence PDF (dossier.py)
   ["compliance/audit", ""], // one B2B audit record
+  ["payments/cases", ""], // the payment state of one case (payment_status.py)
+  ["payments/cases", "risk"], // what the payment layers say about one case
+  ["payments/orders", "booking"], // the form the server kept with a PayPal order, for a return page that lost its tab
 ];
 
 /**
@@ -93,6 +109,7 @@ export const ALLOWED_POST = new Set([
   "review/decide",
   "review/deep-review",
   // Verification loop: request, evaluate, approve, execute, cancel, re-link.
+  "review/second-approve",
   "review/approve-exception",
   "review/request-evidence",
   "review/reevaluate",
@@ -128,6 +145,28 @@ export const ALLOWED_POST = new Set([
   "orchestrator/reset",
   // Evidence respond: token-authenticated by Flask, no console session needed.
   "evidence/respond",
+  // Booking: create the PayPal order a shipper approves, and authorize it on return.
+  // Capturing and paying out are never browser routes: only the settler does those.
+  "payments/orders",
+  "payments/orders/authorize",
+  // Payment controls: any operator may pause payments; a governance admin resumes them and
+  // publishes the limits.
+  "payments/pause",
+  "payments/resume",
+  "payments/limits",
+  // Payment controls: a governance admin publishes how much the agent may pay by itself.
+  "payments/agent/limit",
+  // Settlement: an operator asks PayPal for the state of a payout (route payments/cases/<case id>/payout/refresh). It only reads PayPal and records the answer; nothing moves. The policy name avoids the words the Defense guard test forbids.
+  "payments/status/refresh",
+  // Settlement: an operator sends a failed release to the settler again (password-only, see below); the money still moves only there.
+  "payments/decision/redeliver",
+  // Settlement: an operator applies the PayPal events that arrived before their settlement could be found. It only freezes or records a status; nothing moves.
+  "payments/events/reconcile",
+  // Settlement: a governance admin lifts the freeze on a carrier or shipper.
+  "payments/freezes/lift",
+  // Carrier payee registry: register a payee, and verify one as a different person.
+  "carriers/payee",
+  "carriers/payee/verify",
 ]);
 
 /**
@@ -147,7 +186,22 @@ export const PASSWORD_ONLY_POST = new Set([
   "orchestrator/reset",
   "governance/revoke",
   "governance/publish",
+  // Payment controls: stopping and starting money, and its limits, need a password sign-in.
+  "payments/pause",
+  "payments/resume",
+  "payments/limits",
+  // The agent's limit lets money leave with no person on each case: only a person signed in with a password sets it.
+  "payments/agent/limit",
+  // Sending a failed release again can start a payout: only a person signed in with a password.
+  "payments/decision/redeliver",
+  // Lifting a freeze loosens a hold: only a person signed in with a password.
+  "payments/freezes/lift",
+  // Carrier payees: a payee is moved by a person signed in with a password, never by a
+  // one-click session.
+  "carriers/payee",
+  "carriers/payee/verify",
   // Verification loop: approve and execute change downstream state.
+  "review/second-approve",
   "review/approve-exception",
   "review/approve",
   "review/execute",
@@ -164,6 +218,12 @@ export const PASSWORD_ONLY_PUT = new Set(["governance/prefilter-rules"]);
  */
 export const CASE_ID = /^[A-Za-z0-9_-]{1,80}$/;
 
+/** PayPal order ids: upper-case letters, digits and hyphens. */
+export const PAYPAL_ID = /^[A-Z0-9-]{1,64}$/;
+
+/** Carrier keys: lower-case letters and digits. */
+export const CARRIER_KEY = /^[a-z0-9]{1,80}$/;
+
 /**
  * Whether a path is an allowed write, resolving the two review routes that carry
  * a case id.
@@ -172,13 +232,34 @@ export const CASE_ID = /^[A-Za-z0-9_-]{1,80}$/;
  * also pass `review/../../orchestrator/reset/decide`.
  */
 export function matchWrite(joined: string, allowed: Set<string>): boolean {
+  // payments/cases/<case id>/decision/redeliver; the bare template is a policy name, not a route
+  const retryPath = joined.split("/");
+  if (retryPath.length === 5 && retryPath[0] === "payments" && retryPath[1] === "cases" && CASE_ID.test(retryPath[2])
+      && retryPath[3] === "decision" && retryPath[4] === "redeliver") {
+    return allowed.has("payments/decision/redeliver");
+  }
+  if (joined === "payments/decision/redeliver") return false;
+  // payments/cases/<case id>/payout/refresh; the bare template is a policy name, not a route
+  if (retryPath.length === 5 && retryPath[0] === "payments" && retryPath[1] === "cases" && CASE_ID.test(retryPath[2])
+      && retryPath[3] === "payout" && retryPath[4] === "refresh") {
+    return allowed.has("payments/status/refresh");
+  }
+  if (joined === "payments/status/refresh") return false;
   const parts = joined.split("/");
   if (parts.length === 3 && parts[0] === "review" && CASE_ID.test(parts[1])) {
     const action = parts[2];
-    if (["decide", "deep-review", "request-evidence", "reevaluate", "approve", "approve-exception", "execute"].includes(action)) {
+    if (["decide", "deep-review", "request-evidence", "reevaluate", "approve", "approve-exception", "second-approve", "execute"].includes(action)) {
       return allowed.has(`review/${action}`);
     }
     return false;
+  }
+  // carriers/<carrier key>/payee/<version>/verify
+  if (parts.length === 5 && parts[0] === "carriers" && parts[2] === "payee" && parts[4] === "verify") {
+    return CARRIER_KEY.test(parts[1]) && /^[0-9]{1,9}$/.test(parts[3]) && allowed.has("carriers/payee/verify");
+  }
+  // payments/orders/<order id>/authorize
+  if (parts.length === 4 && parts[0] === "payments" && parts[1] === "orders" && parts[3] === "authorize") {
+    return PAYPAL_ID.test(parts[2]) && allowed.has("payments/orders/authorize");
   }
   // review/<id>/evidence/<rid>/link and review/<id>/evidence/<rid>/cancel
   if (parts.length === 5 && parts[0] === "review" && CASE_ID.test(parts[1]) && parts[2] === "evidence" && CASE_ID.test(parts[3])) {
@@ -189,11 +270,14 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
   if (parts.length === 3 && parts[0] === "cases" && CASE_ID.test(parts[1])) {
     return parts[2] === "activity" && allowed.has("cases/activity");
   }
+  if (joined === "payments/orders/authorize") return false;
+  if (joined === "carriers/payee/verify") return false;
   // These are templates for the id-carrying forms above, not routes of their own;
   // Flask has none of them without an id.
   if (joined === "review/decide" || joined === "review/deep-review" || joined === "cases/activity"
       || joined === "review/request-evidence" || joined === "review/reevaluate"
       || joined === "review/approve" || joined === "review/approve-exception" || joined === "review/execute"
+      || joined === "review/second-approve"
       || joined === "review/evidence/link" || joined === "review/evidence/cancel") {
     return false;
   }
@@ -211,6 +295,11 @@ export function matchWrite(joined: string, allowed: Set<string>): boolean {
  * rule applies to this write" must go through here.
  */
 export function policyKey(joined: string): string {
+  const retryPath = joined.split("/");
+  if (retryPath.length === 5 && retryPath[0] === "payments" && retryPath[1] === "cases" && CASE_ID.test(retryPath[2])
+      && retryPath[3] === "decision" && retryPath[4] === "redeliver") {
+    return "payments/decision/redeliver";
+  }
   const parts = joined.split("/");
   if (parts.length === 3 && parts[0] === "review" && CASE_ID.test(parts[1])) {
     return `review/${parts[2]}`;
@@ -221,6 +310,10 @@ export function policyKey(joined: string): string {
   }
   if (parts.length === 3 && parts[0] === "cases" && CASE_ID.test(parts[1])) {
     return `cases/${parts[2]}`;
+  }
+  if (parts.length === 5 && parts[0] === "carriers" && parts[2] === "payee" && parts[4] === "verify"
+      && CARRIER_KEY.test(parts[1])) {
+    return "carriers/payee/verify";
   }
   return joined;
 }

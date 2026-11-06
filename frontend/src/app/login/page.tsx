@@ -154,11 +154,11 @@ function LoginForm() {
    * that looks like it belongs to us -- and `//elsewhere` is protocol-relative,
    * so checking for a leading `/` alone is not enough.
    */
-  // With no `next`, a signed-in operator lands on Today -- the work in front of
-  // them -- rather than on the live board, which is for watching the pipeline.
+  // With no `next`, a signed-in person lands on the Floorline Pay overview -- the life of a payment
+  // in four steps -- rather than on the live board, which is for watching the pipeline.
   const next = (() => {
     const raw = params.get("next");
-    if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/today";
+    if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/pay";
     return raw;
   })();
 

@@ -483,9 +483,8 @@ def health() -> Any:
         "service": "VF Logistics Fraud Detection",
         "version": "2.0.0",
         "timestamp": utcnow(),
-        "hackathon": "Nebius x NVIDIA Global AI Hackathon",
-        "track": "Best Apps and Agents",
-        "revision": os.getenv("K_REVISION") or None,
+        "hackathon": "PayPal AI Hackathon",
+        "revision": os.getenv("K_REVISION") or os.getenv("RENDER_GIT_COMMIT") or None,
         "sent_ledger": bool(tools.SENT_LEDGER_SUBSCRIPTION),
         "store": store_status(),
         "worker": orchestrator.worker_status()
@@ -2146,6 +2145,28 @@ def receiver_decision() -> Any:
 receiver_decision._required_role = "operator"  # type: ignore[attr-defined]
 
 
+from vf_logistics import (
+    carrier_routes, controls_routes, defense_routes, demo_seed, payment_routes, payment_status, settlement_routes,
+)
+
+payment_routes.register(app, limiter, require_operator, _on_worker, _tenant)
+payment_status.register(app, require_viewer, _on_worker, _tenant)
+controls_routes.register(
+    app, limiter, require_viewer, require_operator, require_governance_admin,
+    require_password_session, _on_worker, _tenant, get_auth_context,
+)
+defense_routes.register(app, require_viewer, _on_worker)
+demo_seed.maybe_seed()
+settlement_routes.register(
+    app, limiter, require_viewer, require_operator, require_governance_admin,
+    require_password_session, _on_worker, _tenant, get_auth_context,
+)
+carrier_routes.register(
+    app, limiter, require_reviewer, require_operator, require_password_session,
+    _on_worker, _tenant, get_auth_context,
+)
+
+
 @app.route("/api/v1/receiver/applied/<key>", methods=["GET"])
 @require_viewer
 def receiver_applied(key: str) -> Any:
@@ -2530,6 +2551,23 @@ def review_approve(case_id: str) -> Any:
     return _evidence_response(evidence.approve(
         case_id, str(body.get("action") or "").strip(), person,
         note=str(body.get("note") or "").strip(),
+        actor_auth=actor_auth, tenant_id=_tenant(),
+    ))
+
+
+@app.route("/api/v1/review/<case_id>/second-approve", methods=["POST"])
+@require_reviewer
+@require_password_session
+@limiter.limit("10 per minute")
+def review_second_approve(case_id: str) -> Any:
+    """The second person's approval of a release large enough to need two."""
+    from vf_logistics import evidence
+
+    body = _json_object()
+    person, actor_auth = _acting_person(body)
+    return _evidence_response(evidence.second_approve(
+        case_id, str(body.get("approval_id") or "").strip(), person,
+        str(body.get("note") or "").strip(),
         actor_auth=actor_auth, tenant_id=_tenant(),
     ))
 

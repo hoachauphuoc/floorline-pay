@@ -1,145 +1,198 @@
-# Floorline — shipment-fraud agents that can raise risk, never lower it
+# Floorline Pay — the agent pays the carrier the moment delivery is proven, and can never pay a shipment the rules held
 
-Deterministic checks set a risk **floor** for every shipment. AI agents may argue a case above that line; nothing they say can take it below, and a person decides every disputed case. (VF Logistics is the freight operator in the demo; the repository and the Cloud Run service `vf-app` keep that name.)
+> **A proof of concept for the PayPal AI Hackathon, running on the PayPal sandbox: no real money moves.** It starts from Floorline as submitted to the Nebius x NVIDIA Global AI Hackathon (tag `nebius-baseline`, commit `5690ea3`). Everything after that tag is the PayPal work; `git diff nebius-baseline` shows it. What has run against the real sandbox and what has not is listed under [Limits, stated](#limits-stated).
 
-- **Hackathon:** Nebius x NVIDIA Global AI Hackathon · **Track:** Best Apps and Agents · **Bonus target:** Best Use of Tavily
-- **Live demo (console and API):** https://vf-app-350828852747.asia-southeast1.run.app — health at `/health`, API under `/api/v1`
+Freight payments run on trust. A shipper's money is **held** at booking with PayPal (`intent: AUTHORIZE`). The carrier is **paid** through PayPal Payouts only after a person has released the shipment or, once a person has turned it on, after the agent has found a clean case below the limit that person published. If the shipment is blocked, the hold is **voided** and the money goes back to the shipper.
+
+Deterministic checks set a risk **floor** for every shipment, including new payment checks: a payee changed just before payment, a payee that is not the one on file, a payout above the booked freight. AI agents may argue a case above that floor; nothing they say can take it below. A held shipment keeps its money held, and a person decides every disputed case. Around the money sit seven credit-security layers (below): the AI ones may only raise risk or tighten a limit, never lower or loosen one, and the settler, the only code that moves money, never calls a model.
+
+- **Hackathon:** PayPal AI Hackathon · **Targets:** Best Use of Agentic Commerce, Best Use of PayPal + AI
+- **Live demo:** https://floorline-pay.onrender.com (the console on Render; the case store and the decision queue are Firestore and Pub/Sub in a separate Google Cloud project; the Nebius service `vf-app` is not changed)
 - **Demo video (under 3 minutes):** YOUTUBE_URL_PENDING
-- **Licence:** MIT · **Full reference:** [REFERENCE.md](REFERENCE.md) · **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- **Licence:** MIT · **Full reference of the inherited system:** [REFERENCE.md](REFERENCE.md) · **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · **Plan:** [docs/PAYPAL_PLAN.md](docs/PAYPAL_PLAN.md)
 
-## What it does
+## Try it in two minutes
 
-Floorline screens shipments for a freight forwarder's compliance desk. Fraud in a forwarder's book is rare, so almost every hold is honest; the job is holding the right shipments and making each decision fast and defensible.
+1. Open the live demo and choose **Continue as guest judge** (one click, no password). A guest can book and pay in the sandbox, look at every screen, and block a case; a guest cannot release or approve.
+2. **Book and pay** (`/book`): fill the booking, press *Pay with PayPal*, approve with a PayPal **sandbox** buyer account, and you come back to a case whose money is *held*, not taken.
+3. Open the case: the Payment card says *Funds held, awaiting a decision*, and the page lists every finding that raised the risk floor and why.
+4. A person decides. Releasing needs a password account, so a guest sees the held state and the refusal rather than a payment. A block returns the held money to the shipper.
 
-1. **Reads the documents as untrusted input.** A bill of lading is screened by Model Armor before any model reads it, then read by a vision model.
-2. **Computes a deterministic floor** (`verifier.py`: arithmetic and list lookups, no model, no network).
-3. **Scores above the floor.** Fraud and compliance agents screen the case with live Tavily web search; an HS classifier checks the declared tariff code against the goods; a zero-day radar searches adverse media for parties no sanctions list has caught up with.
-4. **Argues disputes.** When the floor exceeds the model's score by 15 points or more, a Senior Auditor debate runs. A confident DISAGREE can send the case to a deep investigation it would otherwise skip, upward only. It can never clear a case.
-5. **Releases inside limits a named person published.** Clear cases are released under a delegation boundary; the rest go to a reviewer with the findings, the sources and a due-diligence dossier (PDF). The audit trail names the signed-in account.
-6. **Closes missing evidence.** The reviewer requests documents through per-document links, the shipper uploads without an account, Floorline extracts and re-evaluates, a person approves, and the decision is published once per idempotency key.
+| Step | Status on the real PayPal sandbox |
+|---|---|
+| Create an order, approve it as a buyer, authorize (money held) | **Run for real** on 24 and 30 Oct 2026 (a 1,300 USD hold) |
+| Block, then void the hold | **Run for real** on 5 Nov 2026 on the live service: the block was published, the settler voided the hold (PayPal answered 204), the ledger shows *voided* (case `CASE-SHP-PAY-B1105A`) |
+| Release, then capture and pay the carrier with Payouts | **Run for real** on 5 Nov 2026 on the live service: capture `4BD95385NJ6449936` and payout `9835DKGHAFN3A` both answered 201, the ledger shows *paid* (case `CASE-SHP-PAY-R1105A`). The payout is *accepted* by PayPal; receipt by the carrier is not confirmed (ledger state `unconfirmed`) |
+| Webhook (payout, refund and dispute events) | **Partly run for real** on 5 Nov 2026: registered in the sandbox app, and signed events from PayPal (authorization created, capture completed, payouts batch processing and success, payout item succeeded, capture refunded) were verified and recorded on the live service. The payout of `CASE-SHP-PAY-R1105B` moved from `unconfirmed` to `confirmed` (SUCCESS) from the payout-item event, and refunding its capture in the sandbox froze the carrier (Mekong Haulage Co) as designed. **RESULT PENDING**: no dispute event has arrived, and the first payout (`CASE-SHP-PAY-R1105A`, paid before the webhook existed) stays `unconfirmed` |
+
+## How the money moves
+
+1. **Book and pay** (`/book`). The shipper fills the booking and is sent to PayPal to approve the payment. PayPal returns them to `/book/return`, which authorizes the order and submits the shipment with the PayPal authorization id. The money is held, not taken.
+2. **Screen.** Floorline reads the paperwork as untrusted input, computes the deterministic floor, and lets Nemotron agents with live Tavily search score above it.
+3. **Decide.** A person releases or blocks the shipment. If a governance admin has published an agent limit, the agent decides a clean case below it by itself; any other clean payment goes to a person, as every payment does while the agent is off. The decision is published once per idempotency key.
+4. **Settle** (`settler.py`, the only code that moves money). On a published release it re-checks the payment rules, captures the authorization, and pays the carrier with PayPal Payouts. On a published block it voids the authorization. Every refusal is a named status (`skipped`, `held`, `retry`, `failed`) and nothing is paid. An unknown outcome is answered with 503 so Pub/Sub delivers the decision again; each PayPal call carries a request id derived from the decision key, so a repeat cannot pay twice.
+5. **Watch.** The case page shows a Payment card (held, paid, returned, or held back, with the PayPal ids). `/payments` lists the newest outcome of every payment.
 
 ### The design rule
 
-`reconcile()` takes the higher of the model's score and the floor, and `validate()` raises if the HS or zero-day findings ever lowered it. A weaker model can miss a hold; it cannot release what the rules stopped. The debate is the one hop whose output can change routing instead of a score the floor overrides, so it was the one place a stronger model might matter. It runs on Super: Nemotron 3 Ultra was measured against it there and did not do better (below).
+`payment_checks.check_payment()` only ever **adds** findings to the same floor arithmetic as the rest of Floorline, so it can raise a floor and never lower one. The settler does not trust the release alone: if the payment checks still hold the payout, a person's release does not pay it. The browser can create an order and authorize it, and nothing else; capturing and paying out are not reachable from the console.
 
-### Measured (synthetic holdout; 95% Wilson intervals in brackets)
-
-- Rules alone, 453 holdout cases: recall 93.5% [90–96], false-positive rate 38.4% [28–49].
-- Adding the HS classifier and the zero-day radar, on 200 holdout cases: recall 95.8% [91–98] → 100% [97–100], because the classifier caught all 7 disguised tariff codes the rules missed. It held 2 more honest shipments and, by design, released none the rules held.
-- 19 public enforcement cases, each paired with the honest trade it imitated: 14 frauds held (73.7% [51–89]; rules alone 11), and 9 of the 19 honest look-alikes also held.
-- Model choice, measured on 179 corpus cases the rules scored 0, where the model is the only check: Nemotron 3 Nano flagged 46 of 52 frauds (88% [77–95]) and Super 47 of 52 (90% [79–96]). The sample cannot show a difference, and Super costs 4.3x as much per case, so fraud screening stays on Nano. The cost of that layer: on the holdout half Nano flagged 21 of the 24 frauds the rules missed, and also held 30 of the 53 honest shipments the rules had passed. With the rules' own 33 honest holds that is 63 of 86 honest holdout shipments (73%), against 38.4% for the rules alone.
-- The debate, measured on 46 labelled disputed cases (`data/model_comparison/debate_corpus.json`): Ultra reached a verdict less often than Super (37/46 against 40/46), cost 5.2x as much per debate and took twice as long. Neither told fraud from honest trade: Super said DISAGREE on 16 of 22 frauds and 13 of 18 honest cases, Ultra on 18 of 19 and 17 of 18. The auditor is shown the rules' findings and every honest case in the sample was one the rules held, so DISAGREE largely tracks the rules; it can only send a held case to investigation, never clear one. Read the debate as a routing step, not as evidence of independent judgement.
-- The weakness, in reviewer time: at the 2024 Vietnam customs fraud rate of 0.2%, the rules would hold about 206 shipments per real fraud case. The screen is not precise, and no real customer traffic has been measured. Cost is under half a cent of model spend per case.
-
-The details, the operating curve and the reproduction commands are in [REFERENCE.md](REFERENCE.md#measured-results) and on the console's Evaluation page (`/evaluation`).
-
-## Models, and where Token Factory helped
-
-Every model call goes through **Nebius Token Factory**, one OpenAI-compatible endpoint (`https://api.tokenfactory.nebius.com/v1/`) used through `openai.AsyncOpenAI`.
-
-| Model | Where it runs | Why this size |
+| Check | Floor | When |
 |---|---|---|
-| `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` | fraud, compliance, HS classification, zero-day radar | The floor makes a smaller model safe here, and Super flagged no more frauds where the rules saw none (46/52 against 47/52, at 4.3x the cost) |
-| `nvidia/nemotron-3-super-120b-a12b` | investigation, the auto-debate | The investigation writes the narrative a human reads; the debate routes a held case to it. Super matched Ultra on the debate at a fifth of the cost |
-| `nvidia/Nemotron-3-Ultra-550b-a55b` | not used by default; `DEBATE_MODEL` selects it | Measured against Super on 46 debates: a verdict less often (80% against 87%), no better at telling fraud from honest trade, 5.2x the cost |
-| `openbmb/MiniCPM-V-4_5` | document intake (vision) | Not an NVIDIA model: Token Factory offers no NVIDIA vision model yet |
+| `PAYEE_MISMATCH` | 80 | the payee is not the one on file for the carrier |
+| `PAYEE_MISSING`, `PAYOUT_ABOVE_FREIGHT` | 75 | no payee on a payout; payout above the booked freight |
+| `PAYEE_RECENTLY_CHANGED` | 70 | the payee changed in the last 14 days (or in the future) |
+| `PAYEE_UNVERIFIED`, `PAYEE_CHANGE_TIME_UNREADABLE`, `PAYOUT_AMOUNT_MISSING`, `PAYOUT_AMOUNT_UNREADABLE`, `PAYOUT_FREIGHT_UNVERIFIED` | 45 | something needed to check the payment is missing or unreadable: unverified, never fine |
 
-- **Model choice is a config value.** Moving a hop from Nano to Super to Ultra is a string in `config.py`, so the HS experiment (Nano from 40.0% to 92.9% recall on the pairs set, 50.0% to 91.7% on the holdout) and the two model comparisons above cost nothing in plumbing.
-- **No GPU provisioning.** Per-token access made a 550B model practical to test on 46 debates for about a dollar.
-- **The port was a client change.** The JSON contract of each agent was kept, so moving from Vertex AI Gemini changed the base URL, the model ids and the sampling parameters.
-- **Tavily** is a live runtime call in six places: compliance screening, route validation, investigation, the zero-day radar, the debate's search tool, and the Governance page's sanctions scan. In the radar and the debate, Nemotron calls the search as a tool and chooses the query.
-- **Other Nebius services used: none.** Nebius AI Cloud (Serverless Endpoints and Jobs) is not used; the service runs on Cloud Run.
+The checks run only on a payment case (a shipment with a payout amount, a PayPal authorization or a carrier payee). No finding quotes a payee address, so none reaches a model prompt or the console.
+
+## Credit security: what stands between a fraudster and the money
+
+Paying a carrier is a credit decision made on paperwork, so each layer below takes away one way to be paid wrongly. Every layer is deterministic code that a person configures; the AI layers sit on top and **may only raise risk or tighten a limit, never lower or loosen one**. The settler never calls a model: it reads what the analysis stored on the case.
+
+| Layer | What it stops | Where |
+|---|---|---|
+| **1. Booking-bound authorization** | an authorization id typed into a shipment event that is not this shipment's money: the booking writes the PayPal-reported reference and amount, and the settler checks them, asks PayPal again, and pays only after the capture is `COMPLETED` | `payment_binding.py`, `settler.py` |
+| **2. Carrier payee registry** | a payee the sender names: payees are registered by one person and verified by a **different** person after a callback; the sender's claim about the payee on file is overwritten from the registry at intake, on the case page and in the settler | `carrier_registry.py`, `/carriers` |
+| **3. Limits and a pause switch** | one large payout, a draining day: per payout, per carrier per day (amount and count), per tenant per day; an operator can pause, only a governance admin resumes or publishes limits, all with a password; a block still voids while paused | `payment_controls.py`, `/controls` |
+| **4. Dual approval** | one compromised reviewer releasing a large payout: a release at or above `PAYMENT_DUAL_APPROVAL_USD` (default 2,500; an unreadable value means every payout) is not executable until a **different** reviewer approves it with a password and a note; the settler holds it again | `dual_approval.py`, `evidence.py`, `settler.py` |
+| **5. Settlement integrity** | trusting "accepted" as "paid", and paying into a dispute: a webhook receiver PayPal itself must vouch for (`verify-webhook-signature`), payout status (confirmed, failed or pending, never assumed), authorization lifecycle (renewed after the 3-day honor period, refused after 29 days or when its age is unknown), and a **freeze** on the carrier and shipper of any dispute, reversed capture or failed payout that only a governance admin lifts | `paypal_webhook.py`, `payout_tracking.py`, `authorization_lifecycle.py`, `payment_freeze.py` |
+| **7. AI layers (raise only)** | what the rules cannot see: a payment-risk analyst (a model that sees numbers and categories, never a name or an address), a web check that the carrier exists and that the payee sits on its own website (a search that did not run is *unverified*, not clean), a screen of the message that asked to change a payee (business-email-compromise wording, Model Armor, and a model shown the text without its addresses or long numbers), and a credit standing A to D that caps one payout (the applied cap is the smaller of the person's limit and the standing's) | `payment_ai.py`, `change_screen.py`, `credit_profile.py`, `payment_checks.py` |
+| **Agent payment (off until a person publishes a limit)** | the agent paying beyond what a person allowed: it pays only a case with no findings, an analyst reading of normal with confidence, a carrier the web check found, a payee on the carrier's website or proven by three confirmed payouts, a carrier of standing A, and a payout below the published limit and below the second-approval threshold. A model's answer can only refuse. The settler asks all of it again before any money moves and still runs every check of a person's release; anything missing goes to a person | `agent_payment.py`, `settler.py`, `/controls` |
+
+### What the AI layers add, measured on invented data
+
+[`scripts/evaluate_payment_ai.py`](scripts/evaluate_payment_ai.py) runs the checks over a **synthetic** corpus of 80 payouts (36 fraudulent, 44 legitimate; invented carriers and recorded search results; [`data/payment_fraud_corpus.json`](data/payment_fraud_corpus.json), rebuilt by `scripts/build_payment_corpus.py` from a fixed seed). The rates describe that corpus only, which was built from the patterns the checks were written for; they are not a forecast. Flagged means a risk floor of 40 or more.
+
+| Arm | Catches (recall) | False flags on legitimate payouts |
+|---|---|---|
+| Deterministic payment checks and the request screen | 24 of 36 (66.7%, 95% CI 50.3-79.8%) | 0 of 44 (0%, 95% CI 0-8.0%) |
+| + carrier look-up | 32 of 36 (88.9%, 74.7-95.6%) | 6 of 44 (13.6%, 6.4-26.7%) |
+| + payment-risk analyst | 32 of 36 (88.9%, 74.7-95.6%): **added nothing** to the look-up (run live on 5 Nov 2026) | 6 of 44 (13.6%, 6.4-26.7%): no change |
+| + payee on the carrier's own website (measured without the analyst, 6 Nov 2026) | 36 of 36 (100%) | 6 of 44 (13.6%): no change |
+
+The look-up's 8 extra catches are shell carriers that have no web presence by construction in the corpus, and its 6 false flags are small real carriers with none: it trades one for the other. The four impersonated-carrier cases (a real carrier whose registered payee is a free-mail account) were what the analyst was for, and it caught none of them (0 of 4): on this corpus the analyst added nothing, and the report says so. Comparing the payee with the carrier's own website catches all four.
+
+A second invented corpus, [`data/payment_fraud_holdout.json`](data/payment_fraud_holdout.json) (80 payouts with other carriers and harder cases, written by the same author before the layers it measures), is less kind. The rules and the look-up catch 0 of 36 with 6 of 44 false flags. Run live once on 6 Nov 2026 (Nemotron 3 Nano), the analyst takes that to 9 of 36 with 11 of 44, the website comparison to 16 of 36 with 18 of 44, and the model reader of change requests to 26 of 36 (72.2%, 95% CI 56.0-84.2%) with 18 of 44 (40.9%, 27.7-55.6%). The reader caught all 10 diversion messages that no rule caught, paraphrased in English or written in Vietnamese, and flagged none of the 12 honest change requests. Its first run cut one reply at a 300-token limit, which counted as not flagged; the limit is now 2,000 and a second run of the reader had no cut reply (the longest used 526 tokens). One analyst reply was cut at its 800-token limit and counts as not flagged. The price is 27.3 points more false flags, against our target of at most 5: the 12 new ones are real carriers paid through free mail or a parent company's domain, which in the data look the same as impersonation, and each costs a verification call, not money. Cloned sites, inflated bookings and a payee shared between carriers are still missed (0 of 10).
+
+## PayPal and AI in the project
+
+| | |
+|---|---|
+| PayPal REST, sandbox only (`api-m.sandbox.paypal.com`) | Orders v2 (create with `AUTHORIZE`, authorize), authorization capture and void, Payouts |
+| Where | `src/vf_logistics/paypal_client.py` (every call returns a receipt and never raises), `payment_routes.py` (booking), `settler.py` (capture, payout, void), `payment_status.py` (state and ledger) |
+| AI | Nemotron 3 Nano and Super through Nebius Token Factory screen every case; MiniCPM-V reads scanned documents; Tavily gives live web search to compliance, investigation, the zero-day radar and the debate |
+| AI on payments | a payment-risk analyst (Nemotron, shown numbers and categories and never a name or an address), a web check that the carrier exists (Tavily), a screen of payee-change requests (business-email-compromise wording and Model Armor), a credit standing A to D; each can only raise risk or lower a cap |
+| Not used | PayPal Agent Toolkit and MCP server; the checkout JS SDK (the shipper approves on PayPal's own page) |
 
 ## What was significantly updated during the Submission Period
 
-This began as an entry to a different hackathon (Google Cloud, Vertex AI Gemini): [CHAUPHUOCHOA/vf-logistics-hackathon-google](https://github.com/CHAUPHUOCHOA/vf-logistics-hackathon-google), first commit 29 Aug 2026 (after the Submission Period opened on 26 Aug), last commit `755d998` on 31 Aug (Vietnam time; 30 Aug 23:46 UTC on GitHub). This repository's first commit is `6bb1e59` (17 Sep).
+The baseline is Floorline as submitted to the Nebius x NVIDIA hackathon, a shipment-fraud screen that releases or holds cargo. It had no payment code. The PayPal work, all after the `nebius-baseline` tag:
 
-| | Before (`755d998`) | Now |
-|---|---|---|
-| Models | 4 agents on Gemini via Vertex AI | 7 agents on Token Factory: Nemotron 3 Nano and Super (Ultra measured, not adopted), plus MiniCPM-V |
-| Console | one static HTML page | Next.js 16 in the same container as the API |
-| Evidence loop | a note | request, receive, re-evaluate, approve, execute, with an audit trail |
-| Tests | none | 2,120 backend (96% coverage, with the Firestore and Pub/Sub emulators) and 1,731 frontend (62.0%); mypy 0 errors |
-| CI | no test or lint CI, only a Cloud Build deploy config | five GitHub Actions jobs, each able to fail the build |
+| Added | Where |
+|---|---|
+| Sandbox PayPal client | `paypal_client.py`, `tests/test_paypal_client.py` |
+| Payment fields, validated at the edge, on the B2B audit request | `schemas.py`, `tests/test_paypal_fields.py` |
+| Deterministic payment checks in the risk floor | `payment_checks.py`, `verifier.py`, `tests/test_payment_checks.py` |
+| Settler that captures and pays on a human release, voids on a block | `settler.py`, `decision_receiver.py`, `tests/test_settler.py` |
+| Booking routes with a guarded return address | `payment_routes.py`, `app.py`, `tests/test_payment_routes.py`, `tests/test_payment_approval.py` |
+| Payment state per case and the payment ledger | `payment_status.py`, `tests/test_payment_status.py`, `tests/test_payment_ledger.py` |
+| Booking, return, Payments pages, Payment card, proxy entries, sidebar links | `frontend/src/app/book`, `frontend/src/app/payments`, `frontend/src/components/payments`, `frontend/src/lib/booking.ts`, `proxy-policy.ts`, `api.ts` |
+| Credit security L1-L3 and L6: booking-bound authorizations, a two-person carrier payee registry, limits and a pause switch | `payment_binding.py`, `carrier_registry.py`, `carrier_routes.py`, `payment_controls.py`, `controls_routes.py`, `frontend/src/app/carriers`, `frontend/src/app/controls` |
+| L4: dual approval of a large release | `dual_approval.py`, `evidence.py` (`second_approve`), `settler.py`, the Review panel |
+| L5: settlement integrity | `paypal_webhook.py`, `settlement_routes.py`, `payout_tracking.py`, `authorization_lifecycle.py`, `payment_freeze.py`, `paypal_client.py` |
+| L7: AI layers that only raise risk, a synthetic corpus and its evaluation | `payment_ai.py`, `change_screen.py`, `credit_profile.py`, `payment_eval.py`, `scripts/build_payment_corpus.py`, `scripts/evaluate_payment_ai.py` |
 
 ```bash
-git fetch https://github.com/CHAUPHUOCHOA/vf-logistics-hackathon-google.git main
-git diff --shortstat 755d998 6bb1e59   # the first port step: 32 files, +1,833 / -1,380
-git diff --shortstat 6bb1e59 d76e64e   # to 14 Oct: 395 files, +199,584 / -6,681, in 131 commits
-git diff --shortstat d76e64e febc252 -- src tests frontend   # 14 to 20 Oct, code and console only: 167 files, +23,957 / -292, in 53 commits
+git clone https://github.com/hoachauphuoc/floorline-pay.git   # a plain clone, not --depth
+cd floorline-pay
+git diff --stat nebius-baseline HEAD
 ```
 
-These commands need the full history (a plain `git clone`, not `--depth`). More detail: [REFERENCE.md](REFERENCE.md).
+The inherited Floorline measurements (synthetic corpus, 95% intervals) are in [REFERENCE.md](REFERENCE.md#measured-results). They measure fraud detection, not payments; the payment checks are measured only on the invented corpus described under Credit security, and the analyst model added nothing on it.
 
 ## Run it locally
 
-Prerequisites: Python 3.11+, Node.js 20+ with npm, a Nebius Token Factory key (https://tokenfactory.nebius.com/), and optionally a Tavily key (https://tavily.com/).
+Prerequisites: Python 3.11+, Node.js 20+, a Nebius Token Factory key (https://tokenfactory.nebius.com/), optionally a Tavily key, and for payments a PayPal developer account (https://developer.paypal.com/, free) with a sandbox **business** account (the merchant, which needs a sandbox balance for payouts) and a sandbox **personal** account (the shipper who approves the payment). Sandbox money is not real money.
 
 ```bash
-git clone https://github.com/hoachauphuoc/vf-logistics-nebius-nvidia.git
-cd vf-logistics-nebius-nvidia
 python -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env              # Windows: copy .env.example .env
-# edit .env: set NEBIUS_API_KEY, optionally TAVILY_API_KEY, and STORE_BACKEND=memory for a local run
-PYTHONPATH=src python -m vf_logistics.app     # API on http://localhost:8080
 ```
 
-On PowerShell: `$env:PYTHONPATH = "src"; python -m vf_logistics.app`. The console is a second process:
+Edit `.env`: set `NEBIUS_API_KEY`, optionally `TAVILY_API_KEY`, `STORE_BACKEND=memory` for a local run, and the payment settings:
+
+| Variable | Meaning |
+|---|---|
+| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | the REST app of your sandbox business account. Unset means payments are off: every payment path answers `not_configured` and pays nothing |
+| `PAYMENT_RETURN_ORIGINS` | comma-separated origins PayPal may send a shipper back to, for example `http://localhost:3000`. Unset means no return address is accepted |
+| `PAYMENT_DUAL_APPROVAL_USD` | from this payout a release needs a second approver (default 2500). A value that cannot be read means every payout needs two people |
+| `PAYPAL_WEBHOOK_ID`, `PAYPAL_WEBHOOK_TENANT_ID` | the id of the webhook registered in the PayPal developer dashboard, and the tenant its events belong to (multi-tenant only). Unset means the webhook receiver is off and answers 503 |
+| `PAYMENT_AI_MODEL` | the model of the payment-risk analyst (defaults to the project's model) |
 
 ```bash
+PYTHONPATH=src python -m vf_logistics.app                       # API on http://localhost:8080 (PowerShell: $env:PYTHONPATH = "src"; python -m vf_logistics.app)
 cd frontend && npm ci
-NEXT_PUBLIC_DEMO_MODE=false FLASK_API_BASE=http://127.0.0.1:8080 npm run dev   # http://localhost:3000
+NEXT_PUBLIC_DEMO_MODE=false FLASK_API_BASE=http://127.0.0.1:8080 npm run dev   # console on http://localhost:3000
 ```
 
-Deployment to Cloud Run, the environment variables and the Firestore indexes are in [REFERENCE.md](REFERENCE.md).
+Open `/book`, book a shipment, approve the payment as the sandbox personal account, and open the case.
+
+**Settling needs the decision to reach the receiver.** The settler runs when a published human decision is pushed to `POST /api/v1/receiver/decision` (Pub/Sub push, accepted only with a Google-signed token for `RECEIVER_PUSH_SA` and `RECEIVER_PUSH_AUDIENCE`; see [docs/RECEIVER_CONTRACT.md](docs/RECEIVER_CONTRACT.md)). A local run without that wiring can book, hold, screen and decide, but no money is captured or paid. Deployment to Cloud Run is described in [REFERENCE.md](REFERENCE.md).
 
 ## Signing in
 
-The deployed console asks everyone to sign in. An anonymous visitor is sent to the sign-in screen and the API answers 401. **Continue as guest judge** on the login page signs in with one click and no password: the guest can look around, inject shipments or upload a document, block a case and simulate a policy, but cannot release or approve. Releasing cargo, clearing the board and publishing policy need a password account; two are listed in the Devpost testing instructions, one of them Reviewer-only so you can watch the access control refuse something. `GET /api/v1/auth/policy` (after sign-in) returns what every route enforces.
-
-Try it in a few minutes: as guest judge, upload `sample_docs/injected_bol.pdf` on the DevOps page and watch Model Armor block it before any model reads it; open a held case for its findings, sources and dossier; simulate a policy on Governance.
+The console asks everyone to sign in. **Continue as guest judge** signs in with one click and no password: the guest can book and pay in the sandbox, look around, inject shipments, block a case and simulate a policy, but cannot release or approve. Releasing cargo, and so paying a carrier, needs a password account. `GET /api/v1/auth/policy` (after sign-in) returns what every route enforces.
 
 ## Reproducible testing
 
 ```bash
-# Backend: 2,120 tests; CI runs them inside the Firestore and Pub/Sub emulators (firebase emulators:exec)
+# Backend (3,247 passed, 49 skipped without the Firestore and Pub/Sub emulators)
 pip install "pytest>=8.0.0" "pytest-asyncio>=0.23.0" "pytest-cov>=4.1.0" "pytest-mock>=3.12.0"
-python -m pytest tests/ -v --cov=vf_logistics --cov-fail-under=92
-
-# Types and lint, as CI runs them
+python -m pytest tests/ -q
 python -m mypy src/vf_logistics/ --ignore-missing-imports
 python -m ruff check src/ tests/ scripts/ --select E,F,W --ignore E501,E402,W291,W293
 
-# Frontend: 1,731 tests
-cd frontend && npm ci && npm run lint && npm run test:coverage && npm run build
-
-# The rules-only benchmark, in seconds and at no cost
-python scripts/run_massive_benchmark.py --arm rules
+# Frontend (122 files, 1,988 passed) and build
+cd frontend && npm ci && npx tsc --noEmit && npx eslint src && npx vitest run && npm run build
 ```
 
-Without the emulators the emulator tests skip. [REFERENCE.md](REFERENCE.md#reproducible-testing) has the mutation check, the real-model run and the receiver conformance script.
+The figures are from full runs on the development machine on 6 Nov 2026 (`ruff` clean; `mypy` clean, run with `--python-version 3.13` locally because the numpy stubs there need it; `tsc` clean, `eslint` 0 errors). CI on this repository runs the same checks and passed on the commit before this text (`0c7cebe`). Every PayPal call in the tests goes through a fake or a recorded sandbox answer: no test calls PayPal.
 
-## Requirements of the hackathon rules, and where each is met
+## Limits, stated
+
+- **The webhook has not seen a dispute.** Booking, authorization, void, capture and payout have each run for real, and the webhook verified and recorded real authorization, capture, payout batch, payout item and capture-refunded events; a payout is `confirmed` once PayPal reports the item succeeded, and a refunded capture froze its carrier. Dispute events are covered with fakes and with PayPal answers recorded in `tests/fixtures/paypal`; none has arrived from PayPal. A payout PayPal accepted but never reported on stays `unconfirmed`.
+- **A person's release or block used to stay in the store.** For a case booked through `/book` the decision was recorded and the shipment held or released, but nothing was published, so the settler never saw it and a block never voided the hold. Found on the first real booking and fixed in `0c7cebe`; `tests/test_human_decide_publishes.py` pins it. It has been shown end to end on the live service: a block voided a hold and a release captured and paid (5 Nov 2026).
+- **The agent starts suspended.** Until a person publishes a delegation boundary (Governance page) every protected action, including publishing a decision, is refused and the case goes to a person. The demo runs under `BOUNDARY-v1`, which does not allow the agent to release by itself.
+- **Settling depends on Pub/Sub delivery** to the receiver, as described above.
+- **The booking form is kept on the server under the PayPal order**, so a reload or a new tab on the return page finishes the booking; the browser tab no longer holds the only copy. Until the shipment is accepted a failure leaves the booking in place for a second try, which the server takes without a second hold or a second case.
+- **The webhook receiver** (`/api/v1/paypal/webhook`) is off until `PAYPAL_WEBHOOK_ID` is set. Confirmed on the sandbox on 5 Nov 2026: the signature check, and that payout events carry `sender_batch_id` (our `<key>-payout`), since a real payout item event moved its payout to `confirmed`. Still assumed, never run against the sandbox: that dispute events carry the capture id in `disputed_transactions[].seller_transaction_id`, that renewing an authorization gives a new id the settler then uses, and that the `payer-action` link works as the booking flow expects (the booking flow itself ran).
+- **Daily limits and concurrent settlements.** A payout writes a reservation before it is paid and counts the other open reservations, so of two settlements at the same moment the later one gives way (retried the next day) instead of both passing the limit. A reservation is given up when nothing was paid. Pinned by `tests/test_payment_reservation.py` and `tests/test_settler_reservation.py` against the in-memory store. On the live service (5 Nov 2026) one release wrote the reservation, captured and paid (`CASE-SHP-PAY-R1105E`), and one payout PayPal refused for lack of balance gave its reservation up (`CASE-SHP-PAY-R1105D`); it has not been exercised against Firestore under real concurrency. If a settlement fails after money moved and its reservation is dropped, that amount is uncounted until the decision is delivered again.
+- **"Payout accepted" is not "money received".** The settler records a payout as settled when PayPal accepts the batch; the tracking that confirms the money arrived is best effort. The ledger keeps the two apart: a payout starts `unconfirmed` and moves to `confirmed` only when PayPal's payout-item event arrives through the webhook (seen on the live sandbox on 5 Nov 2026 for `CASE-SHP-PAY-R1105E` and `CASE-SHP-PAY-R1105D`). The case page does not show that second state yet.
+- **A failed settlement can be sent again by a person.** When a release was captured but the payout failed, a person signed in with a password gives a reason on the case page and the decision is published again under its first key; the settler, not the console, runs every check and moves the money, and the capture is not repeated. Run live on 5 Nov 2026: `CASE-SHP-PAY-R1105D` (captured, then the payout was refused for lack of balance) was retried after the sandbox balance was topped up and paid, with the same capture id and a new payout id. Only a settlement that ended `failed` and never `settled` can be sent again (`src/vf_logistics/settlement_retry.py`).
+- **There is no console screen yet for frozen parties or payout status**: they are API only (`GET /api/v1/payments/freezes`, `POST /api/v1/payments/freezes/lift`, `POST /api/v1/payments/cases/<id>/payout/refresh`; the payment state of a case carries `payout_status`).
+- **A new carrier's first payouts are capped** (credit standing C: 2,000 USD) and nothing but being paid without trouble raises the cap; there is no human override yet.
+- **The payment-risk analyst added nothing on the first synthetic corpus.** Run live on 5 Nov 2026 (`scripts/evaluate_payment_ai.py --live-analyst`): it flagged exactly what the carrier look-up flagged (32 of 36, 6 of 44 false) and missed all four impersonated-carrier cases. It stays in the design as a layer that may only raise risk, but this corpus gives no evidence that it helps; on the second corpus it added 9 true and 5 false flags. The corpus is invented from the patterns the checks were written for, so its rates are not a forecast.
+- **The carrier look-up trades one error for another**: it catches carriers with no web presence and flags small real carriers that have none.
+- The settler captures the whole authorization and pays `payout_amount`; if the shipper authorized more than the payout, the difference stays with the merchant account.
+- **The agent pays only under a limit a person published, and that path has run against fakes only.** With no limit, a decision made by the pipeline moves no money and a clean payment case goes to a person. With one, `agent_payment.py` decides as the table above says. It also needs a delegation boundary that lets the agent release (the demo's `BOUNDARY-v1` does not) and a model key for the analyst. It has not been run against the sandbox yet; `tests/test_settler_agent.py` and `tests/test_agent_pipeline.py` pin it with a fake PayPal.
+- Fraud in a forwarder's book is rare, so almost every hold is honest; the inherited screen is not precise, and no real customer traffic has been measured ([REFERENCE.md](REFERENCE.md#measured-results)).
+
+## Requirements of the hackathon rules
 
 | Rule | Where it is met |
 |---|---|
-| Runtime call to Nebius Token Factory | every one of the seven agents |
-| At least one NVIDIA open source model | Nemotron 3 Nano and Super in the pipeline; Ultra measured against Super and not adopted |
-| Track | **Best Apps and Agents** |
-| Significantly updated after 26 Aug 2026 | the section above; first commit here `6bb1e59`, 17 Sep |
-| Working demo URL | the `vf-app` URL at the top |
-| Public repository, detectable open source licence | MIT |
-| README with setup and run instructions | this file |
-| NVIDIA models, Token Factory and other Nebius services highlighted | "Models, and where Token Factory helped" |
-| Feedback on Token Factory, AI Cloud and NVIDIA tools | [SUBMISSION.md](SUBMISSION.md), section *Feedback on Nebius Token Factory, AI Cloud, and NVIDIA tools* |
-| Free access for judging, with credentials | "Signing in" |
-| Demo video under three minutes, public on YouTube | link at the top |
-| Bonus: functional runtime Tavily call | six call sites, `tavily_client.search_cached()` on the live compliance path |
+| PayPal developer platform (sandbox) and an AI tool, with PayPal central | `paypal_client.py`, `settler.py`; Nemotron agents on Nebius Token Factory |
+| Significantly updated after 1 Oct 2026, with an explanation | the section above; `git diff nebius-baseline` |
+| Working demo | the hosted URL once deployed, or the local steps above |
+| Public repository with a detectable open source licence | MIT (`LICENSE`); the repository is made public before submission |
+| Demo video under 3 minutes on YouTube | link at the top |
+| English | all materials |
 
 ## More
 
-[REFERENCE.md](REFERENCE.md) (API, environment variables, measured results, findings, roadmap, repository layout) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/RECEIVER_CONTRACT.md](docs/RECEIVER_CONTRACT.md) · [docs/PROJECT_STORY.md](docs/PROJECT_STORY.md) · [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) · [SUBMISSION.md](SUBMISSION.md)
+[REFERENCE.md](REFERENCE.md) (API, environment variables, measured results of the inherited screen, repository layout) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/RECEIVER_CONTRACT.md](docs/RECEIVER_CONTRACT.md) · [docs/PAYPAL_PLAN.md](docs/PAYPAL_PLAN.md)
 
 Released under the MIT licence; see [LICENSE](LICENSE).

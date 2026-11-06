@@ -1,0 +1,23 @@
+{
+ "status": "ok",
+ "http_status": 201,
+ "body": {
+  "batch_header": {
+   "payout_batch_id": "CJQ68KG8YW2L2",
+   "batch_status": "PENDING",
+   "sender_batch_header": {
+    "sender_batch_id": "e2e-payout-be3664ab08",
+    "email_subject": "Floorline freight payment"
+   }
+  },
+  "links": [
+   {
+    "href": "https://api.sandbox.paypal.com/v1/payments/payouts/CJQ68KG8YW2L2",
+    "rel": "self",
+    "method": "GET",
+    "encType": "application/json"
+   }
+  ]
+ },
+ "error": null
+}

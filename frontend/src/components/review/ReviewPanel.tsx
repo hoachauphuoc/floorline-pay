@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toaster";
-import { ApiError, approveCase, approveException, cancelEvidenceRequest, caseDossierUrl, decideReview, executeApproval, requestDeepReview, reevaluateCase, requestEvidence, reviewDocumentUrl } from "@/lib/api";
+import { ApiError, approveCase, approveException, cancelEvidenceRequest, caseDossierUrl, decideReview, executeApproval, requestDeepReview, reevaluateCase, requestEvidence, reviewDocumentUrl, secondApprove } from "@/lib/api";
 import { caseHref } from "@/lib/case-links";
 import {
   actionLabel,
@@ -392,6 +392,8 @@ export function ReviewPanel({
         ? await approveException(c.case_id, note, waived)
         : await approveCase(c.case_id, action, note);
       if ((res as Record<string, unknown>).approval) {
+        // A release that needs a second approver is not executed here: it waits for one.
+        if ((res.approval as Record<string, unknown>).requires_second === true) return res;
         const approval = res.approval as Record<string, string>;
         return executeReloadingOnConflict(approval.approval_id);
       }
@@ -410,7 +412,12 @@ export function ReviewPanel({
       setFormError(null);
       setNote("");
       onDecided();
-      toast({ title: "Decision executed via the verification loop" });
+      const approved = (result as Record<string, unknown>)?.approval as Record<string, unknown> | undefined;
+      toast({
+        title: approved?.requires_second === true
+          ? "Approved. A second approver must approve it before it is executed"
+          : "Decision executed via the verification loop",
+      });
     },
     onError: (error) => {
       setFormError(error instanceof Error ? error.message : String(error));
@@ -467,6 +474,29 @@ export function ReviewPanel({
   // hint that the lease is over -- evidence.execute_approval decides, and answers 409
   // while the claim is still live (the message is shown in the form's alert).
   const resumable = interrupted ? claim?.approval : undefined;
+  // A large release waits for a second person; Execute is withheld until one has approved.
+  const awaitingSecond = validApproval?.requires_second === true && !validApproval.second_approval;
+  const isFirstApprover = awaitingSecond
+    && (identity?.email ?? "").toLowerCase() === (validApproval?.approver ?? "").toLowerCase();
+  const [secondNote, setSecondNote] = useState("");
+  const verificationSecondApprove = useMutation({
+    onSettled: (_data, error) => {
+      if (outcomeUnknown(error)) onDecided();
+    },
+    mutationFn: () => {
+      if (!validApproval) throw new Error("No valid approval to second");
+      return secondApprove(c.case_id, validApproval.approval_id, secondNote);
+    },
+    onSuccess: () => {
+      setFormError(null);
+      setSecondNote("");
+      onDecided();
+      toast({ title: "Second approval recorded. The release can now be executed" });
+    },
+    onError: (error) => {
+      setFormError(error instanceof Error ? error.message : String(error));
+    },
+  });
 
   const verificationCancel = useMutation({
     mutationFn: () => {
@@ -795,10 +825,45 @@ export function ReviewPanel({
               Waiting for the shipper to upload documents.
             </p>
           )}
-          {hasVerification && c.state === "APPROVED" && (
+          {hasVerification && c.state === "APPROVED" && !awaitingSecond && (
             <p className="text-[11.5px] text-dim" data-testid="state-hint">
               Approved, ready to execute.
             </p>
+          )}
+          {hasVerification && c.state === "APPROVED" && awaitingSecond && (
+            <div className="space-y-2" data-testid="second-approval">
+              <p className="text-[11.5px] leading-relaxed text-dim">
+                This release is large enough to need a second approver before it can be executed.
+                {isFirstApprover
+                  ? " You approved it first, so a different reviewer must approve it."
+                  : " Say what you checked, then approve it as the second person."}
+              </p>
+              {!isFirstApprover && (
+                <>
+                  <Label htmlFor="second-note" className="text-[11.5px] text-dim">
+                    What you checked
+                  </Label>
+                  <Textarea
+                    id="second-note"
+                    value={secondNote}
+                    onChange={(e) => setSecondNote(e.target.value)}
+                    rows={2}
+                    className="border-white/10 bg-black/30 text-[12.5px]"
+                  />
+                  <Button
+                    size="sm"
+                    disabled={verificationSecondApprove.isPending || !secondNote.trim()}
+                    onClick={() => verificationSecondApprove.mutate()}
+                    className="h-8 text-[12px]"
+                  >
+                    {verificationSecondApprove.isPending && (
+                      <Loader2 className="mr-1.5 size-3.5 animate-spin motion-reduce:animate-none" />
+                    )}
+                    Approve as second approver
+                  </Button>
+                </>
+              )}
+            </div>
           )}
           {hasVerification && c.state === "EXECUTING" && (
             <p
@@ -857,7 +922,7 @@ export function ReviewPanel({
             )}
           {hasVerification &&
             (resumable != null ||
-              ((c.state === "APPROVED" || c.state === "EXECUTION_FAILED") && validApproval != null)) && (
+              ((c.state === "APPROVED" || c.state === "EXECUTION_FAILED") && validApproval != null && !awaitingSecond)) && (
               <Button
                 size="sm"
                 disabled={verificationExecute.isPending}

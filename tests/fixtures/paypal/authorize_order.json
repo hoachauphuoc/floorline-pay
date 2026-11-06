@@ -1,0 +1,95 @@
+{
+ "status": "ok",
+ "http_status": 201,
+ "body": {
+  "id": "48981195R5239121E",
+  "status": "COMPLETED",
+  "payment_source": {
+   "paypal": {
+    "email_address": "redacted@example.invalid",
+    "account_id": "AE9HY3BCJPJN8",
+    "account_status": "VERIFIED",
+    "name": {
+     "given_name": "John",
+     "surname": "Doe"
+    },
+    "address": {
+     "country_code": "US"
+    }
+   }
+  },
+  "purchase_units": [
+   {
+    "reference_id": "E2E-CHECK-1",
+    "payments": {
+     "authorizations": [
+      {
+       "status": "CREATED",
+       "id": "16E811157D759750X",
+       "amount": {
+        "currency_code": "USD",
+        "value": "1.00"
+       },
+       "seller_protection": {
+        "status": "ELIGIBLE",
+        "dispute_categories": [
+         "ITEM_NOT_RECEIVED",
+         "UNAUTHORIZED_TRANSACTION"
+        ]
+       },
+       "expiration_time": "2026-11-21T07:31:20Z",
+       "links": [
+        {
+         "href": "https://api.sandbox.paypal.com/v2/payments/authorizations/16E811157D759750X",
+         "rel": "self",
+         "method": "GET"
+        },
+        {
+         "href": "https://api.sandbox.paypal.com/v2/payments/authorizations/16E811157D759750X/capture",
+         "rel": "capture",
+         "method": "POST"
+        },
+        {
+         "href": "https://api.sandbox.paypal.com/v2/payments/authorizations/16E811157D759750X/void",
+         "rel": "void",
+         "method": "POST"
+        },
+        {
+         "href": "https://api.sandbox.paypal.com/v2/payments/authorizations/16E811157D759750X/reauthorize",
+         "rel": "reauthorize",
+         "method": "POST"
+        },
+        {
+         "href": "https://api.sandbox.paypal.com/v2/checkout/orders/48981195R5239121E",
+         "rel": "up",
+         "method": "GET"
+        }
+       ],
+       "create_time": "2026-10-23T07:31:20Z",
+       "update_time": "2026-10-23T07:31:20Z"
+      }
+     ]
+    }
+   }
+  ],
+  "payer": {
+   "name": {
+    "given_name": "John",
+    "surname": "Doe"
+   },
+   "email_address": "redacted@example.invalid",
+   "payer_id": "AE9HY3BCJPJN8",
+   "address": {
+    "country_code": "US"
+   }
+  },
+  "links": [
+   {
+    "href": "https://api.sandbox.paypal.com/v2/checkout/orders/48981195R5239121E",
+    "rel": "self",
+    "method": "GET"
+   }
+  ]
+ },
+ "error": null
+}

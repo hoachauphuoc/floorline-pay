@@ -131,6 +131,11 @@ _TXN_ATTEMPTS = 25
 # emulator with client 2.34) escapes it, so that case is retried here.
 _TXN_ROUNDS = 8
 
+# FirestoreStore.query_audit asks Firestore for one filter only. When it must check others it reads this many rows a
+# request and at most this many requests a call; a call that stops there returns the cursor to go on from.
+_AUDIT_SCAN_PAGE = 200
+_AUDIT_SCAN_PAGES = 25
+
 
 def _is_contention(exc: BaseException, aborted: type[BaseException]) -> bool:
     if isinstance(exc, aborted):
@@ -1925,8 +1930,8 @@ class FirestoreStore:
         search for an older case return an empty result that looked like
         missing data rather than an under-sized window.
 
-        At most one of case_id/action/status is expected per call; combining
-        more than one would need a wider composite index than is declared.
+        Firestore is asked for one equality filter, the first of case_id, action and status that is given, which the
+        declared composite indexes cover; any others are checked here, as MemoryStore checks all three.
         Each declared index now carries _tenant_id as its leading field.
         """
         scope = tenant.resolve(tenant_id)
@@ -1940,12 +1945,25 @@ class FirestoreStore:
             elif status:
                 q = q.where(filter=self._fs.FieldFilter("status", "==", status))
             q = q.order_by("at", direction=self._fs.Query.DESCENDING)
-            if cursor:
-                q = q.start_after({"at": cursor})
-            docs = list(q.limit(limit).stream())
-            items = [d.to_dict() for d in docs]
-            next_cursor = items[-1].get("at") if len(items) == limit else None
-            return items, next_cursor
+            filters = {n: v for n, v in (("case_id", case_id), ("action", action), ("status", status)) if v}
+            # The query above carries the first of them; the others are checked here, reading on until `limit` rows match,
+            # so a combined filter answers as it does on MemoryStore. A single filter asks for exactly `limit` rows.
+            size = limit if len(filters) <= 1 else max(limit, _AUDIT_SCAN_PAGE)
+            items: list[dict[str, Any]] = []
+            after = cursor
+            for _ in range(_AUDIT_SCAN_PAGES):
+                page = q.start_after({"at": after}) if after else q
+                batch = [d.to_dict() for d in page.limit(size).stream()]
+                for row in batch:
+                    if all(row.get(n) == v for n, v in filters.items()):
+                        items.append(row)
+                        if len(items) == limit:
+                            return items, row.get("at")
+                if len(batch) < size:
+                    return items, None
+                after = batch[-1].get("at")
+            # Stopped at the most one call reads: the cursor says where to go on, so a paging caller is not told this is the end.
+            return items, after
 
         return await asyncio.to_thread(_q)
 

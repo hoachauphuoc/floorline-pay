@@ -624,6 +624,10 @@ export interface EvidenceApproval {
   status: string;
   at: string;
   note?: string | null;
+  /** True when the payout is large enough that a second person must approve before it is executed. */
+  requires_second?: boolean;
+  /** The second person's approval: who, when and what they checked. */
+  second_approval?: { approver: string; at: string; note: string } | null;
   /** Set when a release waived missing or contradicting evidence: what, why, and by whom. */
   exception?: {
     unresolved: string[];

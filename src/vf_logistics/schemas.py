@@ -626,6 +626,30 @@ class ComplianceAuditRequest(BaseModel):
         description="Your historical average freight cost for this lane, in USD.",
     )
 
+    # Floorline Pay. Optional like the rest of this request: a payout with no payee
+    # on it is what the payment checks exist to flag, so its absence becomes a finding
+    # rather than a 422. A malformed value is still an integrator data error.
+    carrier_name: str | None = Field(None, max_length=200)
+    carrier_payee_email: str | None = Field(
+        None, max_length=254,
+        description="The PayPal account the carrier asks to be paid to on this load.",
+    )
+    carrier_registered_payee_email: str | None = Field(
+        None, max_length=254,
+        description="The PayPal account your own records hold for this carrier.",
+    )
+    carrier_payee_changed_at: str | None = Field(
+        None, max_length=40,
+        description="When the carrier's payee was last changed, ISO 8601 with a timezone.",
+    )
+    payout_amount: float | None = Field(None, gt=0)
+    paypal_order_id: str | None = Field(None, max_length=64, pattern=r"^[A-Z0-9-]+$")
+    paypal_authorization_id: str | None = Field(None, max_length=64, pattern=r"^[A-Z0-9-]+$")
+    tracking_number: str | None = Field(
+        None, max_length=64, pattern=r"^[A-Za-z0-9._-]+$",
+        description="The bill of lading or container number of the load, sent to PayPal after the carrier is paid.",
+    )
+
     webhook_url: str | None = Field(
         None, max_length=500,
         description="Delivered to when the audit completes, for async submissions",
@@ -638,6 +662,31 @@ class ComplianceAuditRequest(BaseModel):
         if v is None:
             return v
         return v.strip()
+
+    @field_validator("carrier_payee_email", "carrier_registered_payee_email")
+    @classmethod
+    def check_payee_email(cls, v: str | None) -> str | None:
+        """Lower-cased, so the payee comparison is not fooled by letter case alone."""
+        if v is None:
+            return v
+        local, _, domain = v.partition("@")
+        if not local or "@" in domain or "." not in domain or any(c.isspace() for c in v):
+            raise ValueError("must be an email address such as carrier@example.com")
+        return v.lower()
+
+    @field_validator("carrier_payee_changed_at")
+    @classmethod
+    def check_payee_changed_at(cls, v: str | None) -> str | None:
+        """A time without a timezone cannot be compared with now, so it is refused."""
+        if v is None:
+            return v
+        try:
+            parsed = datetime.fromisoformat(v)
+        except ValueError:
+            raise ValueError("must be an ISO 8601 date-time") from None
+        if parsed.tzinfo is None:
+            raise ValueError("must include a timezone, e.g. 2026-11-01T08:00:00+07:00")
+        return v
 
 
 class ComplianceAuditResponse(BaseModel):

@@ -226,6 +226,21 @@ describe("writes that answer slowly or with a refusal", () => {
     }
   });
 
+  it("gives a submitted shipment the long timeout, because it runs the workflow before it answers", async () => {
+    const timeout = vi.spyOn(AbortSignal, "timeout");
+    try {
+      globalThis.fetch = vi.fn(async () =>
+        jsonResponse({ case_id: "CASE-1" }, 202),
+      ) as unknown as typeof fetch;
+
+      const { submitShipmentEvent, LONG_WRITE_TIMEOUT_MS } = await import("@/lib/api");
+      await submitShipmentEvent({ shipment_id: "SHP-1" });
+      expect(timeout).toHaveBeenCalledWith(LONG_WRITE_TIMEOUT_MS);
+    } finally {
+      timeout.mockRestore();
+    }
+  });
+
   it("carries a password-required refusal through to the screen", async () => {
     globalThis.fetch = vi.fn(async () =>
       jsonResponse(

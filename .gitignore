@@ -69,3 +69,11 @@ orchestrator/
 .claude/
 CLAUDE.md
 tests/test_automation_runner_*.py
+
+# Credentials and test accounts that must never be committed: a service-account key, the
+# reviewer records that frontend/scripts/make-operator.mjs writes, anything under secrets/.
+gcp-key.json
+secrets/
+password.txt
+record.txt
+tmp-reviewer-*/

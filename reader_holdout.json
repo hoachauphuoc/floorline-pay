@@ -1,0 +1,208 @@
+{
+ "F-BEC-PARAPHRASE-021": {
+  "state": "flagged",
+  "reasons": [
+   "no usual contact",
+   "new remittance route"
+  ],
+  "tokens": {
+   "in": 240,
+   "out": 246
+  }
+ },
+ "F-BEC-PARAPHRASE-022": {
+  "state": "flagged",
+  "reasons": [
+   "urgency",
+   "authority"
+  ],
+  "tokens": {
+   "in": 235,
+   "out": 526
+  }
+ },
+ "F-BEC-PARAPHRASE-023": {
+  "state": "flagged",
+  "reasons": [
+   "requests secrecy",
+   "bypasses usual contact"
+  ],
+  "tokens": {
+   "in": 234,
+   "out": 172
+  }
+ },
+ "F-BEC-PARAPHRASE-024": {
+  "state": "flagged",
+  "reasons": [
+   "urgency",
+   "secrecy"
+  ],
+  "tokens": {
+   "in": 237,
+   "out": 271
+  }
+ },
+ "F-BEC-PARAPHRASE-025": {
+  "state": "flagged",
+  "reasons": [
+   "no usual contact",
+   "new route"
+  ],
+  "tokens": {
+   "in": 240,
+   "out": 176
+  }
+ },
+ "F-BEC-PARAPHRASE-026": {
+  "state": "flagged",
+  "reasons": [
+   "urgency",
+   "senior authority"
+  ],
+  "tokens": {
+   "in": 235,
+   "out": 410
+  }
+ },
+ "F-BEC-VIETNAMESE-027": {
+  "state": "flagged",
+  "reasons": [
+   "urgency",
+   "no verification"
+  ],
+  "tokens": {
+   "in": 239,
+   "out": 210
+  }
+ },
+ "F-BEC-VIETNAMESE-028": {
+  "state": "flagged",
+  "reasons": [
+   "urgency",
+   "secrecy"
+  ],
+  "tokens": {
+   "in": 237,
+   "out": 214
+  }
+ },
+ "F-BEC-VIETNAMESE-029": {
+  "state": "flagged",
+  "reasons": [
+   "urgency",
+   "no verification"
+  ],
+  "tokens": {
+   "in": 237,
+   "out": 235
+  }
+ },
+ "F-BEC-VIETNAMESE-030": {
+  "state": "flagged",
+  "reasons": [
+   "urgency",
+   "no verification"
+  ],
+  "tokens": {
+   "in": 239,
+   "out": 202
+  }
+ },
+ "L-HONEST-URGENT-CHANGE-063": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 243,
+   "out": 272
+  }
+ },
+ "L-HONEST-URGENT-CHANGE-064": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 233,
+   "out": 252
+  }
+ },
+ "L-HONEST-URGENT-CHANGE-065": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 230,
+   "out": 204
+  }
+ },
+ "L-HONEST-URGENT-CHANGE-066": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 243,
+   "out": 236
+  }
+ },
+ "L-HONEST-URGENT-CHANGE-067": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 233,
+   "out": 245
+  }
+ },
+ "L-HONEST-URGENT-CHANGE-068": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 230,
+   "out": 162
+  }
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-069": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 241,
+   "out": 175
+  }
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-070": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 241,
+   "out": 216
+  }
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-071": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 241,
+   "out": 207
+  }
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-072": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 241,
+   "out": 175
+  }
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-073": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 241,
+   "out": 213
+  }
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-074": {
+  "state": "clear",
+  "reasons": [],
+  "tokens": {
+   "in": 241,
+   "out": 199
+  }
+ }
+}

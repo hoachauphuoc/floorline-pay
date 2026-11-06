@@ -17,6 +17,7 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
+from vf_logistics import payment_controls  # noqa: E402
 from vf_logistics import store as store_mod  # noqa: E402
 
 EMULATOR = os.getenv("FIRESTORE_EMULATOR_HOST", "")
@@ -205,6 +206,36 @@ class TestEventsAndAudit:
         page, cursor = run(store.query_audit(limit=2))
         assert len(page) == 2 and cursor == page[-1]["at"]
         assert len(run(store.query_audit(cursor=cursor, limit=10))[0]) == 2
+
+    def test_audit_filters_combine_and_read_past_the_rows_that_do_not_match(self, store, monkeypatch):
+        monkeypatch.setattr(store_mod, "_AUDIT_SCAN_PAGE", 2)
+        for n in range(3):
+            run(store.add_audit({"case_id": "C1", "action": "settle_payment", "status": "settled", "at": at(n)}))
+        for n in range(3, 8):
+            run(store.add_audit({"case_id": "C1", "action": "settle_payment", "status": "failed", "at": at(n)}))
+        run(store.add_audit({"case_id": "C2", "action": "settle_payment", "status": "settled", "at": at(8)}))
+        run(store.add_audit({"case_id": "C1", "action": "retry_settlement", "status": "requested", "at": at(9)}))
+        page, cursor = run(store.query_audit(action="settle_payment", status="settled", limit=2))
+        assert [a["at"] for a in page] == [at(8), at(2)]
+        rest, cursor = run(store.query_audit(action="settle_payment", status="settled", cursor=cursor, limit=5))
+        assert [a["at"] for a in rest] == [at(1), at(0)] and cursor is None
+        both, _ = run(store.query_audit(case_id="C1", action="settle_payment", limit=100))
+        assert len(both) == 8
+        all_three, _ = run(store.query_audit(case_id="C1", action="settle_payment", status="failed", limit=100))
+        assert len(all_three) == 5
+
+    def test_a_reservation_whose_payment_failed_stays_open_and_a_paid_one_closes(self, store, monkeypatch):
+        monkeypatch.setattr(payment_controls, "get_store", lambda: store)
+        now = store_mod.utcnow()
+        for key in ("k1", "k2"):
+            run(store.add_audit({
+                "audit_id": f"res-{key}", "case_id": "C1", "action": payment_controls.RESERVED, "status": "reserved",
+                "detail": {"idempotency_key": key}, "at": now,
+            }))
+        run(store.add_audit({"case_id": "C1", "action": "settle_payment", "status": "failed", "detail": {"idempotency_key": "k1"}, "at": now}))
+        run(store.add_audit({"case_id": "C1", "action": "settle_payment", "status": "settled", "detail": {"idempotency_key": "k2"}, "at": now}))
+        still_open = run(payment_controls._open_reservations(None))
+        assert [row["detail"]["idempotency_key"] for row in still_open] == ["k1"]
 
     def test_an_audit_row_with_a_fixed_id_is_written_once(self, store):
         row = {"audit_id": "audit-publish-1", "case_id": "C1", "action": "publish_decision", "status": "done", "at": at(1)}

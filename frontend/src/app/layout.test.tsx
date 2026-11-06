@@ -104,12 +104,13 @@ describe("RootLayout", () => {
 });
 
 describe("Floorline metadata", () => {
-  it("titles the console Floorline", () => {
-    expect(metadata.title).toBe("Floorline");
+  it("titles the console Floorline Pay", () => {
+    expect(metadata.title).toBe("Floorline Pay");
   });
 
   it("describes the risk floor the agents may raise but never lower", () => {
     expect(metadata.description).toContain("risk floor the agents may raise but never lower");
-    expect(metadata.description).toContain("Nemotron 3");
+    expect(metadata.description).toContain("PayPal");
+    expect(metadata.description).not.toContain("Nebius");
   });
 });

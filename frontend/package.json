@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.103.1",
+    "ag-grid-community": "36.2.0",
+    "ag-grid-react": "36.2.0",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.3.0",
     "framer-motion": "^13.4.0",

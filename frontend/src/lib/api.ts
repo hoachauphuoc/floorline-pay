@@ -1,5 +1,6 @@
 import { DEMO_MODE } from "./config";
 import { demoAudits, demoUsage } from "./demo-data";
+import type { BookingForm } from "./booking";
 import type {
   AgentReadiness,
   AuditRecord,
@@ -449,6 +450,22 @@ export async function approveException(
   );
 }
 
+/**
+ * The second person's approval of a release large enough to need two. The API wants a
+ * reviewer other than the first approver, a password sign-in and a note.
+ */
+export async function secondApprove(
+  caseId: string,
+  approvalId: string,
+  note: string,
+): Promise<Record<string, unknown>> {
+  if (DEMO_MODE) liveOnly("Approving as the second approver");
+  return postJson<Record<string, unknown>>(
+    `review/${encodeURIComponent(caseId)}/second-approve`,
+    { approval_id: approvalId, note },
+  );
+}
+
 export async function executeApproval(
   caseId: string,
   approvalId: string,
@@ -676,12 +693,154 @@ export async function injectBulk(
   return postJson("simulate/bulk", { count });
 }
 
+/** What creating a PayPal order for the shipper to approve answers with. */
+export interface PaymentOrderRequest {
+  amount: number;
+  currency: string;
+  reference_id: string;
+  return_url: string;
+  cancel_url: string;
+  booking?: BookingForm;
+}
+
+export async function createPaymentOrder(
+  request: PaymentOrderRequest,
+): Promise<{ order_id: string; paypal_status: string | null; approval_url: string }> {
+  if (DEMO_MODE) liveOnly("Creating a PayPal order");
+  return postJson("payments/orders", request);
+}
+
+/** Authorize the order the shipper approved; the answer carries the authorization id. */
+export async function authorizePaymentOrder(
+  orderId: string,
+): Promise<{ order_id: string; authorization_id: string }> {
+  if (DEMO_MODE) liveOnly("Authorizing a PayPal payment");
+  return postJson(`payments/orders/${encodeURIComponent(orderId)}/authorize`);
+}
+
+/** The form the server kept with this order; a 404 means it kept none. */
+export async function fetchBookingDraft(orderId: string): Promise<{ order_id: string; booking: Partial<BookingForm> }> {
+  if (DEMO_MODE) liveOnly("Reading a kept booking");
+  return getJson<{ order_id: string; booking: Partial<BookingForm> }>(`payments/orders/${encodeURIComponent(orderId)}/booking`);
+}
+
+/** A payee as the carrier registry reports it: registered by one person, verified by another. */
+export type CarrierPayee = {
+  version: number;
+  payee_email: string;
+  registered_by: string;
+  registered_at?: string | null;
+  verified_by?: string | null;
+  verified_at?: string | null;
+  changed_at?: string | null;
+  /** True when the message that asked for this payee read like payment-diversion fraud (the screen's reasons follow). */
+  change_request_flagged?: boolean;
+  change_request_reasons?: string[];
+};
+
+/** One carrier: its verified payee, if any, and the registrations still waiting. */
+export type CarrierRow = {
+  carrier_key: string;
+  carrier_name?: string | null;
+  current: CarrierPayee | null;
+  pending: CarrierPayee[];
+};
+
+export async function fetchCarriers(): Promise<{ items: CarrierRow[] }> {
+  if (DEMO_MODE) liveOnly("The carrier registry");
+  return getJson<{ items: CarrierRow[] }>("carriers");
+}
+
+export async function registerCarrierPayee(request: {
+  carrier_name: string;
+  /** The message that asked for the change, if any. It is screened; only the reasons are kept, never the text. */
+  request_text?: string;
+  payee_email: string;
+}): Promise<{ carrier_key: string; version: number; status: string }> {
+  if (DEMO_MODE) liveOnly("Registering a carrier payee");
+  return postJson("carriers/payee", request);
+}
+
+export async function verifyCarrierPayee(
+  carrierKey: string,
+  version: number,
+  callbackNote: string,
+): Promise<{ carrier_key: string; version: number; status: string }> {
+  if (DEMO_MODE) liveOnly("Verifying a carrier payee");
+  return postJson(
+    `carriers/${encodeURIComponent(carrierKey)}/payee/${version}/verify`,
+    { callback_note: callbackNote },
+  );
+}
+
+/** The limits that cap what leaves in a day, in US dollars. Set by a governance admin. */
+export type PaymentLimits = {
+  max_payout_usd: number;
+  carrier_daily_usd: number;
+  tenant_daily_usd: number;
+  carrier_daily_count: number;
+};
+
+/** The most the agent may pay by itself, as a person published it. */
+export type AgentLimit = {
+  limit_usd: string;
+  published_by: string;
+  reason?: string | null;
+  at?: string | null;
+};
+
+/** GET payments/controls: the pause switch, the limits in force and what was paid today. */
+export type PaymentControls = {
+  pause: { paused: boolean; reason?: string | null; by?: string | null; at?: string | null };
+  limits: PaymentLimits | null;
+  limits_are_defaults: boolean;
+  agent_limit?: AgentLimit | null;
+  usage_today: {
+    tenant_usd: string;
+    carriers: Record<string, { usd: string; count: number }>;
+  };
+};
+
+export async function fetchPaymentControls(): Promise<PaymentControls> {
+  if (DEMO_MODE) liveOnly("The payment controls");
+  return getJson<PaymentControls>("payments/controls");
+}
+
+export async function pausePayments(reason: string): Promise<PaymentControls["pause"]> {
+  if (DEMO_MODE) liveOnly("Pausing payments");
+  return postJson("payments/pause", { reason });
+}
+
+export async function resumePayments(reason: string): Promise<PaymentControls["pause"]> {
+  if (DEMO_MODE) liveOnly("Resuming payments");
+  return postJson("payments/resume", { reason });
+}
+
+export async function publishPaymentLimits(
+  limits: PaymentLimits,
+  reason: string,
+): Promise<{ limits: PaymentLimits }> {
+  if (DEMO_MODE) liveOnly("Publishing payment limits");
+  return postJson("payments/limits", { limits, reason });
+}
+
+/** Zero turns the agent off. */
+export async function publishAgentLimit(
+  limitUsd: number,
+  reason: string,
+): Promise<{ agent_limit: AgentLimit | null }> {
+  if (DEMO_MODE) liveOnly("Publishing the agent limit");
+  return postJson("payments/agent/limit", { limit_usd: limitUsd, reason });
+}
+
 /** Submit a shipment event, as Pub/Sub would. */
 export async function submitShipmentEvent(
   shipment: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   if (DEMO_MODE) liveOnly("Submitting a shipment event");
-  return postJson("events/shipment", shipment);
+  // The shipment runs the whole workflow before it answers, 30 to 60 seconds with the models. With the 20 second default the
+  // booking page reported the API unreachable while the case was being created.
+  return postJson("events/shipment", shipment, LONG_WRITE_TIMEOUT_MS);
 }
 
 /**
@@ -1051,6 +1210,185 @@ export async function reportCaseActivity(caseId: string, activeMs: number): Prom
 // relabel it, which is the one cross-tenant leak a client-side console can
 // create without the server's help.
 // --------------------------------------------------------------------------
+
+/** One PayPal call the settler made. Ids and statuses only, never a payee address. */
+export type PaymentStep = {
+  status: string | null;
+  http_status: number | null;
+  paypal_id: string | null;
+  error: string | null;
+};
+
+/** The payment state of a case, read from what the settler recorded (payment_status.py). */
+export type PaymentState = {
+  case_id: string;
+  payment_case: boolean;
+  state:
+    | "none"
+    | "awaiting_decision"
+    | "no_authorization"
+    | "paid"
+    | "voided"
+    | "held"
+    | "pending"
+    | "failed"
+    | "decision_not_sent"
+    | "unknown";
+  reason?: string | null;
+  findings?: string[];
+  decision_not_sent?: boolean;
+  paid_by_agent?: { limit_usd: string; published_by: string } | null;
+  handed_to_person?: boolean;
+  payout_status?: { state: "confirmed" | "failed" | "pending" | "unconfirmed"; status: string | null; at: string | null };
+  capture?: PaymentStep | null;
+  payout?: PaymentStep | null;
+  void?: PaymentStep | null;
+  at?: string | null;
+};
+
+/** The newest settlement outcome of every case that has one, and a count per state. */
+export type PaymentLedger = {
+  items: Array<{
+    case_id: string;
+    state: PaymentState["state"];
+    reason?: string | null;
+    capture?: PaymentStep | null;
+    payout?: PaymentStep | null;
+    void?: PaymentStep | null;
+    payout_status?: { state: "confirmed" | "failed" | "pending" | "unconfirmed"; status: string | null; at: string | null };
+    at?: string | null;
+  }>;
+  counts: Record<string, number>;
+};
+
+export async function fetchPaymentLedger(): Promise<PaymentLedger> {
+  if (DEMO_MODE) liveOnly("The payment ledger");
+  return getJson<PaymentLedger>("payments/ledger");
+}
+
+/** What the payment checks and the AI layers say about one case (payment_status.payment_risk). */
+export type PaymentRisk = {
+  case_id: string;
+  payment_case: boolean;
+  findings?: Array<{ code: string; severity: string; floor: number; detail: string }>;
+  analyst?: { verdict: string; confidence?: number; reasons?: string[]; suggested_tier?: string | null } | null;
+  identity?: { status: string; reason?: string; urls?: string[]; payee_site?: string } | null;
+  credit?: {
+    tier: string;
+    baseline: string;
+    suggested: string | null;
+    cap_usd: string | null;
+    paid_count: number;
+    frozen: boolean;
+  };
+};
+
+export async function fetchPaymentRisk(caseId: string): Promise<PaymentRisk> {
+  if (DEMO_MODE) liveOnly("The payment risk");
+  return getJson<PaymentRisk>(`payments/cases/${encodeURIComponent(caseId)}/risk`);
+}
+
+export async function fetchPaymentState(caseId: string): Promise<PaymentState> {
+  if (DEMO_MODE) liveOnly("The payment state");
+  return getJson<PaymentState>(`payments/cases/${encodeURIComponent(caseId)}`);
+}
+
+/** One of the attacks the Defense page replays against the payment layers (defense_scenarios.py). */
+export type DefenseScenario = {
+  id: string;
+  title: string;
+  attack: string;
+  layer: string;
+  live: boolean;
+  outcome: string;
+  findings: string[];
+  floor: number | null;
+  money_moved_usd: string;
+  proof: string;
+  detail: string;
+};
+
+export async function fetchDefenseScenarios(): Promise<{
+  scenarios: DefenseScenario[];
+  stopped: number;
+  of: number;
+  note: string;
+}> {
+  if (DEMO_MODE) liveOnly("The attack replay");
+  return getJson("defense/scenarios");
+}
+
+type Rate = { count: number; of: number; rate: number | null; low: number | null; high: number | null };
+type Arm = { recall: Rate; false_positive_rate: Rate };
+
+/** What the payment checks catch on the synthetic corpus (payment_eval.py); the analyst arm is null until it is measured. */
+export type DefenseEvaluation = {
+  synthetic: boolean;
+  flag_floor: number;
+  note: string;
+  summary: {
+    cases: number;
+    fraud: number;
+    legit: number;
+    arms: { floor: Arm | null; identity: Arm | null; analyst: Arm | null; site?: Arm | null };
+  };
+};
+
+export async function fetchDefenseEvaluation(): Promise<DefenseEvaluation> {
+  if (DEMO_MODE) liveOnly("The evaluation table");
+  return getJson<DefenseEvaluation>("defense/evaluation");
+}
+
+/** A carrier or shipper that nothing is paid to until a governance admin lifts the freeze (payment_freeze.py). */
+export type FrozenParty = {
+  kind: string;
+  party: string;
+  name?: string | null;
+  reason: string;
+  source?: string | null;
+  at?: string | null;
+};
+
+export async function fetchFrozenParties(): Promise<{ frozen: FrozenParty[] }> {
+  if (DEMO_MODE) liveOnly("The frozen parties");
+  return getJson<{ frozen: FrozenParty[] }>("payments/freezes");
+}
+
+export type UnboundOrder = { order_id: string; authorization_id: string; at: string | null };
+
+export async function fetchUnboundOrders(): Promise<{ orders: UnboundOrder[] }> {
+  if (DEMO_MODE) liveOnly("The holds with no case");
+  return getJson<{ orders: UnboundOrder[] }>("payments/orders/unbound");
+}
+
+export async function fetchPendingPayPalEvents(): Promise<{ pending: number }> {
+  if (DEMO_MODE) liveOnly("The waiting PayPal events");
+  return getJson<{ pending: number }>("payments/events/pending");
+}
+
+export async function reconcilePayPalEvents(): Promise<{ applied: number; pending: number }> {
+  if (DEMO_MODE) liveOnly("Applying the waiting PayPal events");
+  return postJson("payments/events/reconcile", {});
+}
+
+export async function retrySettlement(caseId: string, reason: string): Promise<{ status: string; case_id: string }> {
+  if (DEMO_MODE) liveOnly("Retrying a settlement");
+  return postJson(`payments/cases/${encodeURIComponent(caseId)}/decision/redeliver`, { reason });
+}
+
+export async function refreshPayout(caseId: string): Promise<{ state: string; status: string | null; at: string | null }> {
+  if (DEMO_MODE) liveOnly("Checking a payout with PayPal");
+  return postJson(`payments/cases/${encodeURIComponent(caseId)}/payout/refresh`, {});
+}
+
+export async function liftFreeze(request: {
+  kind: string;
+  name: string;
+  reason: string;
+}): Promise<{ frozen: FrozenParty[] }> {
+  if (DEMO_MODE) liveOnly("Lifting a freeze");
+  return postJson("payments/freezes/lift", request);
+}
 
 export const queryKeys = {
   audits: (tenantId: string) => ["audits", tenantId] as const,

@@ -28,6 +28,7 @@ import logging
 import os
 from typing import Any
 
+from vf_logistics import settler
 from vf_logistics.store import get_store
 from vf_logistics.tenant import multi_tenant_enabled
 
@@ -84,7 +85,7 @@ def verify_push_token(authorization: str | None) -> str | None:
     return account
 
 
-async def receive(envelope: dict[str, Any]) -> tuple[int, dict[str, Any]]:
+async def receive(envelope: Any) -> tuple[int, dict[str, Any]]:
     """
     Apply one pushed decision unless its key was applied before.
 
@@ -92,7 +93,7 @@ async def receive(envelope: dict[str, Any]) -> tuple[int, dict[str, Any]]:
     "duplicate", or "ignored" for a pipeline notification); 422 leaves a decision
     that cannot be deduplicated with Pub/Sub.
     """
-    message = envelope.get("message")
+    message = envelope.get("message") if isinstance(envelope, dict) else None
     if not isinstance(message, dict):
         return 422, {"outcome": "rejected", "reason": "no Pub/Sub message in the request"}
     attributes = message.get("attributes")
@@ -102,7 +103,7 @@ async def receive(envelope: dict[str, Any]) -> tuple[int, dict[str, Any]]:
     owner = attributes.get("tenant_id") or None
     try:
         body = json.loads(base64.b64decode(message.get("data") or ""))
-    except ValueError:
+    except (ValueError, TypeError):
         body = None
     case_id = body.get("case_id") if isinstance(body, dict) else None
     message_id = message.get("messageId") or message.get("message_id") or ""
@@ -126,4 +127,14 @@ async def receive(envelope: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         "first_message_id": str(message_id),
     }
     result = await get_store().apply_decision_once(key, record, tenant_id=owner)
-    return 200, {"outcome": "applied" if result["applied"] else "duplicate", "deliveries": result["deliveries"]}
+    # The key's first application is the decision: a repeat that carries another case or outcome settles what was applied.
+    applied = {name: result.get(name) for name in ("case_id", "outcome", "approval_id")}
+    settlement = await settler.settle({**applied, "idempotency_key": key}, tenant_id=owner)
+    reply = {
+        "outcome": "applied" if result["applied"] else "duplicate",
+        "deliveries": result["deliveries"],
+        "settlement": settlement,
+    }
+    # An unknown settlement outcome is not acknowledged: Pub/Sub delivers the decision
+    # again, and the PayPal request ids make the repeat safe.
+    return (503 if settlement["status"] == settler.RETRY else 200), reply

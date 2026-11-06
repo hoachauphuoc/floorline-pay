@@ -25,9 +25,24 @@ class TestHealthSaysWhatIsDeployed(FlaskTestBase):
         with patch.dict(os.environ, {"K_REVISION": "vf-app-00042-abc"}):
             self.assertEqual(self._health()["revision"], "vf-app-00042-abc")
 
+    def test_the_revision_is_the_render_commit_when_there_is_no_cloud_run_revision(self):
+        with patch.dict(os.environ, {"RENDER_GIT_COMMIT": "645b921abc"}):
+            os.environ.pop("K_REVISION", None)
+            self.assertEqual(self._health()["revision"], "645b921abc")
+
+    def test_the_cloud_run_revision_wins_over_the_render_commit(self):
+        with patch.dict(os.environ, {"K_REVISION": "svc-00001", "RENDER_GIT_COMMIT": "645b921abc"}):
+            self.assertEqual(self._health()["revision"], "svc-00001")
+
+    def test_health_names_the_paypal_hackathon_not_the_nebius_one(self):
+        body = self._health()
+        self.assertEqual(body["hackathon"], "PayPal AI Hackathon")
+        self.assertNotIn("Nebius", json.dumps(body))
+
     def test_the_revision_is_null_when_nothing_names_it(self):
         with patch.dict(os.environ):
             os.environ.pop("K_REVISION", None)
+            os.environ.pop("RENDER_GIT_COMMIT", None)
             self.assertIsNone(self._health()["revision"])
 
     def test_the_sent_ledger_is_reported_as_configured(self):

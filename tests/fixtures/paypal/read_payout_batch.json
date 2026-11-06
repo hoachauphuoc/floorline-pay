@@ -1,0 +1,64 @@
+{
+ "status": "ok",
+ "http_status": 200,
+ "body": {
+  "batch_header": {
+   "payout_batch_id": "YJYKVT64HSEDU",
+   "batch_status": "PENDING",
+   "time_created": "2026-10-23T07:31:31Z",
+   "sender_batch_header": {
+    "sender_batch_id": "e2e-settle-71dcb8a5-payout",
+    "email_subject": "Floorline freight payment"
+   },
+   "funding_source": "BALANCE",
+   "amount": {
+    "currency": "USD",
+    "value": "1.00"
+   },
+   "fees": {
+    "currency": "USD",
+    "value": "0.02"
+   }
+  },
+  "items": [
+   {
+    "payout_item_id": "BA9H9JN7PXAX6",
+    "transaction_status": "PENDING",
+    "payout_item_fee": {
+     "currency": "USD",
+     "value": "0.02"
+    },
+    "payout_batch_id": "YJYKVT64HSEDU",
+    "payout_item": {
+     "recipient_type": "EMAIL",
+     "amount": {
+      "currency": "USD",
+      "value": "1.00"
+     },
+     "note": "Floorline freight payment for E2E-CHECK-1",
+     "receiver": "redacted@example.invalid",
+     "sender_item_id": "e2e-settle-71dcb8a5-payout",
+     "recipient_wallet": "PAYPAL",
+     "purpose": "GOODS"
+    },
+    "links": [
+     {
+      "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/BA9H9JN7PXAX6",
+      "rel": "item",
+      "method": "GET",
+      "encType": "application/json"
+     }
+    ]
+   }
+  ],
+  "links": [
+   {
+    "href": "https://api.sandbox.paypal.com/v1/payments/payouts/YJYKVT64HSEDU?page_size=1000&page=1",
+    "rel": "self",
+    "method": "GET",
+    "encType": "application/json"
+   }
+  ]
+ },
+ "error": null
+}

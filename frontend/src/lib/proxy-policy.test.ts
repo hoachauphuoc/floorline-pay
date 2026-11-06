@@ -45,6 +45,7 @@ describe("matchWrite", () => {
     expect(matchWrite("review/CASE-1/approve", ALLOWED_POST)).toBe(true);
     expect(matchWrite("review/CASE-1/approve-exception", ALLOWED_POST)).toBe(true);
     expect(matchWrite("review/CASE-1/execute", ALLOWED_POST)).toBe(true);
+    expect(matchWrite("review/CASE-1/second-approve", ALLOWED_POST)).toBe(true);
   });
 
   it("resolves the evidence sub-routes by shape", () => {
@@ -63,6 +64,7 @@ describe("matchWrite", () => {
     expect(matchWrite("review/approve", ALLOWED_POST)).toBe(false);
     expect(matchWrite("review/approve-exception", ALLOWED_POST)).toBe(false);
     expect(matchWrite("review/execute", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("review/second-approve", ALLOWED_POST)).toBe(false);
     expect(matchWrite("review/evidence/link", ALLOWED_POST)).toBe(false);
     expect(matchWrite("review/evidence/cancel", ALLOWED_POST)).toBe(false);
     expect(matchWrite("cases/activity", ALLOWED_POST)).toBe(false);
@@ -92,12 +94,21 @@ describe("matchWrite", () => {
 
   it("marks publish, revoke, the prefilter, approve and execute as password-only", () => {
     expect([...PASSWORD_ONLY_POST].sort()).toEqual([
+      "carriers/payee",
+      "carriers/payee/verify",
       "governance/publish",
       "governance/revoke",
       "orchestrator/reset",
+      "payments/agent/limit",
+      "payments/decision/redeliver",
+      "payments/freezes/lift",
+      "payments/limits",
+      "payments/pause",
+      "payments/resume",
       "review/approve",
       "review/approve-exception",
       "review/execute",
+      "review/second-approve",
     ]);
     expect([...PASSWORD_ONLY_PUT]).toEqual(["governance/prefilter-rules"]);
     for (const path of PASSWORD_ONLY_PUT) expect(ALLOWED_PUT.has(path)).toBe(true);
@@ -128,6 +139,7 @@ describe("the lists the Access Control screen shows", () => {
     expect(shown).toContain("POST review/<id>/approve");
     expect(shown).toContain("POST review/<id>/execute");
     expect(shown).toContain("POST review/<id>/approve-exception");
+    expect(shown).toContain("POST review/<id>/second-approve");
     expect(shown).toContain("POST review/<id>/evidence/<id>/link");
     expect(shown).toContain("POST review/<id>/evidence/<id>/cancel");
     expect(shown).toContain("POST cases/<id>/activity");
@@ -142,6 +154,7 @@ describe("policyKey", () => {
     expect(policyKey("review/CASE-1/approve")).toBe("review/approve");
     expect(policyKey("review/CASE-1/execute")).toBe("review/execute");
     expect(policyKey("review/CASE-1/approve-exception")).toBe("review/approve-exception");
+    expect(policyKey("review/CASE-1/second-approve")).toBe("review/second-approve");
     expect(policyKey("review/CASE-1/evidence/evreq-9/cancel")).toBe("review/evidence/cancel");
     expect(policyKey("cases/CASE-1/activity")).toBe("cases/activity");
     expect(policyKey("orchestrator/reset")).toBe("orchestrator/reset");
@@ -154,5 +167,60 @@ describe("policyKey", () => {
   it("leaves a path that is not an id-carrying form alone", () => {
     expect(policyKey("review/../orchestrator/reset")).toBe("review/../orchestrator/reset");
     expect(policyKey("review/approve")).toBe("review/approve");
+  });
+});
+
+describe("the payout check write", () => {
+  const path = "payments/cases/CASE-1/payout/refresh";
+
+  it("is forwarded and needs no password, because it only reads PayPal", () => {
+    expect(matchWrite(path, ALLOWED_POST)).toBe(true);
+    expect(PASSWORD_ONLY_POST.has(policyKey(path))).toBe(false);
+  });
+
+  it("refuses the bare template, an id that is not a case id, a path that climbs and a longer path", () => {
+    expect(matchWrite("payments/status/refresh", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/CASE 1/payout/refresh", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/../payout/refresh", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/CASE-1/payout/refresh/extra", ALLOWED_POST)).toBe(false);
+  });
+});
+
+describe("the kept PayPal events", () => {
+  it("forwards the count and the reconcile; the reconcile needs no password, because it only freezes or records", () => {
+    expect(matchRead("payments/events/pending")).toBe(true);
+    expect(matchRead("payments/orders/unbound")).toBe(true);
+    expect(matchWrite("payments/events/reconcile", ALLOWED_POST)).toBe(true);
+    expect(PASSWORD_ONLY_POST.has(policyKey("payments/events/reconcile"))).toBe(false);
+  });
+
+  it("refuses a longer path", () => {
+    expect(matchRead("payments/events/pending/extra")).toBe(false);
+    expect(matchWrite("payments/events/reconcile/extra", ALLOWED_POST)).toBe(false);
+  });
+});
+
+describe("the kept booking read", () => {
+  it("forwards the booking of an order and nothing around it", () => {
+    expect(matchRead("payments/orders/5O190127TN364715T/booking")).toBe(true);
+    expect(matchRead("payments/orders/../booking")).toBe(false);
+    expect(matchRead("payments/orders/booking")).toBe(false);
+  });
+});
+
+describe("the settlement retry write", () => {
+  const path = "payments/cases/CASE-1/decision/redeliver";
+
+  it("is forwarded, mapped to its policy key, and needs a password sign-in", () => {
+    expect(matchWrite(path, ALLOWED_POST)).toBe(true);
+    expect(policyKey(path)).toBe("payments/decision/redeliver");
+    expect(PASSWORD_ONLY_POST.has(policyKey(path))).toBe(true);
+  });
+
+  it("refuses the bare template, an id that is not a case id, a path that climbs and a longer path", () => {
+    expect(matchWrite("payments/decision/redeliver", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/CASE 1/decision/redeliver", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/../decision/redeliver", ALLOWED_POST)).toBe(false);
+    expect(matchWrite("payments/cases/CASE-1/decision/redeliver/extra", ALLOWED_POST)).toBe(false);
   });
 });

@@ -1,0 +1,797 @@
+{
+ "F-LOOKALIKE-PAYEE-DOMAIN-001": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry",
+   "no change or domain red flags"
+  ],
+  "suggested_tier": "B"
+ },
+ "F-LOOKALIKE-PAYEE-DOMAIN-002": {
+  "verdict": "normal",
+  "confidence": 0.95,
+  "reasons": [
+   "payout aligns with booked freight (97%)",
+   "payee matches registry and uses own domain",
+   "no payee change, no flagged request, carrier not frozen"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-LOOKALIKE-PAYEE-DOMAIN-003": {
+  "verdict": "unknown",
+  "confidence": 0.0,
+  "reasons": [
+   "empty response"
+  ],
+  "suggested_tier": null
+ },
+ "F-LOOKALIKE-PAYEE-DOMAIN-004": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no change or flagged requests"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-LOOKALIKE-PAYEE-DOMAIN-005": {
+  "verdict": "normal",
+  "confidence": 0.95,
+  "reasons": [
+   "payout is close to booked freight (97%)",
+   "payee matches registry and uses own domain",
+   "no payee change or flagged request"
+  ],
+  "suggested_tier": "B"
+ },
+ "F-LOOKALIKE-PAYEE-DOMAIN-006": {
+  "verdict": "normal",
+  "confidence": 0.35,
+  "reasons": [
+   "new carrier",
+   "no prior payments"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-007": {
+  "verdict": "elevated",
+  "confidence": 0.85,
+  "reasons": [
+   "free_mail payee",
+   "carrier never paid before",
+   "payout close to booked freight"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-008": {
+  "verdict": "elevated",
+  "confidence": 0.75,
+  "reasons": [
+   "free_mail payee",
+   "carrier never paid before",
+   "payee domain unrelated to carrier"
+  ],
+  "suggested_tier": "B"
+ },
+ "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-009": {
+  "verdict": "elevated",
+  "confidence": 0.8,
+  "reasons": [
+   "free_mail payee",
+   "payee_domain_unrelated",
+   "carrier_never_paid_before"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-010": {
+  "verdict": "elevated",
+  "confidence": 0.75,
+  "reasons": [
+   "free_mail payee domain",
+   "carrier never paid before",
+   "payout close to booked freight"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-011": {
+  "verdict": "elevated",
+  "confidence": 0.78,
+  "reasons": [
+   "free-mail payee",
+   "carrier never paid before",
+   "payee domain unrelated to carrier"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-012": {
+  "verdict": "normal",
+  "confidence": 0.6,
+  "reasons": [
+   "payout slightly below booked freight",
+   "payee matches registry",
+   "carrier never paid before but no other red flags"
+  ],
+  "suggested_tier": "B"
+ },
+ "F-IMPERSONATED-LISTING-ONLY-013": {
+  "verdict": "elevated",
+  "confidence": 0.78,
+  "reasons": [
+   "free_mail_payee",
+   "carrier_never_paid"
+  ],
+  "suggested_tier": "B"
+ },
+ "F-IMPERSONATED-LISTING-ONLY-014": {
+  "verdict": "elevated",
+  "confidence": 0.78,
+  "reasons": [
+   "free_mail payee",
+   "carrier never paid before"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-IMPERSONATED-LISTING-ONLY-015": {
+  "verdict": "elevated",
+  "confidence": 0.78,
+  "reasons": [
+   "free_mail payee domain",
+   "carrier never paid before",
+   "payout close to booked freight but new carrier"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-IMPERSONATED-LISTING-ONLY-016": {
+  "verdict": "elevated",
+  "confidence": 0.78,
+  "reasons": [
+   "free_mail payee",
+   "carrier_never_paid_before",
+   "payee_matches_registry"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-CLONED-SITE-017": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no recent change"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-CLONED-SITE-018": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry and domain",
+   "no change request or domain mismatch"
+  ],
+  "suggested_tier": "C"
+ },
+ "F-CLONED-SITE-019": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry and domain matches carrier",
+   "no recent changes or flags"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-CLONED-SITE-020": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry and uses own domain",
+   "no recent changes or flags"
+  ],
+  "suggested_tier": "B"
+ },
+ "F-BEC-PARAPHRASE-021": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee unchanged for 34 days",
+   "carrier previously paid"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-PARAPHRASE-022": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout ~97% of booked freight",
+   "payee unchanged >30 days",
+   "domain matches carrier"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-PARAPHRASE-023": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout ~ booked freight",
+   "payee matches registry and domain",
+   "carrier has prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-PARAPHRASE-024": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight (0.97 ratio)",
+   "payee domain matches carrier and registry",
+   "no recent payee change or flagged request"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-PARAPHRASE-025": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout ~ booked freight",
+   "payee stable >30 days",
+   "domain matches carrier"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-PARAPHRASE-026": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight (0.97 ratio)",
+   "payee domain matches carrier and registry",
+   "no recent payee change or flagged request"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-VIETNAMESE-027": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee unchanged",
+   "domain matches carrier"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-VIETNAMESE-028": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight (0.97 ratio)",
+   "payee domain matches carrier and registry",
+   "no recent payee change or flagged request"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-VIETNAMESE-029": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout close to booked freight",
+   "payee unchanged for 40 days",
+   "domain matches carrier and registry"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-BEC-VIETNAMESE-030": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight (0.97 ratio)",
+   "payee domain matches carrier and registry",
+   "no recent payee change flag or freeze"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-PAYEE-SHARED-BETWEEN-CARRIERS-031": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "carrier has prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-PAYEE-SHARED-BETWEEN-CARRIERS-032": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "domain resembles carrier"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-PAYEE-SHARED-BETWEEN-CARRIERS-033": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout ~97% of booked",
+   "payee domain matches carrier",
+   "carrier previously paid"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-INFLATED-BOOKING-034": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry and domain resembles carrier",
+   "carrier has prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-INFLATED-BOOKING-035": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry and domain",
+   "multiple prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "F-INFLATED-BOOKING-036": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry",
+   "carrier has prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-037": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry and domain aligns",
+   "no change request or anomalies"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-038": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry and domain aligns",
+   "multiple prior carrier payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-039": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry and domain aligns",
+   "no flagged changes or anomalies"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-040": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry",
+   "multiple prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-041": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout near booked freight",
+   "payee matches registry and domain",
+   "multiple prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-042": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry and domain aligns with carrier",
+   "multiple prior carrier payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-043": {
+  "verdict": "normal",
+  "confidence": 0.95,
+  "reasons": [
+   "payout close to booked freight (0.97 ratio)",
+   "payee matches registry and uses own domain resembling carrier",
+   "carrier has prior payments (22) and not frozen"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-044": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry and uses own domain",
+   "no recent changes or flags"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-045": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry and domain aligns",
+   "carrier has many prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-ROUTINE-LISTING-FIRST-046": {
+  "verdict": "normal",
+  "confidence": 0.95,
+  "reasons": [
+   "payout close to booked freight (0.97 ratio)",
+   "payee domain matches carrier and registry",
+   "no recent payee change or flags"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-047": {
+  "verdict": "normal",
+  "confidence": 0.88,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no recent payee change or flagged request"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-048": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "carrier has multiple prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-049": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout slightly below booked freight",
+   "payee matches registry",
+   "carrier has prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-050": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "carrier previously paid",
+   "payee matches registry"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-051": {
+  "verdict": "elevated",
+  "confidence": 0.6,
+  "reasons": [
+   "free_mail_payee",
+   "payee_matches_registry",
+   "payout_close_to_booked"
+  ],
+  "suggested_tier": "B"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-052": {
+  "verdict": "elevated",
+  "confidence": 0.6,
+  "reasons": [
+   "free_mail_payee",
+   "payout_close_to_booked",
+   "carrier_established"
+  ],
+  "suggested_tier": "C"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-NEW-053": {
+  "verdict": "normal",
+  "confidence": 0.85,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no change or flagged issues"
+  ],
+  "suggested_tier": "C"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-NEW-054": {
+  "verdict": "normal",
+  "confidence": 0.88,
+  "reasons": [
+   "free_mail_payee",
+   "payout_close_to_booked",
+   "carrier_already_paid"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-NEW-055": {
+  "verdict": "elevated",
+  "confidence": 0.65,
+  "reasons": [
+   "free_mail_payee",
+   "carrier_never_paid_before",
+   "payout_close_to_booked"
+  ],
+  "suggested_tier": "C"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-NEW-056": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no change request flagged"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-NEW-057": {
+  "verdict": "elevated",
+  "confidence": 0.9,
+  "reasons": [
+   "free_mail payee",
+   "carrier never paid before",
+   "payout close to booked freight"
+  ],
+  "suggested_tier": "C"
+ },
+ "L-REAL-CARRIER-FREE-MAIL-NEW-058": {
+  "verdict": "elevated",
+  "confidence": 0.65,
+  "reasons": [
+   "free_mail payee",
+   "new carrier (only 1 payment made)",
+   "payee domain unrelated to carrier"
+  ],
+  "suggested_tier": "C"
+ },
+ "L-GROUP-FINANCE-DOMAIN-059": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no flagged changes"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-GROUP-FINANCE-DOMAIN-060": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no recent payee changes"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-GROUP-FINANCE-DOMAIN-061": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no change request flagged"
+  ],
+  "suggested_tier": "B"
+ },
+ "L-GROUP-FINANCE-DOMAIN-062": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no recent changes or flags"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-URGENT-CHANGE-063": {
+  "verdict": "normal",
+  "confidence": 0.85,
+  "reasons": [
+   "payee matches registry",
+   "domain resembles carrier",
+   "multiple prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-URGENT-CHANGE-064": {
+  "verdict": "elevated",
+  "confidence": 0.55,
+  "reasons": [
+   "payee changed recently (48 hours)",
+   "payee change request flagged",
+   "payout slightly below booked freight"
+  ],
+  "suggested_tier": "B"
+ },
+ "L-HONEST-URGENT-CHANGE-065": {
+  "verdict": "elevated",
+  "confidence": 0.78,
+  "reasons": [
+   "payee_change_request_flagged",
+   "payee_changed_40_days_ago",
+   "flagged_change_request"
+  ],
+  "suggested_tier": "B"
+ },
+ "L-HONEST-URGENT-CHANGE-066": {
+  "verdict": "normal",
+  "confidence": 0.88,
+  "reasons": [
+   "payee matches registry",
+   "payout aligns with booked freight",
+   "domain resembles carrier"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-URGENT-CHANGE-067": {
+  "verdict": "elevated",
+  "confidence": 0.78,
+  "reasons": [
+   "payee_change_request_flagged",
+   "payee_changed_days_ago 43",
+   "flagged change request"
+  ],
+  "suggested_tier": "B"
+ },
+ "L-HONEST-URGENT-CHANGE-068": {
+  "verdict": "normal",
+  "confidence": 0.95,
+  "reasons": [
+   "payee change flagged",
+   "payee matches registry",
+   "payout aligns with booked freight"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-069": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight (0.97)",
+   "payee domain matches carrier and registry",
+   "no recent payee change or flagged request"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-070": {
+  "verdict": "normal",
+  "confidence": 0.95,
+  "reasons": [
+   "payout close to booked freight",
+   "payee domain matches carrier and registry",
+   "no recent payee change or flagged request"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-071": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout close to booked freight",
+   "payee unchanged for 35 days",
+   "domain matches carrier"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-072": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight (0.97 ratio)",
+   "payee domain matches carrier and registry",
+   "no recent payee change or flagged request"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-073": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout near booked freight",
+   "payee unchanged for 85 days",
+   "carrier previously paid"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-HONEST-VIETNAMESE-CHANGE-074": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee domain matches carrier and registry",
+   "carrier has prior payments"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-NEW-CARRIER-WITH-PRESENCE-075": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "first payment",
+   "payout aligns with booked freight",
+   "payee domain matches carrier"
+  ],
+  "suggested_tier": "C"
+ },
+ "L-NEW-CARRIER-WITH-PRESENCE-076": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry",
+   "no change or domain concerns"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-NEW-CARRIER-WITH-PRESENCE-077": {
+  "verdict": "normal",
+  "confidence": 0.88,
+  "reasons": [
+   "payout aligns with booked freight",
+   "payee matches registry and domain resembles carrier",
+   "no recent payee change"
+  ],
+  "suggested_tier": "B"
+ },
+ "L-NEW-CARRIER-WITH-PRESENCE-078": {
+  "verdict": "normal",
+  "confidence": 0.96,
+  "reasons": [
+   "payout close to booked freight (0.97 ratio)",
+   "payee matches registry and domain resembles carrier",
+   "no payee change request or recent change flagged"
+  ],
+  "suggested_tier": "A"
+ },
+ "L-NEW-CARRIER-WITH-PRESENCE-079": {
+  "verdict": "normal",
+  "confidence": 0.85,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry and domain",
+   "no change request or domain mismatch"
+  ],
+  "suggested_tier": "B"
+ },
+ "L-NEW-CARRIER-WITH-PRESENCE-080": {
+  "verdict": "normal",
+  "confidence": 0.92,
+  "reasons": [
+   "payout close to booked freight",
+   "payee matches registry and domain resembles carrier",
+   "no recent payee change or flagged request"
+  ],
+  "suggested_tier": "A"
+ }
+}
