@@ -56,6 +56,8 @@ async def payment_state(case_id: str, tenant_id: str | None = None) -> dict[str,
             "capture": detail.get("capture"),
             "payout": detail.get("payout"),
             "void": detail.get("void"),
+            "paid_by_agent": detail.get("agent"),
+            "handed_to_person": detail.get("handed_to_person") is True,
             "payout_status": await payout_tracking.confirmation(case_id, tenant_id=tenant_id),
             "at": latest.get("at"),
         }

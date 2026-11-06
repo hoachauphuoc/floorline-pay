@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from vf_logistics import settler, tools
+from vf_logistics import agent_payment, settler, tools
 from vf_logistics.evidence import published_message_id
 from vf_logistics.store import get_store, utcnow
 
@@ -52,7 +52,9 @@ async def retry(case_id: str, reason: Any, actor: str, tenant_id: str | None = N
         raise RetryError("only a settlement that ended failed can be retried; this case has none", 409)
     detail = newest["detail"]
     key = str(detail.get("idempotency_key") or "")
-    if detail.get("outcome") != RELEASE or not key:
+    if detail.get("handed_to_person"):
+        raise RetryError("the agent gave this case to a person: release or block it; nothing is sent", 409)
+    if detail.get("outcome") not in (RELEASE, agent_payment.OUTCOME) or not key:
         raise RetryError("only the settlement of a release can be retried; nothing is sent", 409)
     first = await tools._earlier_publish(case_id, key, tenant_id)
     original = first.get("detail") if first else None
@@ -78,7 +80,7 @@ async def retry(case_id: str, reason: Any, actor: str, tenant_id: str | None = N
             "at": utcnow(),
         }, tenant_id=tenant_id)
     decision = {
-        "outcome": RELEASE, "action": "release", "approver": approver, "sent_by": actor, "executor": "settlement_retry", "idempotency_key": key,
+        "outcome": detail["outcome"], "action": "release", "approver": approver, "sent_by": actor, "executor": "settlement_retry", "idempotency_key": key,
     }
     if original.get("approval_id"):
         # The settler finds the approval by this id; a large release sent without it comes back held.

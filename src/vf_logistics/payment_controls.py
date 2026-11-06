@@ -15,6 +15,9 @@ would pass a daily limit is retried, so it goes out when the day turns over, sti
 inside the limits. A payout reserves its amount before it is paid (reserve_payout), and the
 reservation is counted with the paid ones, so two settlements at the same moment cannot both pass a daily limit.
 
+A third control is how much the agent may pay by itself: nothing until a governance admin publishes a limit (agent_limit), always
+below what needs a second approver. It is a ceiling and not a grant for any one payment: agent_payment.py decides each case.
+
 Pausing blocks money going out and not money going back: a block still voids the
 authorization. The switch and the limits are audit rows under the case id
 "PAYMENT-CONTROLS", newest first, never rewritten.
@@ -27,10 +30,12 @@ from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
+from vf_logistics import dual_approval
 from vf_logistics.store import get_store, new_id, utcnow
 
 CASE = "PAYMENT-CONTROLS"
 PUBLISHED = "payment_limits_published"
+AGENT_LIMIT = "agent_limit_published"
 PAUSED = "payments_paused"
 RESUMED = "payments_resumed"
 
@@ -137,6 +142,60 @@ async def publish_limits(
         "at": utcnow(),
     }, tenant_id=tenant_id)
     return published
+
+
+async def agent_limit(tenant_id: str | None = None) -> dict[str, Any] | None:
+    """The limit the agent pays under, or None: none published, turned off, or a record no password sign-in stands behind."""
+    row = await _newest(AGENT_LIMIT, tenant_id)
+    if row is None:
+        return None
+    detail = _detail(row)
+    try:
+        limit = Decimal(str(detail.get("limit_usd")))
+    except InvalidOperation:
+        return None
+    person = str(detail.get("published_by") or "")
+    if not limit.is_finite() or limit <= 0 or not person or detail.get("auth") != "password":
+        return None
+    return {"limit_usd": limit, "published_by": person, "reason": detail.get("reason"), "at": row.get("at")}
+
+
+def _agent_limit_amount(raw: Any) -> Decimal:
+    """The amount asked for, zero meaning off, or a ControlsError that says what is wrong."""
+    off = not isinstance(raw, bool) and raw == 0
+    if not off and _number(raw) is None:
+        raise ControlsError("limit_usd must be a number, zero or above; zero turns the agent off", 400)
+    limit = Decimal(str(raw))
+    threshold = dual_approval.threshold()
+    if limit > 0 and limit >= threshold:
+        raise ControlsError(
+            f"the agent limit must stay below the second-approval threshold of {threshold} USD, "
+            "so that a payment needing two people is never paid by the agent", 400,
+        )
+    return limit
+
+
+async def publish_agent_limit(
+    raw: Any, reason: Any, actor: str, actor_auth: str | None, tenant_id: str | None = None,
+) -> dict[str, Any] | None:
+    """Set the most the agent may pay by itself, or turn it off with zero. Returns the limit now in force."""
+    limit = _agent_limit_amount(raw)
+    why = str(reason or "").strip()
+    if not why:
+        raise ControlsError("a reason is required to publish the agent limit", 400)
+    if not actor:
+        raise ControlsError("the agent limit is published by a person; sign in with a personal account", 403)
+    if actor_auth != "password":
+        raise ControlsError("the agent limit needs a password sign-in", 403)
+    await get_store().add_audit({
+        "audit_id": new_id("audit"),
+        "case_id": CASE,
+        "action": AGENT_LIMIT,
+        "status": "done",
+        "detail": {"limit_usd": str(limit), "reason": why, "published_by": actor, "auth": actor_auth},
+        "at": utcnow(),
+    }, tenant_id=tenant_id)
+    return await agent_limit(tenant_id)
 
 
 async def pause_state(tenant_id: str | None = None) -> dict[str, Any]:

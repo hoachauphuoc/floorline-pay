@@ -59,6 +59,7 @@ function armRows(evaluation: DefenseEvaluation): ArmRow[] {
     ["identity", "+ carrier look-up"],
     ["analyst", "+ payment-risk analyst (model)"],
   ];
+  if (evaluation.summary.arms.site) labels.push(["site", "+ payee against the carrier's website"]);
   return labels.map(([key, arm]) => {
     const data = evaluation.summary.arms[key];
     return data

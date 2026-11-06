@@ -1,0 +1,3847 @@
+{
+ "synthetic": true,
+ "note": "Invented payouts and carriers, kept apart from the main corpus. Built by scripts/build_payment_holdout.py from a fixed seed; the search results are recorded here, not fetched.",
+ "seed": 20261106,
+ "cases": [
+  {
+   "id": "F-LOOKALIKE-PAYEE-DOMAIN-001",
+   "label": "fraud",
+   "scenario": "lookalike_payee_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-001",
+    "shipping_cost": 2350.0,
+    "avg_route_cost": 2350.0,
+    "carrier_name": "Upland Freight 001 Co",
+    "payout_amount": 2279.5,
+    "paypal_authorization_id": "HLDAUTH000000001",
+    "carrier_payee_email": "payments@uplandfreight001-billing.example",
+    "carrier_registered_payee_email": "payments@uplandfreight001-billing.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Upland Freight 001 Co | ocean and inland freight",
+     "content": "Upland Freight 001 Co moves containers between Vietnam and the United States.",
+     "url": "https://upland-freight-001.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-LOOKALIKE-PAYEE-DOMAIN-002",
+   "label": "fraud",
+   "scenario": "lookalike_payee_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-002",
+    "shipping_cost": 5750.0,
+    "avg_route_cost": 5750.0,
+    "carrier_name": "Heron Freight 002 Co",
+    "payout_amount": 5577.5,
+    "paypal_authorization_id": "HLDAUTH000000002",
+    "carrier_payee_email": "payments@heronfreight002-billing.example",
+    "carrier_registered_payee_email": "payments@heronfreight002-billing.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Heron Freight 002 Co | ocean and inland freight",
+     "content": "Heron Freight 002 Co moves containers between Vietnam and the United States.",
+     "url": "https://heron-freight-002.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-LOOKALIKE-PAYEE-DOMAIN-003",
+   "label": "fraud",
+   "scenario": "lookalike_payee_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-003",
+    "shipping_cost": 6050.0,
+    "avg_route_cost": 6050.0,
+    "carrier_name": "Mica Haulage 003 Ltd",
+    "payout_amount": 5868.5,
+    "paypal_authorization_id": "HLDAUTH000000003",
+    "carrier_payee_email": "payments@micahaulage003-billing.example",
+    "carrier_registered_payee_email": "payments@micahaulage003-billing.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Mica Haulage 003 Ltd | ocean and inland freight",
+     "content": "Mica Haulage 003 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://mica-haulage-003.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-LOOKALIKE-PAYEE-DOMAIN-004",
+   "label": "fraud",
+   "scenario": "lookalike_payee_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-004",
+    "shipping_cost": 2500.0,
+    "avg_route_cost": 2500.0,
+    "carrier_name": "Upland Freight 004 Co",
+    "payout_amount": 2425.0,
+    "paypal_authorization_id": "HLDAUTH000000004",
+    "carrier_payee_email": "payments@uplandfreight004-billing.example",
+    "carrier_registered_payee_email": "payments@uplandfreight004-billing.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Upland Freight 004 Co | ocean and inland freight",
+     "content": "Upland Freight 004 Co moves containers between Vietnam and the United States.",
+     "url": "https://upland-freight-004.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-LOOKALIKE-PAYEE-DOMAIN-005",
+   "label": "fraud",
+   "scenario": "lookalike_payee_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-005",
+    "shipping_cost": 2850.0,
+    "avg_route_cost": 2850.0,
+    "carrier_name": "Ibis Freight 005 Co",
+    "payout_amount": 2764.5,
+    "paypal_authorization_id": "HLDAUTH000000005",
+    "carrier_payee_email": "payments@ibisfreight005-billing.example",
+    "carrier_registered_payee_email": "payments@ibisfreight005-billing.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Ibis Freight 005 Co | ocean and inland freight",
+     "content": "Ibis Freight 005 Co moves containers between Vietnam and the United States.",
+     "url": "https://ibis-freight-005.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-LOOKALIKE-PAYEE-DOMAIN-006",
+   "label": "fraud",
+   "scenario": "lookalike_payee_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-006",
+    "shipping_cost": 3950.0,
+    "avg_route_cost": 3950.0,
+    "carrier_name": "Slate Freight 006 Co",
+    "payout_amount": 3831.5,
+    "paypal_authorization_id": "HLDAUTH000000006",
+    "carrier_payee_email": "payments@slatefreight006-billing.example",
+    "carrier_registered_payee_email": "payments@slatefreight006-billing.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Slate Freight 006 Co | ocean and inland freight",
+     "content": "Slate Freight 006 Co moves containers between Vietnam and the United States.",
+     "url": "https://slate-freight-006.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-007",
+   "label": "fraud",
+   "scenario": "impersonated_free_mail_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-007",
+    "shipping_cost": 5000.0,
+    "avg_route_cost": 5000.0,
+    "carrier_name": "Alder Freight 007 Co",
+    "payout_amount": 4850.0,
+    "paypal_authorization_id": "HLDAUTH000000007",
+    "carrier_payee_email": "alder.accounts10@gmail.com",
+    "carrier_registered_payee_email": "alder.accounts10@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Alder Freight 007 Co - carrier listing",
+     "content": "Alder Freight 007 Co appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/alder-freight-007-co"
+    },
+    {
+     "title": "Alder Freight 007 Co | ocean and inland freight",
+     "content": "Alder Freight 007 Co moves containers between Vietnam and the United States.",
+     "url": "https://alder-freight-007.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-008",
+   "label": "fraud",
+   "scenario": "impersonated_free_mail_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-008",
+    "shipping_cost": 5000.0,
+    "avg_route_cost": 5000.0,
+    "carrier_name": "Cedar Carriers 008 JSC",
+    "payout_amount": 4850.0,
+    "paypal_authorization_id": "HLDAUTH000000008",
+    "carrier_payee_email": "cedar.accounts71@gmail.com",
+    "carrier_registered_payee_email": "cedar.accounts71@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Cedar Carriers 008 JSC - carrier listing",
+     "content": "Cedar Carriers 008 JSC appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/cedar-carriers-008-jsc"
+    },
+    {
+     "title": "Cedar Carriers 008 JSC | ocean and inland freight",
+     "content": "Cedar Carriers 008 JSC moves containers between Vietnam and the United States.",
+     "url": "https://cedarcarriers008.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-009",
+   "label": "fraud",
+   "scenario": "impersonated_free_mail_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-009",
+    "shipping_cost": 3050.0,
+    "avg_route_cost": 3050.0,
+    "carrier_name": "Quill Freight 009 Co",
+    "payout_amount": 2958.5,
+    "paypal_authorization_id": "HLDAUTH000000009",
+    "carrier_payee_email": "quill.accounts19@gmail.com",
+    "carrier_registered_payee_email": "quill.accounts19@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Quill Freight 009 Co - carrier listing",
+     "content": "Quill Freight 009 Co appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/quill-freight-009-co"
+    },
+    {
+     "title": "Quill Freight 009 Co | ocean and inland freight",
+     "content": "Quill Freight 009 Co moves containers between Vietnam and the United States.",
+     "url": "https://quill-freight-009.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-010",
+   "label": "fraud",
+   "scenario": "impersonated_free_mail_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-010",
+    "shipping_cost": 4450.0,
+    "avg_route_cost": 4450.0,
+    "carrier_name": "Larch Carriers 010 JSC",
+    "payout_amount": 4316.5,
+    "paypal_authorization_id": "HLDAUTH000000010",
+    "carrier_payee_email": "larch.accounts79@gmail.com",
+    "carrier_registered_payee_email": "larch.accounts79@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Larch Carriers 010 JSC - carrier listing",
+     "content": "Larch Carriers 010 JSC appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/larch-carriers-010-jsc"
+    },
+    {
+     "title": "Larch Carriers 010 JSC | ocean and inland freight",
+     "content": "Larch Carriers 010 JSC moves containers between Vietnam and the United States.",
+     "url": "https://larchcarriers010.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-011",
+   "label": "fraud",
+   "scenario": "impersonated_free_mail_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-011",
+    "shipping_cost": 2250.0,
+    "avg_route_cost": 2250.0,
+    "carrier_name": "Nettle Carriers 011 JSC",
+    "payout_amount": 2182.5,
+    "paypal_authorization_id": "HLDAUTH000000011",
+    "carrier_payee_email": "nettle.accounts30@gmail.com",
+    "carrier_registered_payee_email": "nettle.accounts30@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Nettle Carriers 011 JSC - carrier listing",
+     "content": "Nettle Carriers 011 JSC appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/nettle-carriers-011-jsc"
+    },
+    {
+     "title": "Nettle Carriers 011 JSC | ocean and inland freight",
+     "content": "Nettle Carriers 011 JSC moves containers between Vietnam and the United States.",
+     "url": "https://nettlecarriers011.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-FREE-MAIL-LISTING-FIRST-012",
+   "label": "fraud",
+   "scenario": "impersonated_free_mail_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-012",
+    "shipping_cost": 2350.0,
+    "avg_route_cost": 2350.0,
+    "carrier_name": "Zinnia Haulage 012 Ltd",
+    "payout_amount": 2279.5,
+    "paypal_authorization_id": "HLDAUTH000000012",
+    "carrier_payee_email": "zinnia.accounts82@gmail.com",
+    "carrier_registered_payee_email": "zinnia.accounts82@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Zinnia Haulage 012 Ltd - carrier listing",
+     "content": "Zinnia Haulage 012 Ltd appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/zinnia-haulage-012-ltd"
+    },
+    {
+     "title": "Zinnia Haulage 012 Ltd | ocean and inland freight",
+     "content": "Zinnia Haulage 012 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://zinnia-haulage-012.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-LISTING-ONLY-013",
+   "label": "fraud",
+   "scenario": "impersonated_listing_only",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-013",
+    "shipping_cost": 4300.0,
+    "avg_route_cost": 4300.0,
+    "carrier_name": "Jade Freight 013 Co",
+    "payout_amount": 4171.0,
+    "paypal_authorization_id": "HLDAUTH000000013",
+    "carrier_payee_email": "jade.accounts65@gmail.com",
+    "carrier_registered_payee_email": "jade.accounts65@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Jade Freight 013 Co - carrier listing",
+     "content": "Jade Freight 013 Co appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/jade-freight-013-co"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-LISTING-ONLY-014",
+   "label": "fraud",
+   "scenario": "impersonated_listing_only",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-014",
+    "shipping_cost": 3250.0,
+    "avg_route_cost": 3250.0,
+    "carrier_name": "Gale Haulage 014 Ltd",
+    "payout_amount": 3152.5,
+    "paypal_authorization_id": "HLDAUTH000000014",
+    "carrier_payee_email": "gale.accounts50@gmail.com",
+    "carrier_registered_payee_email": "gale.accounts50@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Gale Haulage 014 Ltd - carrier listing",
+     "content": "Gale Haulage 014 Ltd appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/gale-haulage-014-ltd"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-LISTING-ONLY-015",
+   "label": "fraud",
+   "scenario": "impersonated_listing_only",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-015",
+    "shipping_cost": 3150.0,
+    "avg_route_cost": 3150.0,
+    "carrier_name": "Zinnia Freight 015 Co",
+    "payout_amount": 3055.5,
+    "paypal_authorization_id": "HLDAUTH000000015",
+    "carrier_payee_email": "zinnia.accounts14@gmail.com",
+    "carrier_registered_payee_email": "zinnia.accounts14@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Zinnia Freight 015 Co - carrier listing",
+     "content": "Zinnia Freight 015 Co appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/zinnia-freight-015-co"
+    }
+   ]
+  },
+  {
+   "id": "F-IMPERSONATED-LISTING-ONLY-016",
+   "label": "fraud",
+   "scenario": "impersonated_listing_only",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-016",
+    "shipping_cost": 5300.0,
+    "avg_route_cost": 5300.0,
+    "carrier_name": "Oriole Carriers 016 JSC",
+    "payout_amount": 5141.0,
+    "paypal_authorization_id": "HLDAUTH000000016",
+    "carrier_payee_email": "oriole.accounts89@gmail.com",
+    "carrier_registered_payee_email": "oriole.accounts89@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Oriole Carriers 016 JSC - carrier listing",
+     "content": "Oriole Carriers 016 JSC appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/oriole-carriers-016-jsc"
+    }
+   ]
+  },
+  {
+   "id": "F-CLONED-SITE-017",
+   "label": "fraud",
+   "scenario": "cloned_site",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-017",
+    "shipping_cost": 2650.0,
+    "avg_route_cost": 2650.0,
+    "carrier_name": "Basalt Carriers 017 JSC",
+    "payout_amount": 2570.5,
+    "paypal_authorization_id": "HLDAUTH000000017",
+    "carrier_payee_email": "payments@basaltcarriers017.example",
+    "carrier_registered_payee_email": "payments@basaltcarriers017.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Basalt Carriers 017 JSC | ocean and inland freight",
+     "content": "Basalt Carriers 017 JSC moves containers between Vietnam and the United States.",
+     "url": "https://basaltcarriers017.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-CLONED-SITE-018",
+   "label": "fraud",
+   "scenario": "cloned_site",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-018",
+    "shipping_cost": 4500.0,
+    "avg_route_cost": 4500.0,
+    "carrier_name": "Larch Carriers 018 JSC",
+    "payout_amount": 4365.0,
+    "paypal_authorization_id": "HLDAUTH000000018",
+    "carrier_payee_email": "payments@larchcarriers018.example",
+    "carrier_registered_payee_email": "payments@larchcarriers018.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Larch Carriers 018 JSC | ocean and inland freight",
+     "content": "Larch Carriers 018 JSC moves containers between Vietnam and the United States.",
+     "url": "https://larchcarriers018.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-CLONED-SITE-019",
+   "label": "fraud",
+   "scenario": "cloned_site",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-019",
+    "shipping_cost": 3250.0,
+    "avg_route_cost": 3250.0,
+    "carrier_name": "Peregrine Haulage 019 Ltd",
+    "payout_amount": 3152.5,
+    "paypal_authorization_id": "HLDAUTH000000019",
+    "carrier_payee_email": "payments@peregrine-haulage-019.example",
+    "carrier_registered_payee_email": "payments@peregrine-haulage-019.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Peregrine Haulage 019 Ltd | ocean and inland freight",
+     "content": "Peregrine Haulage 019 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://peregrine-haulage-019.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-CLONED-SITE-020",
+   "label": "fraud",
+   "scenario": "cloned_site",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-020",
+    "shipping_cost": 2050.0,
+    "avg_route_cost": 2050.0,
+    "carrier_name": "Alder Haulage 020 Ltd",
+    "payout_amount": 1988.5,
+    "paypal_authorization_id": "HLDAUTH000000020",
+    "carrier_payee_email": "payments@alder-haulage-020.example",
+    "carrier_registered_payee_email": "payments@alder-haulage-020.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Alder Haulage 020 Ltd | ocean and inland freight",
+     "content": "Alder Haulage 020 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://alder-haulage-020.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-PARAPHRASE-021",
+   "label": "fraud",
+   "scenario": "bec_paraphrase",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-021",
+    "shipping_cost": 3100.0,
+    "avg_route_cost": 3100.0,
+    "carrier_name": "Teal Freight 021 Co",
+    "payout_amount": 3007.0,
+    "paypal_authorization_id": "HLDAUTH000000021",
+    "carrier_payee_email": "payments@teal-freight-021.example",
+    "carrier_registered_payee_email": "payments@teal-freight-021.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 34,
+   "change_request_text": "Our treasury has moved to a new remittance route. Kindly settle this invoice through the details below; there is no requirement to loop in your usual contact.",
+   "search_results": [
+    {
+     "title": "Teal Freight 021 Co | ocean and inland freight",
+     "content": "Teal Freight 021 Co moves containers between Vietnam and the United States.",
+     "url": "https://teal-freight-021.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-PARAPHRASE-022",
+   "label": "fraud",
+   "scenario": "bec_paraphrase",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-022",
+    "shipping_cost": 1850.0,
+    "avg_route_cost": 1850.0,
+    "carrier_name": "Gale Haulage 022 Ltd",
+    "payout_amount": 1794.5,
+    "paypal_authorization_id": "HLDAUTH000000022",
+    "carrier_payee_email": "payments@gale-haulage-022.example",
+    "carrier_registered_payee_email": "payments@gale-haulage-022.example"
+   },
+   "history": {
+    "paid_count": 7,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 35,
+   "change_request_text": "Following our restructuring the earlier beneficiary is retired. Remit to the updated beneficiary by close of business; our controller has signed this off.",
+   "search_results": [
+    {
+     "title": "Gale Haulage 022 Ltd | ocean and inland freight",
+     "content": "Gale Haulage 022 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://gale-haulage-022.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-PARAPHRASE-023",
+   "label": "fraud",
+   "scenario": "bec_paraphrase",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-023",
+    "shipping_cost": 5450.0,
+    "avg_route_cost": 5450.0,
+    "carrier_name": "Yew Haulage 023 Ltd",
+    "payout_amount": 5286.5,
+    "paypal_authorization_id": "HLDAUTH000000023",
+    "carrier_payee_email": "payments@yew-haulage-023.example",
+    "carrier_registered_payee_email": "payments@yew-haulage-023.example"
+   },
+   "history": {
+    "paid_count": 7,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 28,
+   "change_request_text": "We are finalising a sensitive acquisition, so please route this payment to the interim account and leave your account manager out of it for now.",
+   "search_results": [
+    {
+     "title": "Yew Haulage 023 Ltd | ocean and inland freight",
+     "content": "Yew Haulage 023 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://yew-haulage-023.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-PARAPHRASE-024",
+   "label": "fraud",
+   "scenario": "bec_paraphrase",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-024",
+    "shipping_cost": 4350.0,
+    "avg_route_cost": 4350.0,
+    "carrier_name": "Reef Freight 024 Co",
+    "payout_amount": 4219.5,
+    "paypal_authorization_id": "HLDAUTH000000024",
+    "carrier_payee_email": "payments@reef-freight-024.example",
+    "carrier_registered_payee_email": "payments@reef-freight-024.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 29,
+   "change_request_text": "Please disregard the remittance details in your file. Our auditors require the funds in the interim account this week; reply only to this mailbox.",
+   "search_results": [
+    {
+     "title": "Reef Freight 024 Co | ocean and inland freight",
+     "content": "Reef Freight 024 Co moves containers between Vietnam and the United States.",
+     "url": "https://reef-freight-024.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-PARAPHRASE-025",
+   "label": "fraud",
+   "scenario": "bec_paraphrase",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-025",
+    "shipping_cost": 3400.0,
+    "avg_route_cost": 3400.0,
+    "carrier_name": "Quill Carriers 025 JSC",
+    "payout_amount": 3298.0,
+    "paypal_authorization_id": "HLDAUTH000000025",
+    "carrier_payee_email": "payments@quillcarriers025.example",
+    "carrier_registered_payee_email": "payments@quillcarriers025.example"
+   },
+   "history": {
+    "paid_count": 4,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 23,
+   "change_request_text": "Our treasury has moved to a new remittance route. Kindly settle this invoice through the details below; there is no requirement to loop in your usual contact.",
+   "search_results": [
+    {
+     "title": "Quill Carriers 025 JSC | ocean and inland freight",
+     "content": "Quill Carriers 025 JSC moves containers between Vietnam and the United States.",
+     "url": "https://quillcarriers025.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-PARAPHRASE-026",
+   "label": "fraud",
+   "scenario": "bec_paraphrase",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-026",
+    "shipping_cost": 4800.0,
+    "avg_route_cost": 4800.0,
+    "carrier_name": "Larch Carriers 026 JSC",
+    "payout_amount": 4656.0,
+    "paypal_authorization_id": "HLDAUTH000000026",
+    "carrier_payee_email": "payments@larchcarriers026.example",
+    "carrier_registered_payee_email": "payments@larchcarriers026.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 35,
+   "change_request_text": "Following our restructuring the earlier beneficiary is retired. Remit to the updated beneficiary by close of business; our controller has signed this off.",
+   "search_results": [
+    {
+     "title": "Larch Carriers 026 JSC | ocean and inland freight",
+     "content": "Larch Carriers 026 JSC moves containers between Vietnam and the United States.",
+     "url": "https://larchcarriers026.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-VIETNAMESE-027",
+   "label": "fraud",
+   "scenario": "bec_vietnamese",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-027",
+    "shipping_cost": 5100.0,
+    "avg_route_cost": 5100.0,
+    "carrier_name": "Oriole Haulage 027 Ltd",
+    "payout_amount": 4947.0,
+    "paypal_authorization_id": "HLDAUTH000000027",
+    "carrier_payee_email": "payments@oriole-haulage-027.example",
+    "carrier_registered_payee_email": "payments@oriole-haulage-027.example"
+   },
+   "history": {
+    "paid_count": 3,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 36,
+   "change_request_text": "C\u00f4ng ty ch\u00fang t\u00f4i v\u1eeba \u0111\u1ed5i t\u00e0i kho\u1ea3n nh\u1eadn ti\u1ec1n. Anh ch\u1ecb chuy\u1ec3n kho\u1ea3n v\u00e0o t\u00e0i kho\u1ea3n m\u1edbi ngay h\u00f4m nay, kh\u00f4ng c\u1ea7n g\u1ecdi l\u1ea1i \u0111\u1ec3 x\u00e1c nh\u1eadn.",
+   "search_results": [
+    {
+     "title": "Oriole Haulage 027 Ltd | ocean and inland freight",
+     "content": "Oriole Haulage 027 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://oriole-haulage-027.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-VIETNAMESE-028",
+   "label": "fraud",
+   "scenario": "bec_vietnamese",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-028",
+    "shipping_cost": 4100.0,
+    "avg_route_cost": 4100.0,
+    "carrier_name": "Larch Freight 028 Co",
+    "payout_amount": 3977.0,
+    "paypal_authorization_id": "HLDAUTH000000028",
+    "carrier_payee_email": "payments@larch-freight-028.example",
+    "carrier_registered_payee_email": "payments@larch-freight-028.example"
+   },
+   "history": {
+    "paid_count": 3,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 40,
+   "change_request_text": "T\u00e0i kho\u1ea3n c\u0169 \u0111ang b\u1ecb phong t\u1ecfa do ki\u1ec3m to\u00e1n. Vui l\u00f2ng thanh to\u00e1n g\u1ea5p sang t\u00e0i kho\u1ea3n m\u1edbi v\u00e0 gi\u1eef k\u00edn vi\u1ec7c n\u00e0y.",
+   "search_results": [
+    {
+     "title": "Larch Freight 028 Co | ocean and inland freight",
+     "content": "Larch Freight 028 Co moves containers between Vietnam and the United States.",
+     "url": "https://larch-freight-028.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-VIETNAMESE-029",
+   "label": "fraud",
+   "scenario": "bec_vietnamese",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-029",
+    "shipping_cost": 4700.0,
+    "avg_route_cost": 4700.0,
+    "carrier_name": "Larch Haulage 029 Ltd",
+    "payout_amount": 4559.0,
+    "paypal_authorization_id": "HLDAUTH000000029",
+    "carrier_payee_email": "payments@larch-haulage-029.example",
+    "carrier_registered_payee_email": "payments@larch-haulage-029.example"
+   },
+   "history": {
+    "paid_count": 3,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 40,
+   "change_request_text": "Gi\u00e1m \u0111\u1ed1c \u0111\u00e3 \u0111\u1ed3ng \u00fd \u0111\u1ed5i ng\u01b0\u1eddi th\u1ee5 h\u01b0\u1edfng. Anh ch\u1ecb chuy\u1ec3n ti\u1ec1n trong h\u00f4m nay, kh\u00f4ng trao \u0111\u1ed5i v\u1edbi nh\u00e2n vi\u00ean ph\u1ee5 tr\u00e1ch c\u0169.",
+   "search_results": [
+    {
+     "title": "Larch Haulage 029 Ltd | ocean and inland freight",
+     "content": "Larch Haulage 029 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://larch-haulage-029.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-BEC-VIETNAMESE-030",
+   "label": "fraud",
+   "scenario": "bec_vietnamese",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-030",
+    "shipping_cost": 4600.0,
+    "avg_route_cost": 4600.0,
+    "carrier_name": "Peregrine Carriers 030 JSC",
+    "payout_amount": 4462.0,
+    "paypal_authorization_id": "HLDAUTH000000030",
+    "carrier_payee_email": "payments@peregrinecarriers030.example",
+    "carrier_registered_payee_email": "payments@peregrinecarriers030.example"
+   },
+   "history": {
+    "paid_count": 6,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 37,
+   "change_request_text": "C\u00f4ng ty ch\u00fang t\u00f4i v\u1eeba \u0111\u1ed5i t\u00e0i kho\u1ea3n nh\u1eadn ti\u1ec1n. Anh ch\u1ecb chuy\u1ec3n kho\u1ea3n v\u00e0o t\u00e0i kho\u1ea3n m\u1edbi ngay h\u00f4m nay, kh\u00f4ng c\u1ea7n g\u1ecdi l\u1ea1i \u0111\u1ec3 x\u00e1c nh\u1eadn.",
+   "search_results": [
+    {
+     "title": "Peregrine Carriers 030 JSC | ocean and inland freight",
+     "content": "Peregrine Carriers 030 JSC moves containers between Vietnam and the United States.",
+     "url": "https://peregrinecarriers030.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-PAYEE-SHARED-BETWEEN-CARRIERS-031",
+   "label": "fraud",
+   "scenario": "payee_shared_between_carriers",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-031",
+    "shipping_cost": 3300.0,
+    "avg_route_cost": 3300.0,
+    "carrier_name": "Yew Freight 031 Co",
+    "payout_amount": 3201.0,
+    "paypal_authorization_id": "HLDAUTH000000031",
+    "carrier_payee_email": "payments@yew-freight-031.example",
+    "carrier_registered_payee_email": "payments@yew-freight-031.example"
+   },
+   "history": {
+    "paid_count": 2,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 3
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Yew Freight 031 Co | ocean and inland freight",
+     "content": "Yew Freight 031 Co moves containers between Vietnam and the United States.",
+     "url": "https://yew-freight-031.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-PAYEE-SHARED-BETWEEN-CARRIERS-032",
+   "label": "fraud",
+   "scenario": "payee_shared_between_carriers",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-032",
+    "shipping_cost": 5300.0,
+    "avg_route_cost": 5300.0,
+    "carrier_name": "Slate Haulage 032 Ltd",
+    "payout_amount": 5141.0,
+    "paypal_authorization_id": "HLDAUTH000000032",
+    "carrier_payee_email": "payments@slate-haulage-032.example",
+    "carrier_registered_payee_email": "payments@slate-haulage-032.example"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 4
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Slate Haulage 032 Ltd | ocean and inland freight",
+     "content": "Slate Haulage 032 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://slate-haulage-032.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-PAYEE-SHARED-BETWEEN-CARRIERS-033",
+   "label": "fraud",
+   "scenario": "payee_shared_between_carriers",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-033",
+    "shipping_cost": 5950.0,
+    "avg_route_cost": 5950.0,
+    "carrier_name": "Kelp Carriers 033 JSC",
+    "payout_amount": 5771.5,
+    "paypal_authorization_id": "HLDAUTH000000033",
+    "carrier_payee_email": "payments@kelpcarriers033.example",
+    "carrier_registered_payee_email": "payments@kelpcarriers033.example"
+   },
+   "history": {
+    "paid_count": 2,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 2
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Kelp Carriers 033 JSC | ocean and inland freight",
+     "content": "Kelp Carriers 033 JSC moves containers between Vietnam and the United States.",
+     "url": "https://kelpcarriers033.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-BOOKING-034",
+   "label": "fraud",
+   "scenario": "inflated_booking",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-034",
+    "shipping_cost": 6050.0,
+    "avg_route_cost": 6050.0,
+    "carrier_name": "Ibis Freight 034 Co",
+    "payout_amount": 5868.5,
+    "paypal_authorization_id": "HLDAUTH000000034",
+    "carrier_payee_email": "payments@ibis-freight-034.example",
+    "carrier_registered_payee_email": "payments@ibis-freight-034.example"
+   },
+   "history": {
+    "paid_count": 6,
+    "frozen": false,
+    "median_paid": 3231.73,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Ibis Freight 034 Co | ocean and inland freight",
+     "content": "Ibis Freight 034 Co moves containers between Vietnam and the United States.",
+     "url": "https://ibis-freight-034.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-BOOKING-035",
+   "label": "fraud",
+   "scenario": "inflated_booking",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-035",
+    "shipping_cost": 5200.0,
+    "avg_route_cost": 5200.0,
+    "carrier_name": "Alder Carriers 035 JSC",
+    "payout_amount": 5044.0,
+    "paypal_authorization_id": "HLDAUTH000000035",
+    "carrier_payee_email": "payments@aldercarriers035.example",
+    "carrier_registered_payee_email": "payments@aldercarriers035.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false,
+    "median_paid": 2214.22,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Alder Carriers 035 JSC | ocean and inland freight",
+     "content": "Alder Carriers 035 JSC moves containers between Vietnam and the United States.",
+     "url": "https://aldercarriers035.example/about"
+    }
+   ]
+  },
+  {
+   "id": "F-INFLATED-BOOKING-036",
+   "label": "fraud",
+   "scenario": "inflated_booking",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-036",
+    "shipping_cost": 2100.0,
+    "avg_route_cost": 2100.0,
+    "carrier_name": "Flint Freight 036 Co",
+    "payout_amount": 2037.0,
+    "paypal_authorization_id": "HLDAUTH000000036",
+    "carrier_payee_email": "payments@flint-freight-036.example",
+    "carrier_registered_payee_email": "payments@flint-freight-036.example"
+   },
+   "history": {
+    "paid_count": 8,
+    "frozen": false,
+    "median_paid": 1022.21,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Flint Freight 036 Co | ocean and inland freight",
+     "content": "Flint Freight 036 Co moves containers between Vietnam and the United States.",
+     "url": "https://flint-freight-036.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-037",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-037",
+    "shipping_cost": 4750.0,
+    "avg_route_cost": 4750.0,
+    "carrier_name": "Verdant Haulage 037 Ltd",
+    "payout_amount": 4607.5,
+    "paypal_authorization_id": "HLDAUTH000000037",
+    "carrier_payee_email": "payments@verdant-haulage-037.example",
+    "carrier_registered_payee_email": "payments@verdant-haulage-037.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false,
+    "median_paid": 5181.55,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Verdant Haulage 037 Ltd - carrier listing",
+     "content": "Verdant Haulage 037 Ltd appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/verdant-haulage-037-ltd"
+    },
+    {
+     "title": "Verdant Haulage 037 Ltd | ocean and inland freight",
+     "content": "Verdant Haulage 037 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://verdant-haulage-037.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-038",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-038",
+    "shipping_cost": 4000.0,
+    "avg_route_cost": 4000.0,
+    "carrier_name": "Egret Carriers 038 JSC",
+    "payout_amount": 3880.0,
+    "paypal_authorization_id": "HLDAUTH000000038",
+    "carrier_payee_email": "payments@egretcarriers038.example",
+    "carrier_registered_payee_email": "payments@egretcarriers038.example"
+   },
+   "history": {
+    "paid_count": 14,
+    "frozen": false,
+    "median_paid": 3804.83,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Egret Carriers 038 JSC - carrier listing",
+     "content": "Egret Carriers 038 JSC appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/egret-carriers-038-jsc"
+    },
+    {
+     "title": "Egret Carriers 038 JSC | ocean and inland freight",
+     "content": "Egret Carriers 038 JSC moves containers between Vietnam and the United States.",
+     "url": "https://egretcarriers038.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-039",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-039",
+    "shipping_cost": 2100.0,
+    "avg_route_cost": 2100.0,
+    "carrier_name": "Peregrine Haulage 039 Ltd",
+    "payout_amount": 2037.0,
+    "paypal_authorization_id": "HLDAUTH000000039",
+    "carrier_payee_email": "payments@peregrine-haulage-039.example",
+    "carrier_registered_payee_email": "payments@peregrine-haulage-039.example"
+   },
+   "history": {
+    "paid_count": 20,
+    "frozen": false,
+    "median_paid": 2050.99,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Peregrine Haulage 039 Ltd - carrier listing",
+     "content": "Peregrine Haulage 039 Ltd appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/peregrine-haulage-039-ltd"
+    },
+    {
+     "title": "Peregrine Haulage 039 Ltd | ocean and inland freight",
+     "content": "Peregrine Haulage 039 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://peregrine-haulage-039.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-040",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-040",
+    "shipping_cost": 3550.0,
+    "avg_route_cost": 3550.0,
+    "carrier_name": "Egret Haulage 040 Ltd",
+    "payout_amount": 3443.5,
+    "paypal_authorization_id": "HLDAUTH000000040",
+    "carrier_payee_email": "payments@egret-haulage-040.example",
+    "carrier_registered_payee_email": "payments@egret-haulage-040.example"
+   },
+   "history": {
+    "paid_count": 20,
+    "frozen": false,
+    "median_paid": 3508.28,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Egret Haulage 040 Ltd - carrier listing",
+     "content": "Egret Haulage 040 Ltd appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/egret-haulage-040-ltd"
+    },
+    {
+     "title": "Egret Haulage 040 Ltd | ocean and inland freight",
+     "content": "Egret Haulage 040 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://egret-haulage-040.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-041",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-041",
+    "shipping_cost": 2900.0,
+    "avg_route_cost": 2900.0,
+    "carrier_name": "Oriole Freight 041 Co",
+    "payout_amount": 2813.0,
+    "paypal_authorization_id": "HLDAUTH000000041",
+    "carrier_payee_email": "payments@oriole-freight-041.example",
+    "carrier_registered_payee_email": "payments@oriole-freight-041.example"
+   },
+   "history": {
+    "paid_count": 30,
+    "frozen": false,
+    "median_paid": 2749.35,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Oriole Freight 041 Co - carrier listing",
+     "content": "Oriole Freight 041 Co appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/oriole-freight-041-co"
+    },
+    {
+     "title": "Oriole Freight 041 Co | ocean and inland freight",
+     "content": "Oriole Freight 041 Co moves containers between Vietnam and the United States.",
+     "url": "https://oriole-freight-041.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-042",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-042",
+    "shipping_cost": 5200.0,
+    "avg_route_cost": 5200.0,
+    "carrier_name": "Teal Carriers 042 JSC",
+    "payout_amount": 5044.0,
+    "paypal_authorization_id": "HLDAUTH000000042",
+    "carrier_payee_email": "payments@tealcarriers042.example",
+    "carrier_registered_payee_email": "payments@tealcarriers042.example"
+   },
+   "history": {
+    "paid_count": 19,
+    "frozen": false,
+    "median_paid": 5583.83,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Teal Carriers 042 JSC - carrier listing",
+     "content": "Teal Carriers 042 JSC appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/teal-carriers-042-jsc"
+    },
+    {
+     "title": "Teal Carriers 042 JSC | ocean and inland freight",
+     "content": "Teal Carriers 042 JSC moves containers between Vietnam and the United States.",
+     "url": "https://tealcarriers042.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-043",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-043",
+    "shipping_cost": 2450.0,
+    "avg_route_cost": 2450.0,
+    "carrier_name": "Larch Haulage 043 Ltd",
+    "payout_amount": 2376.5,
+    "paypal_authorization_id": "HLDAUTH000000043",
+    "carrier_payee_email": "payments@larch-haulage-043.example",
+    "carrier_registered_payee_email": "payments@larch-haulage-043.example"
+   },
+   "history": {
+    "paid_count": 22,
+    "frozen": false,
+    "median_paid": 2357.85,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Larch Haulage 043 Ltd - carrier listing",
+     "content": "Larch Haulage 043 Ltd appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/larch-haulage-043-ltd"
+    },
+    {
+     "title": "Larch Haulage 043 Ltd | ocean and inland freight",
+     "content": "Larch Haulage 043 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://larch-haulage-043.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-044",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-044",
+    "shipping_cost": 3800.0,
+    "avg_route_cost": 3800.0,
+    "carrier_name": "Upland Carriers 044 JSC",
+    "payout_amount": 3686.0,
+    "paypal_authorization_id": "HLDAUTH000000044",
+    "carrier_payee_email": "payments@uplandcarriers044.example",
+    "carrier_registered_payee_email": "payments@uplandcarriers044.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false,
+    "median_paid": 3902.94,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Upland Carriers 044 JSC - carrier listing",
+     "content": "Upland Carriers 044 JSC appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/upland-carriers-044-jsc"
+    },
+    {
+     "title": "Upland Carriers 044 JSC | ocean and inland freight",
+     "content": "Upland Carriers 044 JSC moves containers between Vietnam and the United States.",
+     "url": "https://uplandcarriers044.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-045",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-045",
+    "shipping_cost": 2500.0,
+    "avg_route_cost": 2500.0,
+    "carrier_name": "Kelp Haulage 045 Ltd",
+    "payout_amount": 2425.0,
+    "paypal_authorization_id": "HLDAUTH000000045",
+    "carrier_payee_email": "payments@kelp-haulage-045.example",
+    "carrier_registered_payee_email": "payments@kelp-haulage-045.example"
+   },
+   "history": {
+    "paid_count": 16,
+    "frozen": false,
+    "median_paid": 2341.97,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Kelp Haulage 045 Ltd - carrier listing",
+     "content": "Kelp Haulage 045 Ltd appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/kelp-haulage-045-ltd"
+    },
+    {
+     "title": "Kelp Haulage 045 Ltd | ocean and inland freight",
+     "content": "Kelp Haulage 045 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://kelp-haulage-045.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-ROUTINE-LISTING-FIRST-046",
+   "label": "legit",
+   "scenario": "routine_listing_first",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-046",
+    "shipping_cost": 3000.0,
+    "avg_route_cost": 3000.0,
+    "carrier_name": "Heron Freight 046 Co",
+    "payout_amount": 2910.0,
+    "paypal_authorization_id": "HLDAUTH000000046",
+    "carrier_payee_email": "payments@heron-freight-046.example",
+    "carrier_registered_payee_email": "payments@heron-freight-046.example"
+   },
+   "history": {
+    "paid_count": 30,
+    "frozen": false,
+    "median_paid": 3135.02,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Heron Freight 046 Co - carrier listing",
+     "content": "Heron Freight 046 Co appears among the freight companies listed for Southeast Asia.",
+     "url": "https://freight-listings.example/carriers/heron-freight-046-co"
+    },
+    {
+     "title": "Heron Freight 046 Co | ocean and inland freight",
+     "content": "Heron Freight 046 Co moves containers between Vietnam and the United States.",
+     "url": "https://heron-freight-046.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-047",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_established",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-047",
+    "shipping_cost": 2750.0,
+    "avg_route_cost": 2750.0,
+    "carrier_name": "Yew Haulage 047 Ltd",
+    "payout_amount": 2667.5,
+    "paypal_authorization_id": "HLDAUTH000000047",
+    "carrier_payee_email": "yew.accounts27@gmail.com",
+    "carrier_registered_payee_email": "yew.accounts27@gmail.com"
+   },
+   "history": {
+    "paid_count": 20,
+    "frozen": false,
+    "median_paid": 2825.09,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Yew Haulage 047 Ltd | ocean and inland freight",
+     "content": "Yew Haulage 047 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://yew-haulage-047.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-048",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_established",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-048",
+    "shipping_cost": 1850.0,
+    "avg_route_cost": 1850.0,
+    "carrier_name": "Jade Freight 048 Co",
+    "payout_amount": 1794.5,
+    "paypal_authorization_id": "HLDAUTH000000048",
+    "carrier_payee_email": "jade.accounts46@gmail.com",
+    "carrier_registered_payee_email": "jade.accounts46@gmail.com"
+   },
+   "history": {
+    "paid_count": 8,
+    "frozen": false,
+    "median_paid": 1803.34,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Jade Freight 048 Co | ocean and inland freight",
+     "content": "Jade Freight 048 Co moves containers between Vietnam and the United States.",
+     "url": "https://jade-freight-048.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-049",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_established",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-049",
+    "shipping_cost": 4250.0,
+    "avg_route_cost": 4250.0,
+    "carrier_name": "Cedar Haulage 049 Ltd",
+    "payout_amount": 4122.5,
+    "paypal_authorization_id": "HLDAUTH000000049",
+    "carrier_payee_email": "cedar.accounts52@gmail.com",
+    "carrier_registered_payee_email": "cedar.accounts52@gmail.com"
+   },
+   "history": {
+    "paid_count": 12,
+    "frozen": false,
+    "median_paid": 3910.94,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Cedar Haulage 049 Ltd | ocean and inland freight",
+     "content": "Cedar Haulage 049 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://cedar-haulage-049.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-050",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_established",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-050",
+    "shipping_cost": 3400.0,
+    "avg_route_cost": 3400.0,
+    "carrier_name": "Basalt Carriers 050 JSC",
+    "payout_amount": 3298.0,
+    "paypal_authorization_id": "HLDAUTH000000050",
+    "carrier_payee_email": "basalt.accounts99@gmail.com",
+    "carrier_registered_payee_email": "basalt.accounts99@gmail.com"
+   },
+   "history": {
+    "paid_count": 10,
+    "frozen": false,
+    "median_paid": 3325.19,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Basalt Carriers 050 JSC | ocean and inland freight",
+     "content": "Basalt Carriers 050 JSC moves containers between Vietnam and the United States.",
+     "url": "https://basaltcarriers050.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-051",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_established",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-051",
+    "shipping_cost": 4800.0,
+    "avg_route_cost": 4800.0,
+    "carrier_name": "Delta Freight 051 Co",
+    "payout_amount": 4656.0,
+    "paypal_authorization_id": "HLDAUTH000000051",
+    "carrier_payee_email": "delta.accounts31@gmail.com",
+    "carrier_registered_payee_email": "delta.accounts31@gmail.com"
+   },
+   "history": {
+    "paid_count": 19,
+    "frozen": false,
+    "median_paid": 5206.96,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Delta Freight 051 Co | ocean and inland freight",
+     "content": "Delta Freight 051 Co moves containers between Vietnam and the United States.",
+     "url": "https://delta-freight-051.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-ESTABLISHED-052",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_established",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-052",
+    "shipping_cost": 4050.0,
+    "avg_route_cost": 4050.0,
+    "carrier_name": "Flint Carriers 052 JSC",
+    "payout_amount": 3928.5,
+    "paypal_authorization_id": "HLDAUTH000000052",
+    "carrier_payee_email": "flint.accounts99@gmail.com",
+    "carrier_registered_payee_email": "flint.accounts99@gmail.com"
+   },
+   "history": {
+    "paid_count": 12,
+    "frozen": false,
+    "median_paid": 4274.69,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Flint Carriers 052 JSC | ocean and inland freight",
+     "content": "Flint Carriers 052 JSC moves containers between Vietnam and the United States.",
+     "url": "https://flintcarriers052.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-NEW-053",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_new",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-053",
+    "shipping_cost": 4550.0,
+    "avg_route_cost": 4550.0,
+    "carrier_name": "Larch Haulage 053 Ltd",
+    "payout_amount": 4413.5,
+    "paypal_authorization_id": "HLDAUTH000000053",
+    "carrier_payee_email": "larch.accounts99@gmail.com",
+    "carrier_registered_payee_email": "larch.accounts99@gmail.com"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Larch Haulage 053 Ltd | ocean and inland freight",
+     "content": "Larch Haulage 053 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://larch-haulage-053.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-NEW-054",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_new",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-054",
+    "shipping_cost": 3700.0,
+    "avg_route_cost": 3700.0,
+    "carrier_name": "Heron Haulage 054 Ltd",
+    "payout_amount": 3589.0,
+    "paypal_authorization_id": "HLDAUTH000000054",
+    "carrier_payee_email": "heron.accounts59@gmail.com",
+    "carrier_registered_payee_email": "heron.accounts59@gmail.com"
+   },
+   "history": {
+    "paid_count": 2,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Heron Haulage 054 Ltd | ocean and inland freight",
+     "content": "Heron Haulage 054 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://heron-haulage-054.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-NEW-055",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_new",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-055",
+    "shipping_cost": 2750.0,
+    "avg_route_cost": 2750.0,
+    "carrier_name": "Mica Carriers 055 JSC",
+    "payout_amount": 2667.5,
+    "paypal_authorization_id": "HLDAUTH000000055",
+    "carrier_payee_email": "mica.accounts61@gmail.com",
+    "carrier_registered_payee_email": "mica.accounts61@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Mica Carriers 055 JSC | ocean and inland freight",
+     "content": "Mica Carriers 055 JSC moves containers between Vietnam and the United States.",
+     "url": "https://micacarriers055.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-NEW-056",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_new",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-056",
+    "shipping_cost": 2750.0,
+    "avg_route_cost": 2750.0,
+    "carrier_name": "Larch Carriers 056 JSC",
+    "payout_amount": 2667.5,
+    "paypal_authorization_id": "HLDAUTH000000056",
+    "carrier_payee_email": "larch.accounts90@gmail.com",
+    "carrier_registered_payee_email": "larch.accounts90@gmail.com"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Larch Carriers 056 JSC | ocean and inland freight",
+     "content": "Larch Carriers 056 JSC moves containers between Vietnam and the United States.",
+     "url": "https://larchcarriers056.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-NEW-057",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_new",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-057",
+    "shipping_cost": 5450.0,
+    "avg_route_cost": 5450.0,
+    "carrier_name": "Nettle Haulage 057 Ltd",
+    "payout_amount": 5286.5,
+    "paypal_authorization_id": "HLDAUTH000000057",
+    "carrier_payee_email": "nettle.accounts81@gmail.com",
+    "carrier_registered_payee_email": "nettle.accounts81@gmail.com"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Nettle Haulage 057 Ltd | ocean and inland freight",
+     "content": "Nettle Haulage 057 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://nettle-haulage-057.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-REAL-CARRIER-FREE-MAIL-NEW-058",
+   "label": "legit",
+   "scenario": "real_carrier_free_mail_new",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-058",
+    "shipping_cost": 5500.0,
+    "avg_route_cost": 5500.0,
+    "carrier_name": "Mica Carriers 058 JSC",
+    "payout_amount": 5335.0,
+    "paypal_authorization_id": "HLDAUTH000000058",
+    "carrier_payee_email": "mica.accounts75@gmail.com",
+    "carrier_registered_payee_email": "mica.accounts75@gmail.com"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Mica Carriers 058 JSC | ocean and inland freight",
+     "content": "Mica Carriers 058 JSC moves containers between Vietnam and the United States.",
+     "url": "https://micacarriers058.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-GROUP-FINANCE-DOMAIN-059",
+   "label": "legit",
+   "scenario": "group_finance_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-059",
+    "shipping_cost": 2450.0,
+    "avg_route_cost": 2450.0,
+    "carrier_name": "Peregrine Haulage 059 Ltd",
+    "payout_amount": 2376.5,
+    "paypal_authorization_id": "HLDAUTH000000059",
+    "carrier_payee_email": "finance@peregrine-group-059.example",
+    "carrier_registered_payee_email": "finance@peregrine-group-059.example"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Peregrine Haulage 059 Ltd | ocean and inland freight",
+     "content": "Peregrine Haulage 059 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://peregrine-haulage-059.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-GROUP-FINANCE-DOMAIN-060",
+   "label": "legit",
+   "scenario": "group_finance_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-060",
+    "shipping_cost": 4150.0,
+    "avg_route_cost": 4150.0,
+    "carrier_name": "Yew Carriers 060 JSC",
+    "payout_amount": 4025.5,
+    "paypal_authorization_id": "HLDAUTH000000060",
+    "carrier_payee_email": "finance@yew-group-060.example",
+    "carrier_registered_payee_email": "finance@yew-group-060.example"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Yew Carriers 060 JSC | ocean and inland freight",
+     "content": "Yew Carriers 060 JSC moves containers between Vietnam and the United States.",
+     "url": "https://yewcarriers060.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-GROUP-FINANCE-DOMAIN-061",
+   "label": "legit",
+   "scenario": "group_finance_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-061",
+    "shipping_cost": 1950.0,
+    "avg_route_cost": 1950.0,
+    "carrier_name": "Oriole Carriers 061 JSC",
+    "payout_amount": 1891.5,
+    "paypal_authorization_id": "HLDAUTH000000061",
+    "carrier_payee_email": "finance@oriole-group-061.example",
+    "carrier_registered_payee_email": "finance@oriole-group-061.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Oriole Carriers 061 JSC | ocean and inland freight",
+     "content": "Oriole Carriers 061 JSC moves containers between Vietnam and the United States.",
+     "url": "https://oriolecarriers061.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-GROUP-FINANCE-DOMAIN-062",
+   "label": "legit",
+   "scenario": "group_finance_domain",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-062",
+    "shipping_cost": 5550.0,
+    "avg_route_cost": 5550.0,
+    "carrier_name": "Zinnia Carriers 062 JSC",
+    "payout_amount": 5383.5,
+    "paypal_authorization_id": "HLDAUTH000000062",
+    "carrier_payee_email": "finance@zinnia-group-062.example",
+    "carrier_registered_payee_email": "finance@zinnia-group-062.example"
+   },
+   "history": {
+    "paid_count": 1,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Zinnia Carriers 062 JSC | ocean and inland freight",
+     "content": "Zinnia Carriers 062 JSC moves containers between Vietnam and the United States.",
+     "url": "https://zinniacarriers062.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-URGENT-CHANGE-063",
+   "label": "legit",
+   "scenario": "honest_urgent_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-063",
+    "shipping_cost": 5750.0,
+    "avg_route_cost": 5750.0,
+    "carrier_name": "Nettle Carriers 063 JSC",
+    "payout_amount": 5577.5,
+    "paypal_authorization_id": "HLDAUTH000000063",
+    "carrier_payee_email": "payments@nettlecarriers063.example",
+    "carrier_registered_payee_email": "payments@nettlecarriers063.example"
+   },
+   "history": {
+    "paid_count": 7,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 81,
+   "change_request_text": "Urgent notice from our finance office: our bank merges on the first of the month. The new details are in the signed contract annex; please call your account manager to confirm.",
+   "search_results": [
+    {
+     "title": "Nettle Carriers 063 JSC | ocean and inland freight",
+     "content": "Nettle Carriers 063 JSC moves containers between Vietnam and the United States.",
+     "url": "https://nettlecarriers063.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-URGENT-CHANGE-064",
+   "label": "legit",
+   "scenario": "honest_urgent_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-064",
+    "shipping_cost": 2000.0,
+    "avg_route_cost": 2000.0,
+    "carrier_name": "Ibis Freight 064 Co",
+    "payout_amount": 1940.0,
+    "paypal_authorization_id": "HLDAUTH000000064",
+    "carrier_payee_email": "payments@ibis-freight-064.example",
+    "carrier_registered_payee_email": "payments@ibis-freight-064.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 48,
+   "change_request_text": "We need this updated immediately because our bank is merging, so please phone our accounts team on the number in your contract file to check.",
+   "search_results": [
+    {
+     "title": "Ibis Freight 064 Co | ocean and inland freight",
+     "content": "Ibis Freight 064 Co moves containers between Vietnam and the United States.",
+     "url": "https://ibis-freight-064.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-URGENT-CHANGE-065",
+   "label": "legit",
+   "scenario": "honest_urgent_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-065",
+    "shipping_cost": 4050.0,
+    "avg_route_cost": 4050.0,
+    "carrier_name": "Quill Freight 065 Co",
+    "payout_amount": 3928.5,
+    "paypal_authorization_id": "HLDAUTH000000065",
+    "carrier_payee_email": "payments@quill-freight-065.example",
+    "carrier_registered_payee_email": "payments@quill-freight-065.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 40,
+   "change_request_text": "Our director asked us to give you the new details in writing; please verify them by calling the number on our website.",
+   "search_results": [
+    {
+     "title": "Quill Freight 065 Co | ocean and inland freight",
+     "content": "Quill Freight 065 Co moves containers between Vietnam and the United States.",
+     "url": "https://quill-freight-065.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-URGENT-CHANGE-066",
+   "label": "legit",
+   "scenario": "honest_urgent_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-066",
+    "shipping_cost": 6100.0,
+    "avg_route_cost": 6100.0,
+    "carrier_name": "Oriole Freight 066 Co",
+    "payout_amount": 5917.0,
+    "paypal_authorization_id": "HLDAUTH000000066",
+    "carrier_payee_email": "payments@oriole-freight-066.example",
+    "carrier_registered_payee_email": "payments@oriole-freight-066.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 39,
+   "change_request_text": "Urgent notice from our finance office: our bank merges on the first of the month. The new details are in the signed contract annex; please call your account manager to confirm.",
+   "search_results": [
+    {
+     "title": "Oriole Freight 066 Co | ocean and inland freight",
+     "content": "Oriole Freight 066 Co moves containers between Vietnam and the United States.",
+     "url": "https://oriole-freight-066.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-URGENT-CHANGE-067",
+   "label": "legit",
+   "scenario": "honest_urgent_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-067",
+    "shipping_cost": 2450.0,
+    "avg_route_cost": 2450.0,
+    "carrier_name": "Quill Haulage 067 Ltd",
+    "payout_amount": 2376.5,
+    "paypal_authorization_id": "HLDAUTH000000067",
+    "carrier_payee_email": "payments@quill-haulage-067.example",
+    "carrier_registered_payee_email": "payments@quill-haulage-067.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 43,
+   "change_request_text": "We need this updated immediately because our bank is merging, so please phone our accounts team on the number in your contract file to check.",
+   "search_results": [
+    {
+     "title": "Quill Haulage 067 Ltd | ocean and inland freight",
+     "content": "Quill Haulage 067 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://quill-haulage-067.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-URGENT-CHANGE-068",
+   "label": "legit",
+   "scenario": "honest_urgent_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-068",
+    "shipping_cost": 4400.0,
+    "avg_route_cost": 4400.0,
+    "carrier_name": "Slate Freight 068 Co",
+    "payout_amount": 4268.0,
+    "paypal_authorization_id": "HLDAUTH000000068",
+    "carrier_payee_email": "payments@slate-freight-068.example",
+    "carrier_registered_payee_email": "payments@slate-freight-068.example"
+   },
+   "history": {
+    "paid_count": 11,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 78,
+   "change_request_text": "Our director asked us to give you the new details in writing; please verify them by calling the number on our website.",
+   "search_results": [
+    {
+     "title": "Slate Freight 068 Co | ocean and inland freight",
+     "content": "Slate Freight 068 Co moves containers between Vietnam and the United States.",
+     "url": "https://slate-freight-068.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-VIETNAMESE-CHANGE-069",
+   "label": "legit",
+   "scenario": "honest_vietnamese_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-069",
+    "shipping_cost": 4150.0,
+    "avg_route_cost": 4150.0,
+    "carrier_name": "Gale Carriers 069 JSC",
+    "payout_amount": 4025.5,
+    "paypal_authorization_id": "HLDAUTH000000069",
+    "carrier_payee_email": "payments@galecarriers069.example",
+    "carrier_registered_payee_email": "payments@galecarriers069.example"
+   },
+   "history": {
+    "paid_count": 5,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 56,
+   "change_request_text": "T\u1eeb ng\u00e0y 1 th\u00e1ng sau, c\u00f4ng ty chuy\u1ec3n sang t\u00e0i kho\u1ea3n m\u1edbi t\u1ea1i c\u00f9ng ng\u00e2n h\u00e0ng. Anh ch\u1ecb vui l\u00f2ng g\u1ecdi s\u1ed1 trong h\u1ee3p \u0111\u1ed3ng \u0111\u1ec3 x\u00e1c nh\u1eadn.",
+   "search_results": [
+    {
+     "title": "Gale Carriers 069 JSC | ocean and inland freight",
+     "content": "Gale Carriers 069 JSC moves containers between Vietnam and the United States.",
+     "url": "https://galecarriers069.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-VIETNAMESE-CHANGE-070",
+   "label": "legit",
+   "scenario": "honest_vietnamese_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-070",
+    "shipping_cost": 2300.0,
+    "avg_route_cost": 2300.0,
+    "carrier_name": "Heron Haulage 070 Ltd",
+    "payout_amount": 2231.0,
+    "paypal_authorization_id": "HLDAUTH000000070",
+    "carrier_payee_email": "payments@heron-haulage-070.example",
+    "carrier_registered_payee_email": "payments@heron-haulage-070.example"
+   },
+   "history": {
+    "paid_count": 8,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 57,
+   "change_request_text": "Ng\u00e2n h\u00e0ng c\u1ee7a ch\u00fang t\u00f4i s\u00e1p nh\u1eadp chi nh\u00e1nh. Th\u00f4ng tin m\u1edbi c\u00f3 trong ph\u1ee5 l\u1ee5c h\u1ee3p \u0111\u1ed3ng \u0111\u00e3 k\u00fd; k\u1ebf to\u00e1n s\u1ebd g\u1ecdi l\u1ea1i \u0111\u1ec3 \u0111\u1ed1i chi\u1ebfu.",
+   "search_results": [
+    {
+     "title": "Heron Haulage 070 Ltd | ocean and inland freight",
+     "content": "Heron Haulage 070 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://heron-haulage-070.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-VIETNAMESE-CHANGE-071",
+   "label": "legit",
+   "scenario": "honest_vietnamese_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-071",
+    "shipping_cost": 2500.0,
+    "avg_route_cost": 2500.0,
+    "carrier_name": "Peregrine Freight 071 Co",
+    "payout_amount": 2425.0,
+    "paypal_authorization_id": "HLDAUTH000000071",
+    "carrier_payee_email": "payments@peregrine-freight-071.example",
+    "carrier_registered_payee_email": "payments@peregrine-freight-071.example"
+   },
+   "history": {
+    "paid_count": 6,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 35,
+   "change_request_text": "T\u1eeb ng\u00e0y 1 th\u00e1ng sau, c\u00f4ng ty chuy\u1ec3n sang t\u00e0i kho\u1ea3n m\u1edbi t\u1ea1i c\u00f9ng ng\u00e2n h\u00e0ng. Anh ch\u1ecb vui l\u00f2ng g\u1ecdi s\u1ed1 trong h\u1ee3p \u0111\u1ed3ng \u0111\u1ec3 x\u00e1c nh\u1eadn.",
+   "search_results": [
+    {
+     "title": "Peregrine Freight 071 Co | ocean and inland freight",
+     "content": "Peregrine Freight 071 Co moves containers between Vietnam and the United States.",
+     "url": "https://peregrine-freight-071.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-VIETNAMESE-CHANGE-072",
+   "label": "legit",
+   "scenario": "honest_vietnamese_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-072",
+    "shipping_cost": 3650.0,
+    "avg_route_cost": 3650.0,
+    "carrier_name": "Larch Haulage 072 Ltd",
+    "payout_amount": 3540.5,
+    "paypal_authorization_id": "HLDAUTH000000072",
+    "carrier_payee_email": "payments@larch-haulage-072.example",
+    "carrier_registered_payee_email": "payments@larch-haulage-072.example"
+   },
+   "history": {
+    "paid_count": 9,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 69,
+   "change_request_text": "Ng\u00e2n h\u00e0ng c\u1ee7a ch\u00fang t\u00f4i s\u00e1p nh\u1eadp chi nh\u00e1nh. Th\u00f4ng tin m\u1edbi c\u00f3 trong ph\u1ee5 l\u1ee5c h\u1ee3p \u0111\u1ed3ng \u0111\u00e3 k\u00fd; k\u1ebf to\u00e1n s\u1ebd g\u1ecdi l\u1ea1i \u0111\u1ec3 \u0111\u1ed1i chi\u1ebfu.",
+   "search_results": [
+    {
+     "title": "Larch Haulage 072 Ltd | ocean and inland freight",
+     "content": "Larch Haulage 072 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://larch-haulage-072.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-VIETNAMESE-CHANGE-073",
+   "label": "legit",
+   "scenario": "honest_vietnamese_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-073",
+    "shipping_cost": 2000.0,
+    "avg_route_cost": 2000.0,
+    "carrier_name": "Nettle Carriers 073 JSC",
+    "payout_amount": 1940.0,
+    "paypal_authorization_id": "HLDAUTH000000073",
+    "carrier_payee_email": "payments@nettlecarriers073.example",
+    "carrier_registered_payee_email": "payments@nettlecarriers073.example"
+   },
+   "history": {
+    "paid_count": 11,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 85,
+   "change_request_text": "T\u1eeb ng\u00e0y 1 th\u00e1ng sau, c\u00f4ng ty chuy\u1ec3n sang t\u00e0i kho\u1ea3n m\u1edbi t\u1ea1i c\u00f9ng ng\u00e2n h\u00e0ng. Anh ch\u1ecb vui l\u00f2ng g\u1ecdi s\u1ed1 trong h\u1ee3p \u0111\u1ed3ng \u0111\u1ec3 x\u00e1c nh\u1eadn.",
+   "search_results": [
+    {
+     "title": "Nettle Carriers 073 JSC | ocean and inland freight",
+     "content": "Nettle Carriers 073 JSC moves containers between Vietnam and the United States.",
+     "url": "https://nettlecarriers073.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-HONEST-VIETNAMESE-CHANGE-074",
+   "label": "legit",
+   "scenario": "honest_vietnamese_change",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-074",
+    "shipping_cost": 4700.0,
+    "avg_route_cost": 4700.0,
+    "carrier_name": "Delta Carriers 074 JSC",
+    "payout_amount": 4559.0,
+    "paypal_authorization_id": "HLDAUTH000000074",
+    "carrier_payee_email": "payments@deltacarriers074.example",
+    "carrier_registered_payee_email": "payments@deltacarriers074.example"
+   },
+   "history": {
+    "paid_count": 11,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": 56,
+   "change_request_text": "Ng\u00e2n h\u00e0ng c\u1ee7a ch\u00fang t\u00f4i s\u00e1p nh\u1eadp chi nh\u00e1nh. Th\u00f4ng tin m\u1edbi c\u00f3 trong ph\u1ee5 l\u1ee5c h\u1ee3p \u0111\u1ed3ng \u0111\u00e3 k\u00fd; k\u1ebf to\u00e1n s\u1ebd g\u1ecdi l\u1ea1i \u0111\u1ec3 \u0111\u1ed1i chi\u1ebfu.",
+   "search_results": [
+    {
+     "title": "Delta Carriers 074 JSC | ocean and inland freight",
+     "content": "Delta Carriers 074 JSC moves containers between Vietnam and the United States.",
+     "url": "https://deltacarriers074.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-075",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-075",
+    "shipping_cost": 4850.0,
+    "avg_route_cost": 4850.0,
+    "carrier_name": "Alder Haulage 075 Ltd",
+    "payout_amount": 4704.5,
+    "paypal_authorization_id": "HLDAUTH000000075",
+    "carrier_payee_email": "payments@alder-haulage-075.example",
+    "carrier_registered_payee_email": "payments@alder-haulage-075.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Alder Haulage 075 Ltd | ocean and inland freight",
+     "content": "Alder Haulage 075 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://alder-haulage-075.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-076",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-076",
+    "shipping_cost": 5150.0,
+    "avg_route_cost": 5150.0,
+    "carrier_name": "Alder Haulage 076 Ltd",
+    "payout_amount": 4995.5,
+    "paypal_authorization_id": "HLDAUTH000000076",
+    "carrier_payee_email": "payments@alder-haulage-076.example",
+    "carrier_registered_payee_email": "payments@alder-haulage-076.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Alder Haulage 076 Ltd | ocean and inland freight",
+     "content": "Alder Haulage 076 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://alder-haulage-076.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-077",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-077",
+    "shipping_cost": 3300.0,
+    "avg_route_cost": 3300.0,
+    "carrier_name": "Upland Haulage 077 Ltd",
+    "payout_amount": 3201.0,
+    "paypal_authorization_id": "HLDAUTH000000077",
+    "carrier_payee_email": "payments@upland-haulage-077.example",
+    "carrier_registered_payee_email": "payments@upland-haulage-077.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Upland Haulage 077 Ltd | ocean and inland freight",
+     "content": "Upland Haulage 077 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://upland-haulage-077.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-078",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-078",
+    "shipping_cost": 3650.0,
+    "avg_route_cost": 3650.0,
+    "carrier_name": "Ibis Carriers 078 JSC",
+    "payout_amount": 3540.5,
+    "paypal_authorization_id": "HLDAUTH000000078",
+    "carrier_payee_email": "payments@ibiscarriers078.example",
+    "carrier_registered_payee_email": "payments@ibiscarriers078.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Ibis Carriers 078 JSC | ocean and inland freight",
+     "content": "Ibis Carriers 078 JSC moves containers between Vietnam and the United States.",
+     "url": "https://ibiscarriers078.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-079",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-079",
+    "shipping_cost": 2250.0,
+    "avg_route_cost": 2250.0,
+    "carrier_name": "Jade Haulage 079 Ltd",
+    "payout_amount": 2182.5,
+    "paypal_authorization_id": "HLDAUTH000000079",
+    "carrier_payee_email": "payments@jade-haulage-079.example",
+    "carrier_registered_payee_email": "payments@jade-haulage-079.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Jade Haulage 079 Ltd | ocean and inland freight",
+     "content": "Jade Haulage 079 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://jade-haulage-079.example/about"
+    }
+   ]
+  },
+  {
+   "id": "L-NEW-CARRIER-WITH-PRESENCE-080",
+   "label": "legit",
+   "scenario": "new_carrier_with_presence",
+   "shipment": {
+    "origin": "Da Nang, Vietnam",
+    "destination": "Long Beach, United States",
+    "weight_kg": 2400,
+    "declared_value": 52000,
+    "shipper_name": "Hoa Sen Ceramics",
+    "shipper_company": "Hoa Sen Ceramics JSC",
+    "shipper_country": "Vietnam",
+    "shipper_tax_id": "0401234567",
+    "receiver_name": "Purchasing",
+    "receiver_company": "Pacific Tile Supply Inc",
+    "receiver_country": "United States",
+    "shipper_tx_count": 35,
+    "cargo_description": "Glazed ceramic floor tiles, 900 boxes",
+    "hs_code": "6907.21",
+    "transit_points": "none",
+    "route_details": "direct sailing",
+    "currency": "USD",
+    "shipment_id": "HOLD-080",
+    "shipping_cost": 3650.0,
+    "avg_route_cost": 3650.0,
+    "carrier_name": "Heron Haulage 080 Ltd",
+    "payout_amount": 3540.5,
+    "paypal_authorization_id": "HLDAUTH000000080",
+    "carrier_payee_email": "payments@heron-haulage-080.example",
+    "carrier_registered_payee_email": "payments@heron-haulage-080.example"
+   },
+   "history": {
+    "paid_count": 0,
+    "frozen": false,
+    "median_paid": null,
+    "other_carriers_on_payee": 0
+   },
+   "payee_changed_days_ago": null,
+   "change_request_text": null,
+   "search_results": [
+    {
+     "title": "Heron Haulage 080 Ltd | ocean and inland freight",
+     "content": "Heron Haulage 080 Ltd moves containers between Vietnam and the United States.",
+     "url": "https://heron-haulage-080.example/about"
+    }
+   ]
+  }
+ ]
+}

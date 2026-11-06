@@ -187,6 +187,12 @@ def check_payment_ai(shipment: dict[str, Any], ai: dict[str, Any] | None) -> lis
             "CARRIER_NOT_FOUND_ONLINE", "HIGH", 65,
             "A web search found nothing that names this carrier.",
         ))
+    if isinstance(who, dict) and who.get("payee_site") == "off_site":
+        findings.append(_finding(
+            "PAYEE_OFF_CARRIER_SITE", "MEDIUM", 55,
+            "The search found this carrier's own website and the payee is not on it, so the company may be real and the "
+            "payee not. Confirm the payee with the carrier on a number taken from that website.",
+        ))
     return findings
 
 

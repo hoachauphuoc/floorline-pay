@@ -102,6 +102,23 @@ describe("DefensePage", () => {
     expect(screen.getByText(/describe this corpus only/)).toBeInTheDocument();
   });
 
+  it("shows what comparing the payee with the carrier's website adds", async () => {
+    vi.mocked(fetchDefenseScenarios).mockResolvedValue(SCENARIOS);
+    vi.mocked(fetchDefenseEvaluation).mockResolvedValue({
+      ...EVALUATION,
+      summary: {
+        ...EVALUATION.summary,
+        arms: {
+          ...EVALUATION.summary.arms,
+          site: { recall: { ...RATE, count: 36, rate: 1 }, false_positive_rate: { ...NONE, count: 6, rate: 0.1364 } },
+        },
+      },
+    });
+    renderPage();
+    expect(await screen.findByText("+ payee against the carrier's website")).toBeInTheDocument();
+    expect(screen.getByText(/36 of 36/)).toBeInTheDocument();
+  });
+
   it("shows an attack that was not stopped as a failure", async () => {
     vi.mocked(fetchDefenseScenarios).mockResolvedValue({
       ...SCENARIOS,

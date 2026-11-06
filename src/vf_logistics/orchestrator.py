@@ -64,7 +64,7 @@ from vf_logistics import shipper_registry
 from vf_logistics import tavily_client
 from vf_logistics import tools
 from vf_logistics import untrusted
-from vf_logistics import payment_ai, payment_checks
+from vf_logistics import agent_payment, payment_ai, payment_checks
 from vf_logistics import verifier
 from vf_logistics.agents import (
     analyze_shipment,
@@ -878,6 +878,56 @@ async def _decide(
     return case
 
 
+async def _send_agent_decision(case: dict[str, Any], limit: dict[str, Any]) -> dict[str, Any]:
+    """
+    Publish the keyed decision the settler pays from; if it cannot go out, the case goes to a person.
+
+    It goes out before the case is stored, so a crash in between leaves a case the worker analyses again and never an auto-cleared
+    case nobody can act on: the settler answers retry while the state is SPECIALISTS_DONE, and the second pass finds the key already
+    published (tools.publish_decision) and sends nothing new.
+    """
+    from vf_logistics.evidence import published_message_id
+
+    case_id = case["case_id"]
+    tenant = _case_tenant(case)
+    reason = "the agent's decision could not be sent"
+    try:
+        receipt = await governance.execute(
+            "publish_decision",
+            case,
+            tenant_id=tenant,
+            decision={
+                "outcome": agent_payment.OUTCOME,
+                "effective_risk": case.get("risk_score"),
+                "executor": "agent",
+                "approver": limit["published_by"],
+                "agent_limit_usd": str(limit["limit_usd"]),
+                "idempotency_key": agent_payment.key_for(case_id),
+            },
+        )
+        case["actions"].append(receipt)
+        if published_message_id(receipt) is not None:
+            return case
+    except Exception as exc:  # noqa: BLE001 - a decision that may not have gone out is a person's to take
+        reason = f"the agent's decision could not be sent ({type(exc).__name__})"
+    case["state"] = "PENDING_HUMAN"
+    case["proposed_outcome"] = agent_payment.OUTCOME
+    case["gate_denials"] = [{"action": "publish_decision", "reason": reason, "human_triggers": []}]
+    case["decision"] = None
+    await emit(
+        case_id,
+        "gate_denied",
+        f"Proposed {agent_payment.OUTCOME} not executed: {reason}",
+        outcome="PENDING_HUMAN",
+        tenant_id=tenant,
+    )
+    await lineage.record_decision(
+        case, "gate_denied", outcome="PENDING_HUMAN", actor="governance",
+        tenant_id=tenant,
+    )
+    return case
+
+
 async def _prefilter_rules(tenant_id: str | None) -> verifier.PrefilterRules:
     """
     The pre-AI screening rules for one tenant, or the bundled defaults.
@@ -962,7 +1012,10 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
                 tenant_id=tenant,
             )
 
-        if validation.get("skip_ai"):
+        # The rules would clear this case with no analysis, and a payment needs one: the agent pays only on what the analysis stored,
+        # and a person can only act on a case that was not cleared. The rules may still reject a payment.
+        needs_analysis = payment_checks.is_payment_case(case["shipment"]) and not validation.get("auto_reject_by_rules")
+        if validation.get("skip_ai") and not needs_analysis:
             auto_reject = bool(validation.get("auto_reject_by_rules"))
             action = "auto_reject" if auto_reject else "auto_clear"
             flag = "auto_reject_by_rules" if auto_reject else "auto_clear_by_rules"
@@ -1411,6 +1464,13 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
             and compliance_cleared
             and not model_failed
         )
+        # Nobody can release an auto-cleared case, so a payment case is auto-cleared only when the agent may pay it; any other clean
+        # payment case goes to a person, who can, instead of leaving the money held with no one able to act.
+        agent_limit: dict[str, Any] | None = None
+        agent_refusals: list[str] = []
+        if clean and payment_checks.is_payment_case(case["shipment"]):
+            agent_limit, agent_refusals = await agent_payment.review(case, case["shipment"], tenant)
+            clean = not agent_refusals
         needs_investigation = (
             status in ("BLOCKED", "REVIEW_REQUIRED")
             or risk >= INVESTIGATE_AT
@@ -1450,6 +1510,22 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
                     }),
                     ("publish_decision", {
                         "decision": {"outcome": "AUTO_CLEARED", "effective_risk": risk}
+                    }),
+                ],
+            )
+            # After _decide and never before it: sent first, this would announce a clearance the boundary may then refuse.
+            if agent_limit is not None and case["state"] == "AUTO_CLEARED":
+                case = await _send_agent_decision(case, agent_limit)
+        elif agent_refusals:
+            case = await _decide(
+                case,
+                "HELD_FOR_REVIEW",
+                "Every check on this payment is clean, but the agent may not pay it: "
+                + "; ".join(agent_refusals) + ". A person decides.",
+                [
+                    ("assign_analyst", {"queue": "trade-review", "priority": "NORMAL"}),
+                    ("publish_decision", {
+                        "decision": {"outcome": "HELD_FOR_REVIEW", "effective_risk": risk}
                     }),
                 ],
             )

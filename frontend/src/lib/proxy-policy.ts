@@ -154,6 +154,8 @@ export const ALLOWED_POST = new Set([
   "payments/pause",
   "payments/resume",
   "payments/limits",
+  // Payment controls: a governance admin publishes how much the agent may pay by itself.
+  "payments/agent/limit",
   // Settlement: an operator asks PayPal for the state of a payout (route payments/cases/<case id>/payout/refresh). It only reads PayPal and records the answer; nothing moves. The policy name avoids the words the Defense guard test forbids.
   "payments/status/refresh",
   // Settlement: an operator sends a failed release to the settler again (password-only, see below); the money still moves only there.
@@ -188,6 +190,8 @@ export const PASSWORD_ONLY_POST = new Set([
   "payments/pause",
   "payments/resume",
   "payments/limits",
+  // The agent's limit lets money leave with no person on each case: only a person signed in with a password sets it.
+  "payments/agent/limit",
   // Sending a failed release again can start a payout: only a person signed in with a password.
   "payments/decision/redeliver",
   // Lifting a freeze loosens a hold: only a person signed in with a password.

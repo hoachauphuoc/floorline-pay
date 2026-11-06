@@ -15,6 +15,8 @@ verifier.validate asserts the floor did not fall. What each answer can and canno
   identity  a web search for the carrier. A search that did not run is "unverified", which is a
             finding, never a pass: an outage is not evidence that the carrier is real. A search
             that ran and found nothing that names the carrier is "not_found", a stronger one.
+            When it finds the carrier's own site and the payee is not on it, that is a finding too: the company
+            is real, but the money may not be going to it. The payee itself never leaves this module.
 
 assess() never raises, so a failure here cannot stop a case being analysed.
 """
@@ -28,6 +30,7 @@ import re
 from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
 from typing import Any
+from urllib.parse import urlsplit
 
 from vf_logistics import carrier_registry, credit_profile, nebius_client, tavily_client
 from vf_logistics import config as model_config
@@ -161,8 +164,41 @@ async def analyst(feature_set: dict[str, Any], complete: Complete | None = None)
     return (await _ask(feature_set, complete))[0]
 
 
-async def identity(carrier_name: Any, search: Search | None = None) -> dict[str, Any]:
-    """Whether a web search finds the carrier. A search that did not run is "unverified"."""
+# Legal forms a company leaves out of its domain name, so a site is not refused for lacking them.
+_LEGAL_WORDS = frozenset({"jsc", "plc", "gmbh", "pte", "bhd"})
+# Three payouts PayPal confirmed to a payee that never changed show the account is the carrier's, whatever mail domain it uses.
+PROVEN_PAYOUTS = 3
+
+
+def payee_proven(shipment: dict[str, Any], history: dict[str, Any]) -> bool:
+    return int(history.get("paid_count") or 0) >= PROVEN_PAYOUTS and not shipment.get("carrier_payee_changed_at")
+
+
+def _host(url: Any) -> str:
+    try:
+        return (urlsplit(str(url or "")).hostname or "").lower().removeprefix("www.")
+    except ValueError:
+        return ""
+
+
+def _payee_site(hits: list[dict[str, Any]], tokens: list[str], payee: Any) -> str:
+    """on_site, off_site or unknown.
+
+    A directory page names the carrier too, so only a host that spells the carrier's name counts as its site; with no such site
+    nothing is claimed.
+    """
+    address = str(payee or "").strip().lower()
+    domain = address.rpartition("@")[2] if "@" in address else ""
+    words = [t for t in tokens if t not in _LEGAL_WORDS] or tokens
+    sites = {host for host in (_host(r.get("url")) for r in hits) if host and all(w in _letters(host) for w in words)}
+    if not domain or not sites:
+        return "unknown"
+    same = any(domain == site or domain.endswith(f".{site}") or site.endswith(f".{domain}") for site in sites)
+    return "on_site" if same else "off_site"
+
+
+async def identity(carrier_name: Any, search: Search | None = None, payee: Any = None) -> dict[str, Any]:
+    """Whether a web search finds the carrier, and whether `payee` is on its site. A search that did not run is "unverified"."""
     name = str(carrier_name or "").strip()
     if not name:
         return {"status": "unverified", "reason": "no carrier name to look up", "urls": []}
@@ -183,7 +219,10 @@ async def identity(carrier_name: Any, search: Search | None = None) -> dict[str,
     ]
     urls = [str(r.get("url")) for r in hits[:3] if r.get("url")]
     if hits:
-        return {"status": "found", "reason": f"{len(hits)} result(s) name the carrier", "urls": urls}
+        return {
+            "status": "found", "reason": f"{len(hits)} result(s) name the carrier", "urls": urls,
+            "payee_site": _payee_site(hits, tokens, payee),
+        }
     return {"status": "not_found", "reason": "no search result names the carrier", "urls": []}
 
 
@@ -198,7 +237,8 @@ async def assess(
     except Exception:  # noqa: BLE001 - context for the analyst; the floor does not depend on it
         history = {}
     (verdict, tokens_in, tokens_out), who = await asyncio.gather(
-        _ask(features(shipment, history), complete), identity(carrier, search),
+        _ask(features(shipment, history), complete),
+        identity(carrier, search, None if payee_proven(shipment, history) else shipment.get("carrier_payee_email")),
     )
     # The usage lets the pipeline count the analyst's tokens in the case cost, so the tenant budget sees this model call too.
     return {

@@ -96,6 +96,22 @@ describe("ControlsPage", () => {
     mocks.fetchPaymentControls.mockResolvedValue(controls());
   });
 
+  it("shows the agent's limit and who published it", async () => {
+    mocks.fetchPaymentControls.mockResolvedValue(
+      controls({ agent_limit: { limit_usd: "1000", published_by: "admin@forwarder.example", reason: "first month", at: null } }),
+    );
+    renderPage();
+    const card = await screen.findByRole("region", { name: "Agent payments" });
+    expect(card).toHaveTextContent("1000");
+    expect(card).toHaveTextContent("admin@forwarder.example");
+  });
+
+  it("says the agent is off when the controls name no limit", async () => {
+    renderPage();
+    const card = await screen.findByRole("region", { name: "Agent payments" });
+    expect(card).toHaveTextContent("Off. Every payment waits for a person.");
+  });
+
   it("says payments are running and offers to pause them", async () => {
     renderPage();
     await waitFor(() => expect(screen.getByText("Payments are running")).toBeInTheDocument());

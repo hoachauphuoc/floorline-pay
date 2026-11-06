@@ -1,8 +1,8 @@
 """
 Routes for the payment controls (payment_controls.py).
 
-Anyone with the operator role may pause payments; resuming them and publishing limits need
-a governance admin. All three need a password sign-in, so a one-click guest session cannot
+Anyone with the operator role may pause payments; resuming them and publishing limits, the agent's included, need
+a governance admin. All of them need a password sign-in, so a one-click guest session cannot
 touch them, and each is recorded against the signed-in person with the reason given. The
 reading route is for anyone signed in.
 """
@@ -58,6 +58,7 @@ def register(
                 "pause": await payment_controls.pause_state(tenant_id=tenant()),
                 "limits": live,
                 "limits_are_defaults": live == payment_controls.DEFAULT_LIMITS,
+                "agent_limit": await payment_controls.agent_limit(tenant_id=tenant()),
                 "usage_today": await payment_controls.usage_today(tenant_id=tenant()),
             }
 
@@ -108,3 +109,18 @@ def register(
         except payment_controls.ControlsError as exc:
             return jsonify({"error": exc.message}), exc.status
         return jsonify({"limits": published}), 200
+
+    @app.route("/api/v1/payments/agent/limit", methods=["POST"])
+    @require_governance_admin
+    @require_password_session
+    @limiter.limit("10 per minute")
+    def payments_agent_limit() -> Any:
+        actor, actor_auth = person()
+        data = body()
+        try:
+            published = run_async(payment_controls.publish_agent_limit(
+                data.get("limit_usd"), data.get("reason"), actor, actor_auth, tenant_id=tenant(),
+            ))
+        except payment_controls.ControlsError as exc:
+            return jsonify({"error": exc.message}), exc.status
+        return jsonify({"agent_limit": _plain(published)}), 200

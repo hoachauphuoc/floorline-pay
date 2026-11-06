@@ -43,7 +43,7 @@ const TONE: Record<PaymentState["state"], string> = {
 
 /**
  * What happened to the money on one case: held at booking, paid to the carrier after a
- * person released it, or returned to the shipper after a block. Drawn from the settler's
+ * person released it or the agent paid it inside a person's limit, or returned to the shipper after a block. Drawn from the settler's
  * own record. A state this card does not know is shown as not recognised, never as a success.
  */
 export function PaymentCard({
@@ -112,6 +112,11 @@ export function PaymentCard({
       {state.state === "paid" && paidNext(state.payout_status) && (
         <p className="mt-1 text-[12px] text-dim">{paidNext(state.payout_status)}</p>
       )}
+      {state.state === "paid" && state.paid_by_agent && (
+        <p className="mt-1 text-[12px] text-dim">
+          {`Paid by the agent, below the ${state.paid_by_agent.limit_usd} USD limit published by ${state.paid_by_agent.published_by}.`}
+        </p>
+      )}
       {state.reason && (
         <p className="mt-1 text-[12px] leading-relaxed text-dim">{state.reason}</p>
       )}
@@ -160,7 +165,7 @@ export function PaymentCard({
           The decision was saved but was never sent to the settler, so no money has moved. Send it again.
         </p>
       )}
-      {(state.state === "failed" || notSent) && onRetry && (
+      {(state.state === "failed" || notSent) && onRetry && !state.handed_to_person && (
         <div className="mt-3 space-y-2">
           <label className="block text-[11.5px] text-dim" htmlFor={`retry-reason-${state.case_id}`}>
             Reason for the retry

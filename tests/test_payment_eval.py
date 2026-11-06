@@ -101,9 +101,9 @@ class TestWhatTheChecksCatch:
 
     def test_the_scenarios_the_checks_cannot_see_stay_unflagged_without_the_analyst(self, rows):
         scenarios = ev().summarize(rows)["scenarios"]
-        assert scenarios["impersonated_carrier_free_mail"]["flagged"] == {"floor": 0, "identity": 0}
-        assert scenarios["shell_carrier"]["flagged"] == {"floor": 0, "identity": 8}
-        assert scenarios["small_carrier_not_online"]["flagged"] == {"floor": 0, "identity": 6}
+        assert scenarios["impersonated_carrier_free_mail"]["flagged"] == {"floor": 0, "identity": 0, "site": 4}
+        assert scenarios["shell_carrier"]["flagged"] == {"floor": 0, "identity": 8, "site": 8}
+        assert scenarios["small_carrier_not_online"]["flagged"] == {"floor": 0, "identity": 6, "site": 6}
         for name in ("payee_mismatch", "recent_payee_change", "inflated_payout", "bec_change_request"):
             assert scenarios[name]["flagged"]["floor"] == scenarios[name]["cases"]
 

@@ -9,11 +9,13 @@ were written against; it says nothing about how often these patterns occur, and 
 a forecast of production.
 
 A payout is flagged when the risk floor that verifier.validate gives it is FLAG_FLOOR or more,
-the line at which the pipeline holds a case for a person. Three arms, each adding to the one before:
+the line at which the pipeline holds a case for a person. Five arms, each adding to the one before:
 
   floor     the deterministic payment checks, with the screen of the payee-change request
   identity  plus the carrier look-up, read from the recorded search results
   analyst   plus the model's verdict, when one was produced (a live run, or one replayed from a file)
+  site      plus the payee compared with the carrier's own website, on top of whatever ran before it
+  reader    plus a model's reading of the change request, when readings were produced by a live run or replayed
 
 An arm that did not run is reported as not run. Nothing here assumes the analyst helps: the
 report shows what it added, in true and false flags, with Wilson 95% intervals on every rate, and
@@ -56,9 +58,14 @@ async def prepare(case: dict[str, Any], now: datetime | None = None) -> dict[str
     if ago is not None:
         shipment["carrier_payee_changed_at"] = ((now or datetime.now(timezone.utc)) - timedelta(days=ago)).isoformat()
     text = case.get("change_request_text")
-    if text and (await change_screen.screen(text, _unscreened))["flagged"]:
+    if text and (await change_screen.screen(text, _unscreened, _unread))["flagged"]:
         shipment["carrier_payee_change_flagged"] = True
     return shipment
+
+
+async def _unread(**kwargs: Any) -> tuple[str, int, int]:
+    # The reader has its own arm, from the readings of a live run; everything else here calls no model.
+    raise RuntimeError("no model in a measurement")
 
 
 def _search_of(case: dict[str, Any]) -> Any:
@@ -74,17 +81,25 @@ def _floor(shipment: dict[str, Any], ai: dict[str, Any] | None) -> int:
 
 async def measure(
     case: dict[str, Any], analyst: dict[str, Any] | None = None, now: datetime | None = None,
+    reader: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """The floor of one case in each arm. Raises if an arm lowered the floor."""
     shipment = await prepare(case, now)
     identity = await payment_ai.identity(shipment.get("carrier_name"), _search_of(case))
+    payee = None if payment_ai.payee_proven(shipment, case.get("history") or {}) else shipment.get("carrier_payee_email")
+    checked = await payment_ai.identity(shipment.get("carrier_name"), _search_of(case), payee)
     floors: dict[str, int | None] = {
         "floor": _floor(shipment, None),
         "identity": _floor(shipment, {"identity": identity}),
         "analyst": None if analyst is None else _floor(shipment, {"identity": identity, "analyst": analyst}),
+        "site": _floor(shipment, {"identity": checked, **({} if analyst is None else {"analyst": analyst})}),
+        "reader": None if reader is None else _floor(
+            {**shipment, "carrier_payee_change_flagged": True} if reader.get("state") == "flagged" else shipment,
+            {"identity": checked, **({} if analyst is None else {"analyst": analyst})},
+        ),
     }
     previous = floors["floor"] or 0
-    for arm in ("identity", "analyst"):
+    for arm in ("identity", "analyst", "site", "reader"):
         current = floors[arm]
         if current is None:
             continue
@@ -99,9 +114,13 @@ async def measure(
 
 async def run(
     corpus: dict[str, Any], analysts: dict[str, dict[str, Any]] | None = None, now: datetime | None = None,
+    readers: dict[str, dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Measure every case; `analysts` maps a case id to the analyst's verdict for it."""
-    return [await measure(case, (analysts or {}).get(case["id"]), now) for case in corpus["cases"]]
+    """Measure every case; `analysts` and `readers` map a case id to that layer's answer; a case with no request has no reading."""
+    return [
+        await measure(case, (analysts or {}).get(case["id"]), now, None if readers is None else readers.get(case["id"], {}))
+        for case in corpus["cases"]
+    ]
 
 
 def _flagged(row: dict[str, Any], arm: str) -> bool | None:
@@ -123,7 +142,7 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     fraud = [r for r in rows if r["label"] == "fraud"]
     legit = [r for r in rows if r["label"] == "legit"]
     arms: dict[str, Any] = {}
-    for arm in ("floor", "identity", "analyst"):
+    for arm in ("floor", "identity", "analyst", "site", "reader"):
         if any(_flagged(r, arm) is None for r in rows):
             arms[arm] = None
             continue
@@ -135,11 +154,12 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
     for row in rows:
         entry = scenarios.setdefault(row["scenario"], {"label": row["label"], "cases": 0, "flagged": {}})
         entry["cases"] += 1
-        for arm in ("floor", "identity", "analyst"):
+        for arm in ("floor", "identity", "analyst", "site", "reader"):
             if arms[arm] is not None:
                 entry["flagged"][arm] = entry["flagged"].get(arm, 0) + (1 if _flagged(row, arm) else 0)
     added: dict[str, Any] = {}
-    for before, after in (("floor", "identity"), ("identity", "analyst")):
+    last = "identity" if arms["analyst"] is None else "analyst"
+    for before, after in (("floor", "identity"), ("identity", "analyst"), (last, "site"), ("site", "reader")):
         if arms[before] is None or arms[after] is None:
             added[after] = None
             continue
@@ -161,22 +181,26 @@ def _pct(rate: dict[str, Any]) -> str:
 def report(summary: dict[str, Any]) -> str:
     """The summary as plain text, with the synthetic caveat first."""
     lines = [
-        "SYNTHETIC CORPUS: invented payouts and carriers, built from the patterns the checks were written for.",
+        "SYNTHETIC CORPUS: invented payouts and carriers, not real traffic.",
         f"These rates describe this corpus only. {summary['cases']} cases ({summary['fraud']} fraudulent, "
         f"{summary['legit']} legitimate). Flagged means a risk floor of {FLAG_FLOOR} or more.",
         "",
     ]
     labels = {
         "floor": "deterministic checks", "identity": "+ carrier look-up", "analyst": "+ analyst model",
+        "site": "+ payee against the carrier's site",
+        "reader": "+ model reading the change request",
     }
     for arm, text in labels.items():
         data = summary["arms"][arm]
         if data is None:
-            lines.append(f"{text}: NOT RUN (no analyst verdicts were supplied; run with --live-analyst or --replay)")
+            how = "readings were" if arm == "reader" else "analyst verdicts were"
+            flags = "--live-reader or --replay-reader" if arm == "reader" else "--live-analyst or --replay"
+            lines.append(f"{text}: NOT RUN (no {how} supplied; run with {flags})")
             continue
         lines.append(f"{text}: recall {_pct(data['recall'])}; false positives {_pct(data['false_positive_rate'])}")
     lines.append("")
-    for arm in ("identity", "analyst"):
+    for arm in ("identity", "analyst", "site", "reader"):
         added = summary["added"][arm]
         if added is None:
             continue

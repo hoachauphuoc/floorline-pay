@@ -99,6 +99,7 @@ describe("matchWrite", () => {
       "governance/publish",
       "governance/revoke",
       "orchestrator/reset",
+      "payments/agent/limit",
       "payments/decision/redeliver",
       "payments/freezes/lift",
       "payments/limits",

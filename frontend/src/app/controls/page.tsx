@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Gated } from "@/components/layout/Gated";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
+import { AgentLimitCard } from "@/components/payments/AgentLimitCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -138,6 +139,8 @@ export default function ControlsPage() {
         )}
         <PublishLimits lock={adminLock} start={limits} onDone={refresh} />
       </section>
+
+      <AgentLimitCard limit={controls.data.agent_limit ?? null} lock={adminLock} onDone={refresh} />
 
       <section className="bento-card p-4" aria-label="Sent for payout today">
         <h2 className="text-[12px] font-medium text-white">Sent for payout today (UTC)</h2>

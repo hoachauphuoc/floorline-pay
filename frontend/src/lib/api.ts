@@ -781,11 +781,20 @@ export type PaymentLimits = {
   carrier_daily_count: number;
 };
 
+/** The most the agent may pay by itself, as a person published it. */
+export type AgentLimit = {
+  limit_usd: string;
+  published_by: string;
+  reason?: string | null;
+  at?: string | null;
+};
+
 /** GET payments/controls: the pause switch, the limits in force and what was paid today. */
 export type PaymentControls = {
   pause: { paused: boolean; reason?: string | null; by?: string | null; at?: string | null };
   limits: PaymentLimits | null;
   limits_are_defaults: boolean;
+  agent_limit?: AgentLimit | null;
   usage_today: {
     tenant_usd: string;
     carriers: Record<string, { usd: string; count: number }>;
@@ -813,6 +822,15 @@ export async function publishPaymentLimits(
 ): Promise<{ limits: PaymentLimits }> {
   if (DEMO_MODE) liveOnly("Publishing payment limits");
   return postJson("payments/limits", { limits, reason });
+}
+
+/** Zero turns the agent off. */
+export async function publishAgentLimit(
+  limitUsd: number,
+  reason: string,
+): Promise<{ agent_limit: AgentLimit | null }> {
+  if (DEMO_MODE) liveOnly("Publishing the agent limit");
+  return postJson("payments/agent/limit", { limit_usd: limitUsd, reason });
 }
 
 /** Submit a shipment event, as Pub/Sub would. */
@@ -1219,6 +1237,8 @@ export type PaymentState = {
   reason?: string | null;
   findings?: string[];
   decision_not_sent?: boolean;
+  paid_by_agent?: { limit_usd: string; published_by: string } | null;
+  handed_to_person?: boolean;
   payout_status?: { state: "confirmed" | "failed" | "pending" | "unconfirmed"; status: string | null; at: string | null };
   capture?: PaymentStep | null;
   payout?: PaymentStep | null;
@@ -1244,6 +1264,28 @@ export type PaymentLedger = {
 export async function fetchPaymentLedger(): Promise<PaymentLedger> {
   if (DEMO_MODE) liveOnly("The payment ledger");
   return getJson<PaymentLedger>("payments/ledger");
+}
+
+/** What the payment checks and the AI layers say about one case (payment_status.payment_risk). */
+export type PaymentRisk = {
+  case_id: string;
+  payment_case: boolean;
+  findings?: Array<{ code: string; severity: string; floor: number; detail: string }>;
+  analyst?: { verdict: string; confidence?: number; reasons?: string[]; suggested_tier?: string | null } | null;
+  identity?: { status: string; reason?: string; urls?: string[]; payee_site?: string } | null;
+  credit?: {
+    tier: string;
+    baseline: string;
+    suggested: string | null;
+    cap_usd: string | null;
+    paid_count: number;
+    frozen: boolean;
+  };
+};
+
+export async function fetchPaymentRisk(caseId: string): Promise<PaymentRisk> {
+  if (DEMO_MODE) liveOnly("The payment risk");
+  return getJson<PaymentRisk>(`payments/cases/${encodeURIComponent(caseId)}/risk`);
 }
 
 export async function fetchPaymentState(caseId: string): Promise<PaymentState> {
@@ -1288,7 +1330,7 @@ export type DefenseEvaluation = {
     cases: number;
     fraud: number;
     legit: number;
-    arms: { floor: Arm | null; identity: Arm | null; analyst: Arm | null };
+    arms: { floor: Arm | null; identity: Arm | null; analyst: Arm | null; site?: Arm | null };
   };
 };
 

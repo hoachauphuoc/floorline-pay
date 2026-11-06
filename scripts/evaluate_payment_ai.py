@@ -25,7 +25,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from vf_logistics import payment_ai, payment_eval  # noqa: E402
+from vf_logistics import change_screen, payment_ai, payment_eval  # noqa: E402
 
 
 async def ask_analyst(corpus: dict) -> dict[str, dict]:
@@ -37,16 +37,35 @@ async def ask_analyst(corpus: dict) -> dict[str, dict]:
     return verdicts
 
 
+async def ask_reader(corpus: dict) -> dict[str, dict]:
+    """The model's reading of every change request in the corpus."""
+    return {c["id"]: await change_screen.read(c["change_request_text"]) for c in corpus["cases"] if c.get("change_request_text")}
+
+
 async def main(args: argparse.Namespace) -> str:
-    corpus = payment_eval.load_corpus()
+    chosen = getattr(args, "corpus", None)
+    corpus = payment_eval.load_corpus(pathlib.Path(chosen)) if chosen else payment_eval.load_corpus()
     analysts: dict[str, dict] | None = None
     if args.replay:
         analysts = json.loads(pathlib.Path(args.replay).read_text(encoding="utf-8"))
     elif args.live_analyst:
         analysts = await ask_analyst(corpus)
+        # A run with no answers would be saved and reported as an analyst that added nothing, which it did not measure.
+        if all(answer.get("verdict") == "unknown" for answer in analysts.values()):
+            raise SystemExit("no verdict came back: the model could not be reached (is NEBIUS_API_KEY set?)")
     if args.save and analysts is not None:
         pathlib.Path(args.save).write_text(json.dumps(analysts, indent=1) + "\n", encoding="utf-8")
-    rows = await payment_eval.run(corpus, analysts)
+    readers: dict[str, dict] | None = None
+    if getattr(args, "replay_reader", None):
+        readers = json.loads(pathlib.Path(args.replay_reader).read_text(encoding="utf-8"))
+    elif getattr(args, "live_reader", False):
+        readers = await ask_reader(corpus)
+        # A run with no answers would be reported as a reader that added nothing, which it did not measure.
+        if all(reading.get("state") == "unavailable" for reading in readers.values()):
+            raise SystemExit("no reading came back: the model could not be reached (is NEBIUS_API_KEY set?)")
+    if getattr(args, "save_reader", None) and readers is not None:
+        pathlib.Path(args.save_reader).write_text(json.dumps(readers, indent=1) + "\n", encoding="utf-8")
+    rows = await payment_eval.run(corpus, analysts, readers=readers)
     return payment_eval.report(payment_eval.summarize(rows))
 
 
@@ -55,4 +74,8 @@ if __name__ == "__main__":
     parser.add_argument("--live-analyst", action="store_true", help="ask the model about every case (costs tokens)")
     parser.add_argument("--replay", help="analyst verdicts saved by an earlier run")
     parser.add_argument("--save", help="write this run's analyst verdicts to a file")
+    parser.add_argument("--corpus", help="measure this corpus instead of the main one, such as data/payment_fraud_holdout.json")
+    parser.add_argument("--live-reader", action="store_true", help="ask the model to read every change request (costs tokens)")
+    parser.add_argument("--replay-reader", help="readings saved by an earlier run")
+    parser.add_argument("--save-reader", help="write this run's readings to a file")
     print(asyncio.run(main(parser.parse_args())))

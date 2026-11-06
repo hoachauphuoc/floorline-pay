@@ -42,6 +42,11 @@ async def _no_armor(text: Any, stage: str) -> dict[str, Any]:
     return {"available": False, "blocked": False, "deterministic": None}
 
 
+async def _no_reader(**kwargs: Any) -> tuple[str, int, int]:
+    # The table is replayed on every visit to the page, so it must not spend a model call each time.
+    raise RuntimeError("no model in a replay")
+
+
 async def _routine() -> dict[str, Any]:
     corpus = payment_eval.load_corpus()
     case = next(c for c in corpus["cases"] if c["scenario"] == "routine")
@@ -81,7 +86,7 @@ async def run() -> list[dict[str, Any]]:
     ))
 
     s = await _routine()
-    screened = await change_screen.screen(BEC_MESSAGE, _no_armor)
+    screened = await change_screen.screen(BEC_MESSAGE, _no_armor, _no_reader)
     if screened["flagged"]:
         s["carrier_payee_change_flagged"] = True
     ok, codes, floor = _held(s, "PAYEE_CHANGE_REQUEST_FLAGGED")

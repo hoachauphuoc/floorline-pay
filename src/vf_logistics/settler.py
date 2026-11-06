@@ -2,9 +2,13 @@
 The downstream settler of Floorline Pay: the only code that moves money.
 
 It runs on the receiving side of case-decisions (decision_receiver.receive), after a
-person's decision has been applied, never in the analysis or agent runtime. A published
+decision has been applied, never in the analysis or agent runtime. A published
 RELEASED_BY_HUMAN captures the shipper's PayPal authorization and pays the carrier; a
 published BLOCKED_BY_HUMAN voids the authorization so the money goes back.
+
+The agent's own decision is a published AUTO_CLEARED under the key agent_payment.key_for gives the case. agent_payment.review says yes
+again here, because a limit can be withdrawn after the analysis, and then every check of a person's release runs. No model is called:
+what the analysis stored is read. A case the agent may not pay goes to a person, because nobody can act on an auto-cleared case.
 
 Every refusal is a named status and nothing is paid:
   skipped  the case moves no money, or there is nothing to void
@@ -33,6 +37,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from vf_logistics import (
+    agent_payment,
     authorization_lifecycle,
     carrier_registry,
     credit_profile,
@@ -229,12 +234,13 @@ def _approval_record_missing(case: dict[str, Any], shipment: dict[str, Any], app
 
 async def _release(
     case: dict[str, Any], shipment: dict[str, Any], key: str, tenant_id: str | None, approval_id: str,
+    released: str = "RELEASED_BY_HUMAN",
 ) -> dict[str, Any]:
     state = case.get("state")
     if state in _NOT_FINAL:
         return _result(RETRY, f"the case is still {state}; deliver the decision again")
-    if state != "RELEASED_BY_HUMAN":
-        return _result(FAILED, f"the case is {state}, not RELEASED_BY_HUMAN; nothing is paid")
+    if state != released:
+        return _result(FAILED, f"the case is {state}, not {released}; nothing is paid")
     if _approval_record_missing(case, shipment, approval_id):
         return _result(
             HELD,
@@ -505,6 +511,40 @@ async def _block(case: dict[str, Any], shipment: dict[str, Any], key: str, tenan
     return _result(VOIDED, "authorization voided; the shipper's funds are released", void=_step(voided))
 
 
+async def _hand_to_person(case: dict[str, Any], reason: str, tenant_id: str | None) -> None:
+    """Put a case the agent could not pay in a person's queue: nobody can act on an auto-cleared case, and the money stays held."""
+    case["state"] = "PENDING_HUMAN"
+    case["proposed_outcome"] = agent_payment.OUTCOME
+    case["gate_denials"] = [{"action": "settle_payment", "reason": reason, "human_triggers": []}]
+    case["decision"] = None
+    case["updated_at"] = utcnow()
+    await get_store().put_case(case, expected_version=case.get("_version"), tenant_id=tenant_id)
+
+
+async def _captured(key: str, tenant_id: str | None) -> bool:
+    """True once this decision's capture went through: _release writes the payout index row right after it."""
+    rows, _ = await get_store().query_audit(case_id=f"PAYOUT-{key}", limit=1, tenant_id=tenant_id)
+    return bool(rows)
+
+
+async def _agent_release(case: dict[str, Any], shipment: dict[str, Any], key: str, tenant_id: str | None) -> dict[str, Any]:
+    limit, refused = await agent_payment.review(case, shipment, tenant_id)
+    if limit is None or refused:
+        why = "; ".join(refused)
+        if await _captured(key, tenant_id):
+            # A person's release cannot take over a captured payment, so this stays a failed settlement a person can retry.
+            return _result(FAILED, f"the money is captured, but the agent may not pay the carrier now ({why}); restore what is missing and retry")
+        result = _result(HELD, f"the agent may not pay this case ({why}); nothing is paid and a person decides")
+    else:
+        result = await _release(case, shipment, key, tenant_id, "", released=agent_payment.OUTCOME)
+        result = {**result, "agent": {"limit_usd": str(limit["limit_usd"]), "published_by": limit["published_by"]}}
+    # After a capture the case stays on the agent's key: a person's release would capture under a new key, which PayPal refuses.
+    if result["status"] in (HELD, FAILED) and not await _captured(key, tenant_id):
+        await _hand_to_person(case, str(result["reason"]), tenant_id)
+        result = {**result, "handed_to_person": True}
+    return result
+
+
 async def _stored_result(case_id: str, key: str, tenant_id: str | None) -> dict[str, Any] | None:
     """What an earlier delivery of this decision already settled or voided, so a redelivery answers the same.
 
@@ -533,7 +573,8 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
     key = str(decision.get("idempotency_key") or "")
     outcome = decision.get("outcome")
     try:
-        if outcome not in ("RELEASED_BY_HUMAN", "BLOCKED_BY_HUMAN") or not key or not case_id:
+        by_agent = outcome == agent_payment.OUTCOME and key == agent_payment.key_for(case_id)
+        if (outcome not in ("RELEASED_BY_HUMAN", "BLOCKED_BY_HUMAN") and not by_agent) or not key or not case_id:
             return _result(SKIPPED, "not a keyed human release or block")
         case = await get_store().get_case(case_id, tenant_id=tenant_id)
         shipment = (case or {}).get("shipment") or {}
@@ -542,13 +583,22 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
         stored = await _stored_result(case_id, key, tenant_id)
         if stored is not None:
             return stored
+        if by_agent and case.get("state") != agent_payment.OUTCOME:
+            if case.get("state") == agent_payment.DECIDING:
+                return _result(RETRY, "the analysis is still storing this case; deliver the decision again")
+            return _result(SKIPPED, f"the case is {case.get('state')}, so a person decides it and the agent pays nothing")
         if not paypal_client.configured():
+            if by_agent:
+                await _hand_to_person(case, "PayPal is not configured", tenant_id)
             return _result(FAILED, "PayPal is not configured; nothing is paid")
         shipment = await carrier_registry.enrich(dict(shipment), tenant_id=tenant_id)
         if outcome == "BLOCKED_BY_HUMAN":
             result = await _block(case, shipment, key, tenant_id)
         else:
-            result = await _release(case, shipment, key, tenant_id, str(decision.get("approval_id") or ""))
+            if by_agent:
+                result = await _agent_release(case, shipment, key, tenant_id)
+            else:
+                result = await _release(case, shipment, key, tenant_id, str(decision.get("approval_id") or ""))
             if result["status"] != SETTLED:
                 await payment_controls.cancel_reservations(key, tenant_id)
     except Exception as exc:  # noqa: BLE001 - settle never raises; the status says what happened

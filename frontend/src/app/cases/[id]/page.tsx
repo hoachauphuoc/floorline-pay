@@ -12,9 +12,10 @@ import { ErrorState } from "@/components/layout/States";
 import { CaseTimeline } from "@/components/operations/CaseTimeline";
 import { useCaseActivity } from "@/components/operations/useCaseActivity";
 import { PaymentCard } from "@/components/payments/PaymentCard";
+import { PaymentRiskCard } from "@/components/payments/PaymentRiskCard";
 import { ReviewPanel } from "@/components/review/ReviewPanel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchAuditTrail, fetchCase, fetchPaymentState, queryKeys, refreshPayout, retrySettlement } from "@/lib/api";
+import { fetchAuditTrail, fetchCase, fetchPaymentRisk, fetchPaymentState, queryKeys, refreshPayout, retrySettlement } from "@/lib/api";
 import { caseHref } from "@/lib/case-links";
 import { caseStateLabel, formatUsd } from "@/lib/format";
 import { holds, useIdentity } from "@/lib/identity";
@@ -53,6 +54,14 @@ export default function CasePage() {
   const audit = useQuery({
     queryKey: queryKeys.auditTrail(tenant.id, { caseId }),
     queryFn: () => fetchAuditTrail({ caseId, limit: 100 }),
+    enabled: caseId !== "",
+    retry: false,
+  });
+
+  // What the checks and the AI say about the payout, for the person who decides. Optional, like the payment state below.
+  const paymentRisk = useQuery({
+    queryKey: ["payment-risk", tenant.id, caseId],
+    queryFn: () => fetchPaymentRisk(caseId),
     enabled: caseId !== "",
     retry: false,
   });
@@ -162,6 +171,11 @@ export default function CasePage() {
               The audit trail could not be read, so this line is drawn from the case
               record alone.
             </p>
+          )}
+          {paymentRisk.data?.payment_case === true && (
+            <div className="mb-3">
+              <PaymentRiskCard risk={paymentRisk.data} />
+            </div>
           )}
           {payment.data?.payment_case === true && (
             <div className="mb-3">
