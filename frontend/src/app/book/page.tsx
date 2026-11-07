@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { createPaymentOrder } from "@/lib/api";
 import {
   EMPTY_BOOKING,
+  bookingFromQuery,
   bookingProblem,
   orderRequest,
   saveBooking,
@@ -49,6 +50,7 @@ export default function BookPage() {
   const [form, setForm] = useState<BookingForm>(() => ({
     ...EMPTY_BOOKING,
     shipment_id: `SHP-PAY-${Date.now().toString(36).toUpperCase()}`,
+    ...(typeof window === "undefined" ? {} : bookingFromQuery(window.location.search ?? "")),
   }));
   const problem = bookingProblem(form);
 

@@ -47,6 +47,24 @@ export const EMPTY_BOOKING: BookingForm = {
   payout_amount: "",
 };
 
+const MAX_PRESET_LENGTH = 200;
+
+/**
+ * The fields a link may pre-fill, so a demo booking can be made from a phone. A link only fills the form: it never submits, only the form's own
+ * fields are read, and the carrier PayPal account is never read because it decides where the payout goes. Every value still goes through
+ * bookingProblem and the server checks.
+ */
+export function bookingFromQuery(search: string): Partial<BookingForm> {
+  const params = new URLSearchParams(search);
+  const preset: Partial<BookingForm> = {};
+  for (const key of Object.keys(EMPTY_BOOKING) as Array<keyof BookingForm>) {
+    if (key === "carrier_payee_email") continue;
+    const value = params.get(key)?.trim();
+    if (value && value.length <= MAX_PRESET_LENGTH) preset[key] = value;
+  }
+  return preset;
+}
+
 const NUMERIC = new Set(["weight_kg", "declared_value", "shipping_cost", "payout_amount"]);
 
 /** The reason this form cannot be booked yet, or null. */
