@@ -98,6 +98,14 @@ _BOOK: dict[str, dict[str, Any]] = {
         "prior_flags": 0,
         "known_since": "2022-03-11",
     },
+    # Fictional demo counterparty, added 7 Nov 2026 by a person: it has no web footprint, so an agent payment trial on it tests the payment path
+    # and is not decided by what web search returns for a real company's name. Disclose it wherever the trial is cited.
+    "0399000101": {
+        "company": "Lotus Demo Ceramics Co Ltd",
+        "tx_count": 120,
+        "prior_flags": 0,
+        "known_since": "2023-05-02",
+    },
 }
 
 
