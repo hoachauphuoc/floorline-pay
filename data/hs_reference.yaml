@@ -106,6 +106,19 @@ headings:
     residual: false
     dual_use: false
 
+  # ---- Chapter 69: ceramic tableware (ordinary goods, not controlled) ----
+  - hs: "6911"
+    chapter: "69"
+    covers: "tableware, kitchenware, other household and toilet articles, of porcelain or china"
+    residual: false
+    dual_use: false
+
+  - hs: "6912"
+    chapter: "69"
+    covers: "ceramic tableware, kitchenware, other household and toilet articles, other than of porcelain or china"
+    residual: false
+    dual_use: false
+
   # ---- Chapter 28: inorganic chemicals ----
   - hs: "2843"
     chapter: "28"
