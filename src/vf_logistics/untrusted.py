@@ -61,7 +61,7 @@ FORBIDDEN_FIELDS = {
     "risk_score", "risk_level", "compliance_status", "compliance_score",
     "decision", "state", "actions", "auto_clear", "auto_clear_permitted",
     "risk_floor", "validation", "reconciliation", "effective_risk",
-    "delegation_boundary", "approved", "published", "reviewer",
+    "delegation_boundary", "approved", "published", "reviewer", "gate_risk", "grounding",
 }
 
 MAX_FIELD_CHARS = 600

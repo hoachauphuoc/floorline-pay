@@ -32,6 +32,12 @@ _EMPTY = (None, "", "N/A", "not stated")
 _MAX_TEXT = 200
 _COST_WORDS = ("shipping cost", "freight")
 _HIGH_WORDS = ("high", "excessive", "overcharg")
+# A flag naming one of these, or trying to instruct the reader, is never ignored by the grounded gate, whatever else it says: it stays grounded.
+_HEAVY_SIGNALS = (
+    "sanction", "embargo", "ofac", "watchlist", "blacklist", "shell", "forg", "fake", "counterfeit", "launder", "stolen", "impersonat",
+    "synthetic", "duplicate", "spike", "sudden", "new account", "conceal", "illicit", "suspicio", "mismatch", "inconsisten", "dual-use",
+    "dual use", "diver", "terror", "weapon", "narcotic", "ignore", "instruction", "pre-clear", "pre-approv", "do not flag", "don't flag", "override",
+)
 
 
 def _text(flag: Any) -> str:
@@ -66,6 +72,8 @@ def classify_flag(flag: Any, shipment: Any, validation: Any = None) -> str:
     if not isinstance(shipment, dict) or flag is None or isinstance(flag, (int, float)):
         return GROUNDED
     text = _text(flag).lower()
+    if any(signal in text for signal in _HEAVY_SIGNALS):
+        return GROUNDED
     if any(word in text for word in _ABSENCE_WORDS):
         keys = {key for phrase, key in _FIELDS if phrase in text}
         if not keys:
