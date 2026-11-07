@@ -17,6 +17,7 @@ import {
 import { fetchPaymentLedger, type PaymentState } from "@/lib/api";
 import { formatRelative } from "@/lib/format";
 import { paidLabel } from "@/lib/payout-label";
+import { BOARD_AUTO_REFRESH } from "@/lib/pipeline";
 import { useTenant } from "@/lib/tenant-context";
 import { cn } from "@/lib/utils";
 
@@ -62,7 +63,7 @@ export default function PaymentsPage() {
   const ledger = useQuery({
     queryKey: ["payment-ledger", tenant.id],
     queryFn: fetchPaymentLedger,
-    refetchInterval: 15_000,
+    refetchInterval: BOARD_AUTO_REFRESH ? 15_000 : false,
     retry: false,
   });
 

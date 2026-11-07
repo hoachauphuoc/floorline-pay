@@ -8,6 +8,7 @@ import { ErrorState } from "@/components/layout/States";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchPaymentControls, fetchPaymentLedger } from "@/lib/api";
 import { paidKind, type PaidKind } from "@/lib/payout-label";
+import { BOARD_AUTO_REFRESH } from "@/lib/pipeline";
 import { useTenant } from "@/lib/tenant-context";
 
 const STEPS = [
@@ -43,13 +44,13 @@ export default function PayPage() {
   const ledger = useQuery({
     queryKey: ["payment-ledger", tenant.id],
     queryFn: fetchPaymentLedger,
-    refetchInterval: 15_000,
+    refetchInterval: BOARD_AUTO_REFRESH ? 15_000 : false,
     retry: false,
   });
   const controls = useQuery({
     queryKey: ["payment-controls", tenant.id],
     queryFn: fetchPaymentControls,
-    refetchInterval: 15_000,
+    refetchInterval: BOARD_AUTO_REFRESH ? 15_000 : false,
     retry: false,
   });
 

@@ -20,6 +20,7 @@ from typing import Any
 
 from flask import Flask, Response, redirect, request, jsonify, send_from_directory
 from werkzeug.exceptions import HTTPException, RequestEntityTooLarge
+from google.api_core.exceptions import DeadlineExceeded, ResourceExhausted, RetryError, ServiceUnavailable
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -259,6 +260,20 @@ def _prefilter_rules() -> "verifier.PrefilterRules":
     stored = _on_worker(get_store().get_prefilter_rules(tenant_id=_tenant()))
     return verifier.PrefilterRules.from_dict(stored)
 
+# A store that cannot be read (the free read quota is spent, or the backend is down) is an outage the client may retry, not a fault in this request.
+_STORE_DOWN = (ResourceExhausted, ServiceUnavailable, DeadlineExceeded, RetryError)
+_STORE_DOWN_MESSAGE = "Storage is temporarily unavailable (quota exceeded or an outage). Retry in a minute."
+
+
+def _store_unavailable(e: Exception) -> Any:
+    """A 503 with Retry-After for a store outage. The storage error is logged, never sent to the client."""
+    logger.error("Storage unavailable: %s: %s", type(e).__name__, e)
+    response = jsonify({"error": _STORE_DOWN_MESSAGE})
+    response.status_code = 503
+    response.headers["Retry-After"] = "60"
+    return response
+
+
 def _safe_error(e: Exception, status: int = 500) -> Any:
     """
     Return a sanitized error response. Logs the real exception server-side.
@@ -272,6 +287,8 @@ def _safe_error(e: Exception, status: int = 500) -> Any:
     if isinstance(e, HTTPException):
         raise e
 
+    if isinstance(e, _STORE_DOWN):
+        return _store_unavailable(e)
     logger.exception("Request failed: %s", e)
     if _IS_PRODUCTION:
         return jsonify({"error": "Internal server error"}), status
@@ -308,6 +325,15 @@ def _rate_limited(e: Any) -> Any:
         "error": "Rate limit exceeded",
         "detail": str(getattr(e, "description", "too many requests")),
     }), 429
+
+
+@app.errorhandler(ResourceExhausted)
+@app.errorhandler(ServiceUnavailable)
+@app.errorhandler(DeadlineExceeded)
+@app.errorhandler(RetryError)
+def _store_down(e: Any) -> Any:
+    """Routes without their own try/except, such as the payment booking and authorize routes, get the same 503."""
+    return _store_unavailable(e)
 
 
 @app.errorhandler(404)
