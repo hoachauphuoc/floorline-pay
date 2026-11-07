@@ -230,6 +230,7 @@ SHIPMENT DATA:
 - Shipper: {shipment.get('shipper_name', 'N/A')}
 - Shipper Company: {shipment.get('shipper_company', 'N/A')}
 - Receiver: {shipment.get('receiver_name', 'N/A')}
+- Receiver Company: {shipment.get('receiver_company', 'N/A')}
 - Route: {shipment.get('route_details', 'N/A')}
 - Average Route Cost: {shipment.get('avg_route_cost', 'N/A')} USD
 - Shipper Transaction Count: {shipment.get('shipper_tx_count', 'N/A')}

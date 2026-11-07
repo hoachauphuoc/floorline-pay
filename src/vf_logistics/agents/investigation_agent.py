@@ -121,8 +121,8 @@ async def investigate_case(case_data: dict[str, Any]) -> dict[str, Any]:
     # Tavily enrichment: search for the specific fraud pattern and counterparties
     tavily_context = ""
     shipment = case_data.get("primary_shipment", {})
-    shipper = shipment.get("shipper_name", "")
-    receiver = shipment.get("receiver_name", "") or shipment.get("consignee", "")
+    shipper = shipment.get("shipper_name") or shipment.get("shipper_company") or ""
+    receiver = shipment.get("receiver_name") or shipment.get("receiver_company") or shipment.get("consignee", "")
     trigger = case_data.get("trigger_reason", "")
 
     tavily_queries = []
@@ -220,7 +220,7 @@ def _format_shipment(shipment: dict) -> str:
     - Route: {shipment.get('origin', 'N/A')} ? {shipment.get('destination', 'N/A')}
     - Value: {shipment.get('declared_value', 'N/A')} USD
     - Cost: {shipment.get('shipping_cost', 'N/A')} USD
-    - Shipper: {shipment.get('shipper_name', 'N/A')}
+    - Shipper: {shipment.get('shipper_name') or shipment.get('shipper_company') or 'N/A'}
     - Status: {shipment.get('status', 'N/A')}
     """
 
@@ -244,8 +244,10 @@ def _format_entity(entity: dict) -> str:
     if not isinstance(entity, dict) or not entity:
         return "No data"
     return f"""
-    - Name: {entity.get('name', 'N/A')}
+    - Name: {entity.get('name') or entity.get('company') or 'N/A'}
     - Company: {entity.get('company', 'N/A')}
+    - Tax ID: {entity.get('tax_id', 'N/A')}
+    - Country: {entity.get('country', 'N/A')}
     - Registration Date: {entity.get('registration_date', 'N/A')}
     - Total Transactions: {entity.get('transaction_count', 'N/A')}
     - Risk Rating: {entity.get('risk_rating', 'N/A')}

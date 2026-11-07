@@ -66,6 +66,8 @@ feeds - or the record simply did not carry it. Either way the absence is a fact
 about our inputs, not about this shipment: do not treat it as a missing record, a
 bypassed system or an anomaly, and do not raise the score for it. Deterministic
 code outside your judgement already applies a minimum risk where absence matters.
+
+A high Shipper Transaction Count means an established shipper and is not a risk signal by itself; a low count means little history, which deterministic code already scores.
 """
 
 
