@@ -107,8 +107,8 @@ async def analyze_shipment(shipment_data: dict[str, Any]) -> dict[str, Any]:
     Weight (kg): {shipment_data.get('weight_kg', 'N/A')}
     Declared Value: {shipment_data.get('declared_value', 'N/A')} USD
     Shipping Cost: {shipment_data.get('shipping_cost', 'N/A')} USD
-    Shipper: {shipment_data.get('shipper_name', 'N/A')}
-    Receiver: {shipment_data.get('receiver_name', 'N/A')}
+    Shipper: {shipment_data.get('shipper_name') or shipment_data.get('shipper_company') or 'N/A'}
+    Receiver: {shipment_data.get('receiver_name') or shipment_data.get('receiver_company') or 'N/A'}
     Created: {_policy_field(shipment_data, 'created_at')}
     Status: {shipment_data.get('status', 'N/A')}
     Route: {shipment_data.get('route_details', 'N/A')}
