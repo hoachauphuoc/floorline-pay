@@ -167,6 +167,11 @@ async def create_payout(
     return await _call("POST", "/v1/payments/payouts", body, request_id)
 
 
+def _says_repeated(body: dict[str, Any]) -> bool:
+    said = " ".join(str(body.get(field) or "") for field in ("name", "message")).lower() + str(body.get("details") or "").lower()
+    return "duplicate" in said or "already" in said
+
+
 def duplicate_batch_id(receipt: dict[str, Any]) -> str | None:
     """The PayPal batch id named by a refusal of a payout whose sender_batch_id was already used, or None.
 
@@ -177,8 +182,7 @@ def duplicate_batch_id(receipt: dict[str, Any]) -> str | None:
     body = receipt.get("body")
     if receipt.get("status") != HTTP_ERROR or not isinstance(http, int) or not 400 <= http < 500 or not isinstance(body, dict):
         return None
-    said = " ".join(str(body.get(field) or "") for field in ("name", "message")).lower() + str(body.get("details") or "").lower()
-    if "duplicate" not in said and "already" not in said:
+    if not _says_repeated(body):
         return None
     links = body.get("links")
     for link in links if isinstance(links, list) else []:
@@ -187,6 +191,18 @@ def duplicate_batch_id(receipt: dict[str, Any]) -> str | None:
             batch_id = href.rstrip("/").rsplit("/", 1)[-1]
             return batch_id or None
     return None
+
+
+def refused_outright(receipt: dict[str, Any]) -> bool:
+    """True when PayPal's answer proves this request took nothing: a 4xx that does not speak of a repeated key.
+
+    A timeout, a conflict and a rate limit (408, 409, 429) say the request may still be running or may run later, so they prove nothing.
+    """
+    http = receipt.get("http_status")
+    body = receipt.get("body")
+    if receipt.get("status") != HTTP_ERROR or not isinstance(http, int) or not 400 <= http < 500 or not isinstance(body, dict):
+        return False
+    return http not in (408, 409, 429) and not _says_repeated(body)
 
 
 async def get_payout_batch(batch_id: str, request_id: str) -> dict[str, Any]:

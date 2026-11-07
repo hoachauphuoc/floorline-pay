@@ -347,7 +347,7 @@ async def reserve_payout(
 ) -> tuple[str, str] | None:
     """
     Reserve this payout's amount, then check the daily limits against what is paid and what others have
-    reserved. None when it fits; else (status, reason) and the reservation is given up again. The reservation is
+    reserved. None when it fits; else (status, reason) and a reservation this call made is given up again. The reservation is
     written before the totals are read, so of two settlements at the same moment the later one sees the earlier one.
     """
     if not key:
@@ -356,7 +356,9 @@ async def reserve_payout(
     if live is None:
         return "held", "the published payment limits cannot be read; nothing is paid"
     open_now = await _open_reservations(tenant_id)
-    if not any(str(_detail(row).get("idempotency_key") or "") == key for row in open_now):
+    # A reservation still open from an earlier delivery may stand for a payout PayPal holds, so only the settler may give it up.
+    kept = any(str(_detail(row).get("idempotency_key") or "") == key for row in open_now)
+    if not kept:
         await get_store().add_audit({
             "audit_id": new_id("RSV"),
             "case_id": RESERVATIONS,
@@ -378,7 +380,7 @@ async def reserve_payout(
         entry["usd"] += amount
         entry["count"] += 1
     refusal = _daily_refusal(live, used, carrier_key, payout)
-    if refusal is not None:
+    if refusal is not None and not kept:
         await cancel_reservations(key, tenant_id)
     return refusal
 

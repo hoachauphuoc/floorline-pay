@@ -168,6 +168,11 @@ async def _freeze_for(
     return {"matched": True, "case_id": case_id, "frozen": frozen}
 
 
+def _seller_ids(disputed: Any) -> list[str]:
+    """The capture ids a dispute's transactions name; a list PayPal left out names none."""
+    return [str(t.get("seller_transaction_id") or "") for t in (disputed if isinstance(disputed, list) else []) if isinstance(t, dict)]
+
+
 async def _disputed_transactions(event_id: str, resource: dict[str, Any]) -> Any:
     """The transactions a dispute is about. The event may leave them out, so PayPal is asked; a dispute that cannot be
     looked up raises, so the event is delivered again instead of being recorded as matching nothing."""
@@ -208,11 +213,7 @@ async def _apply(
         )
     if event_type == _DISPUTE_OPENED:
         disputed = await _disputed_transactions(event_id, resource)
-        captures = [
-            str(t.get("seller_transaction_id") or "")
-            for t in (disputed if isinstance(disputed, list) else []) if isinstance(t, dict)
-        ]
-        return await _freeze_for(event_id, captures, "a dispute was opened on a payment", tenant_id)
+        return await _freeze_for(event_id, _seller_ids(disputed), "a dispute was opened on a payment", tenant_id)
     return {}
 
 
@@ -277,13 +278,8 @@ async def receive(headers: Mapping[str, str], event: Any) -> tuple[int, dict[str
     return 200, {"outcome": outcome, "event_type": event_type, **effect}
 
 
-async def reconcile(tenant_id: str | None = None, apply: bool = True) -> dict[str, int]:
-    """Apply again the kept events whose settlement can now be found. Returns how many were applied and how many wait.
-
-    Each effect is idempotent and keyed by the event, so a second run changes nothing. This only freezes or records a payout
-    status: it never pays anyone and never loosens anything.
-    With apply=False nothing is applied: the answer only says how many events wait, for the console to show.
-    """
+async def _kept_events(tenant_id: str | None) -> tuple[list[dict[str, Any]], bool]:
+    """The kept events not applied yet, and whether every kept row could be read."""
     pending: list[dict[str, Any]] = []
     done: set[str] = set()
     cursor: str | None = None
@@ -296,13 +292,24 @@ async def reconcile(tenant_id: str | None = None, apply: bool = True) -> dict[st
                 pending.append(_detail(row))
         if not cursor:
             break
+    return [item for item in pending if str(item.get("event_id") or "") not in done], not cursor
+
+
+async def reconcile(tenant_id: str | None = None, apply: bool = True) -> dict[str, int]:
+    """Apply again the kept events whose settlement can now be found. Returns how many were applied and how many wait.
+
+    Each effect is idempotent and keyed by the event, so a second run changes nothing. This only freezes or records a payout
+    status: it never pays anyone and never loosens anything.
+    With apply=False nothing is applied: the answer only says how many events wait, for the console to show.
+    """
+    pending, _ = await _kept_events(tenant_id)
     if not apply:
-        return {"applied": 0, "pending": sum(1 for item in pending if str(item.get("event_id") or "") not in done)}
+        return {"applied": 0, "pending": len(pending)}
     applied = 0
     waiting = 0
     for item in pending:
         event_id = str(item.get("event_id") or "")
-        if not event_id or event_id in done:
+        if not event_id:
             continue
         resource = item.get("resource")
         try:
@@ -323,3 +330,24 @@ async def reconcile(tenant_id: str | None = None, apply: bool = True) -> dict[st
         else:
             waiting += 1
     return {"applied": applied, "pending": waiting}
+
+
+async def unapplied_trouble(capture_id: str, tenant_id: str | None = None) -> bool:
+    """True when a kept refund, reversal, denial or dispute that names this capture has not taken effect.
+
+    reconcile() logs an event it cannot apply and goes on, so the settler cannot read "no freeze" as "no trouble": it asks here right
+    before a payout. Kept rows that cannot all be read count, because the capture cannot be cleared. A dispute kept without its
+    transactions names no capture here: reconcile() looks it up, and counting it would stop every payout while one lookup fails.
+    """
+    pending, complete = await _kept_events(tenant_id)
+    if not complete:
+        return True
+    for item in pending:
+        resource = item.get("resource")
+        resource = resource if isinstance(resource, dict) else {}
+        event_type = item.get("event_type")
+        if event_type in _CAPTURE_TROUBLE and capture_id in _capture_ids(resource):
+            return True
+        if event_type == _DISPUTE_OPENED and capture_id in _seller_ids(resource.get("disputed_transactions")):
+            return True
+    return False

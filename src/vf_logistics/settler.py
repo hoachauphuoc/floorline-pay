@@ -232,6 +232,21 @@ def _approval_record_missing(case: dict[str, Any], shipment: dict[str, Any], app
     return not any(isinstance(a, dict) and a.get("approval_id") == approval_id for a in approvals or [])
 
 
+async def _frozen_party(shipment: dict[str, Any], shippers: list[str], tenant_id: str | None) -> str | None:
+    """Why a party of this payment is frozen, or None: the first freeze found on the carrier or on a name of the shipper."""
+    for kind, name in (("carrier", shipment.get("carrier_name")), *(("shipper", shipper) for shipper in shippers)):
+        frozen = await payment_freeze.frozen(kind, name, tenant_id)
+        if frozen is not None:
+            return f"payments to this {kind} are frozen ({frozen['reason']}); a governance admin must lift the freeze"
+    return None
+
+
+def _frozen_after_capture(frozen: str, **steps: Any) -> dict[str, Any]:
+    """A freeze found once the money is captured ends failed, not held: settlement_retry sends only a failed settlement again, so
+    held would strand the captured money after a person lifts the freeze."""
+    return _result(FAILED, f"the money is captured, but {frozen}, and a person can then retry; no new payout was sent", **steps)
+
+
 async def _release(
     case: dict[str, Any], shipment: dict[str, Any], key: str, tenant_id: str | None, approval_id: str,
     released: str = "RELEASED_BY_HUMAN",
@@ -255,14 +270,11 @@ async def _release(
     if not shippers:
         # A freeze is kept under the shipper's name; a case that gives none cannot be checked, and an unchecked shipper is not a clear one.
         return _result(HELD, "the case names no shipper (shipper_company or shipper_name), so a freeze on the shipper cannot be checked; nothing is paid")
-    for kind, name in (("carrier", shipment.get("carrier_name")), *(("shipper", shipper) for shipper in shippers)):
-        frozen = await payment_freeze.frozen(kind, name, tenant_id)
-        if frozen is not None:
-            return _result(
-                HELD,
-                f"payments to this {kind} are frozen ({frozen['reason']}); a governance admin must lift the "
-                "freeze; nothing is paid",
-            )
+    frozen = await _frozen_party(shipment, shippers, tenant_id)
+    if frozen is not None:
+        if await _captured(key, tenant_id):
+            return _frozen_after_capture(frozen)
+        return _result(HELD, f"{frozen}; nothing is paid")
     held = payment_checks.check_payment(shipment)
     if held:
         codes = ", ".join(f["code"] for f in held)
@@ -313,8 +325,8 @@ async def _release(
         "detail": {"settled_case_id": case.get("case_id")},
         "at": utcnow(),
     }, tenant_id=tenant_id)
-    # An event PayPal sent before these two rows existed was kept as waiting; apply it now that it can be matched. It only freezes
-    # or records a payout status, so a failure here is logged and never changes what is paid.
+    # An event PayPal sent before these two rows existed was kept as waiting; apply it now that it can be matched. A failure here is
+    # only logged: the checks right before the payout read what took effect, so a refund that froze nobody still stops the payout.
     try:
         await paypal_webhook.reconcile(tenant_id)
     except Exception:  # noqa: BLE001
@@ -331,6 +343,18 @@ async def _release(
                 capture=_step(captured),
             )
         name = f"{key}-payout-2"
+    # Judged again here, after the waiting events were applied and as late as possible: the freeze check at the top ran before this
+    # capture could be matched, so a refund, reversal or dispute applied just now has to stop this payout.
+    frozen = await _frozen_party(shipment, shippers, tenant_id)
+    if frozen is not None:
+        return _frozen_after_capture(frozen, capture=_step(captured))
+    if not capture_id or await paypal_webhook.unapplied_trouble(str(capture_id), tenant_id):
+        return _result(
+            RETRY,
+            "a PayPal refund, reversal or dispute on this capture has not taken effect, so this payment cannot be judged; "
+            "no new payout was sent; deliver the decision again",
+            capture=_step(captured),
+        )
     paid = await _send_payout(
         payee, shipment.get("payout_amount"), currency, name,
         f"Floorline freight payment for {shipment.get('shipment_id') or case.get('case_id')}", tenant_id,
@@ -354,7 +378,8 @@ async def _release(
             )
         status = RETRY if _retryable(paid) else FAILED
         return _result(status, "PayPal captured the funds but did not pay the carrier",
-                       capture=_step(captured), payout=_step(paid))
+                       capture=_step(captured), payout=_step(paid),
+                       **({"proved_unpaid": True} if paid.get("proved_unpaid") else {}))
     return _result(
         SETTLED, "captured and paid", capture=_step(captured), payout=_step(paid),
         **({"recovered_from": paid["recovered_from"]} if paid.get("recovered_from") else {}),
@@ -438,7 +463,8 @@ async def _send_payout(payee: str, amount: Any, currency: str, name: str, note: 
     batch_id = _step(paid).get("paypal_id")
     if paid["status"] == paypal_client.OK and batch_id:
         await _keep_batch(name, str(batch_id), tenant_id)
-    return paid
+    # Only the first request can prove it: a repeat may be refused for another reason while an earlier request stands at PayPal.
+    return {**paid, "proved_unpaid": attempt is None and paypal_client.refused_outright(paid)}
 
 
 async def _recovered_payout(
@@ -558,11 +584,30 @@ async def _stored_result(case_id: str, key: str, tenant_id: str | None) -> dict[
     return None
 
 
+async def _payout_attempted(key: str, tenant_id: str | None) -> bool:
+    """True once a payout of this decision may have reached PayPal: _send_payout writes its attempt row before it asks."""
+    for name in (f"{key}-payout", f"{key}-payout-2"):
+        rows, _ = await get_store().query_audit(case_id=f"PAYBATCH-{name}", limit=1, tenant_id=tenant_id)
+        if rows:
+            return True
+    return False
+
+
+async def _payout_may_be_out(result: dict[str, Any], key: str, tenant_id: str | None) -> bool:
+    """True unless this decision's payout is proved not to stand at PayPal. Its reservation then keeps counting: dropping it would let
+    another payout pass the daily limit while this one is uncounted, and keeping it only tightens the limit until a delivery settles it."""
+    if result.get("proved_unpaid") or result.get("dead_batch"):
+        return False
+    return await _payout_attempted(key, tenant_id)
+
+
 async def _give_up_reservation(key: str, tenant_id: str | None) -> None:
-    """Drop this decision's reservation after a settlement that stopped on an error. If the drop itself fails the
-    reservation stays and keeps counting, which only tightens the day's limit until the redelivery settles it."""
+    """Drop this decision's reservation after a settlement that stopped on an error, unless a payout of it may stand at PayPal. If a
+    read or the drop itself fails the reservation stays and keeps counting, which only tightens the day's limit until the redelivery
+    settles it."""
     try:
-        await payment_controls.cancel_reservations(key, tenant_id)
+        if not await _payout_may_be_out({}, key, tenant_id):
+            await payment_controls.cancel_reservations(key, tenant_id)
     except Exception:  # noqa: BLE001
         return
 
@@ -599,7 +644,7 @@ async def settle(decision: dict[str, Any], tenant_id: str | None = None) -> dict
                 result = await _agent_release(case, shipment, key, tenant_id)
             else:
                 result = await _release(case, shipment, key, tenant_id, str(decision.get("approval_id") or ""))
-            if result["status"] != SETTLED:
+            if result["status"] != SETTLED and not await _payout_may_be_out(result, key, tenant_id):
                 await payment_controls.cancel_reservations(key, tenant_id)
     except Exception as exc:  # noqa: BLE001 - settle never raises; the status says what happened
         await _give_up_reservation(key, tenant_id)
