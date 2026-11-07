@@ -680,6 +680,16 @@ def _check_release(
     risk_ceiling, value_ceiling = float(ceiling), float(max_value)
 
     risk = case.get("risk_score")
+    # For a payment case whose model score no flag supports, the orchestrator names a lower risk (switch AGENT_GROUNDED_GATE, off by default).
+    # It counts only as a real number between the deterministic floor and the risk score; anything else leaves the risk score as it is.
+    gate_risk = case.get("gate_risk")
+    floor = reconciliation.get("risk_floor")
+    if (
+        _is_number(risk) and _is_number(gate_risk) and _is_number(floor)
+        and not isinstance(gate_risk, bool) and not isinstance(floor, bool)
+        and float(floor) <= float(gate_risk) <= float(risk)
+    ):
+        risk = gate_risk
     if not _is_number(risk) or float(risk) > risk_ceiling:
         return deny(f"effective risk {risk} exceeds delegated ceiling {ceiling}")
 

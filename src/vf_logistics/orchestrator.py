@@ -58,6 +58,7 @@ from vf_logistics import config
 from vf_logistics import document_render
 from vf_logistics import document_store
 from vf_logistics import governance
+from vf_logistics import grounding
 from vf_logistics import lineage
 from vf_logistics import model_armor
 from vf_logistics import shipper_registry
@@ -100,6 +101,9 @@ log = logging.getLogger(__name__)
 # --- Decision thresholds. Env-overridable so the policy is not buried in code.
 FRAUD_CLEAR_BELOW = int(os.getenv("FRAUD_CLEAR_BELOW", "40"))
 INVESTIGATE_AT = int(os.getenv("INVESTIGATE_AT", "70"))
+# A person turns this on (Render environment). Off, the agent gate reads the case risk as always. On, a payment case whose model score no flag of
+# its own supports (grounding.grounded_risk) is read at the deterministic floor plus any penalty; the case risk and the model score stay as they were.
+AGENT_GROUNDED_GATE = os.getenv("AGENT_GROUNDED_GATE", "").strip().lower() in ("1", "true", "yes", "on")
 
 # How sure the Senior Auditor must be before a DISAGREE changes a case's route.
 # Read per call (debate_escalate_confidence) so it can be tuned without a deploy.
@@ -1370,6 +1374,7 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
         case["risk_level"] = fraud_result.get("risk_level") or "UNKNOWN"
         case["compliance_status"] = compliance_result.get("compliance_status") or "UNKNOWN"
         case["compliance_score"] = _as_int(compliance_result.get("compliance_score"), 50)
+        case["grounding"] = grounding.classify(fraud_result.get("flags"), shipment, validation)
         case["state"] = "SPECIALISTS_DONE"
 
         if reconciled["source"] == "deterministic floor":
@@ -1437,6 +1442,14 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
 
     elif state == "SPECIALISTS_DONE":
         risk = case.get("risk_score") or 0
+        gate_risk = risk
+        gate_note = ""
+        case.pop("gate_risk", None)
+        if AGENT_GROUNDED_GATE and payment_checks.is_payment_case(case["shipment"]):
+            gate_risk, note = grounding.grounded_risk(risk, case.get("reconciliation"), case.get("grounding"))
+            if note:
+                case["gate_risk"] = gate_risk
+                gate_note = " " + note
         reconciled = case.get("reconciliation") or {}
         # Read the way governance._check_release reads it: only an explicit True
         # from reconcile() permits. A case with no reconciliation has no record
@@ -1459,7 +1472,7 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
         model_failed = bool(case.get("_model_failures"))
 
         clean = (
-            risk < FRAUD_CLEAR_BELOW
+            gate_risk < FRAUD_CLEAR_BELOW
             and may_auto_clear
             and compliance_cleared
             and not model_failed
@@ -1499,13 +1512,13 @@ async def advance(case: dict[str, Any]) -> dict[str, Any]:
             case = await _decide(
                 case,
                 "AUTO_CLEARED",
-                f"Fraud risk {risk}/100 is below the {FRAUD_CLEAR_BELOW} "
+                f"Fraud risk {gate_risk}/100 is below the {FRAUD_CLEAR_BELOW} "
                 f"threshold, compliance returned {case.get('compliance_status')}, "
-                f"and deterministic validation raised nothing.",
+                f"and deterministic validation raised nothing." + gate_note,
                 [
                     ("release_shipment", {
                         "shipment_id": case["shipment_id"],
-                        "reason": f"Fraud risk {risk} below threshold "
+                        "reason": f"Fraud risk {gate_risk} below threshold "
                                   f"{FRAUD_CLEAR_BELOW}, no deterministic findings",
                     }),
                     ("publish_decision", {
