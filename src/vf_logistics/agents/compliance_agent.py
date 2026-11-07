@@ -146,13 +146,13 @@ async def screen_shipment(
     Shipment ID: {shipment_data.get('shipment_id', 'N/A')}
     
     SHIPPER DETAILS:
-    - Name: {shipment_data.get('shipper_name', 'N/A')}
+    - Name: {shipment_data.get('shipper_name') or shipment_data.get('shipper_company') or 'N/A'}
     - Company: {shipment_data.get('shipper_company', 'N/A')}
     - Country: {shipment_data.get('shipper_country', 'N/A')}
     - Tax ID: {shipment_data.get('shipper_tax_id', 'N/A')}
     
     RECEIVER DETAILS:
-    - Name: {shipment_data.get('receiver_name', 'N/A')}
+    - Name: {shipment_data.get('receiver_name') or shipment_data.get('receiver_company') or 'N/A'}
     - Company: {shipment_data.get('receiver_company', 'N/A')}
     - Country: {shipment_data.get('receiver_country', 'N/A')}
     
@@ -168,8 +168,8 @@ async def screen_shipment(
     - Transit Points: {shipment_data.get('transit_points', 'N/A')}
     """
     
-    shipper_name = _searchable_name(shipment_data.get("shipper_name"))
-    receiver_name = _searchable_name(shipment_data.get("receiver_name"))
+    shipper_name = _searchable_name(shipment_data.get("shipper_name")) or _searchable_name(shipment_data.get("shipper_company"))
+    receiver_name = _searchable_name(shipment_data.get("receiver_name")) or _searchable_name(shipment_data.get("receiver_company"))
 
     # Always cached. The bypass that used to sit here was removed on measurement; the
     # reasoning is above the function.
