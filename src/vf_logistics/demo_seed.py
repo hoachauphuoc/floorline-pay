@@ -11,8 +11,10 @@ by that judge.
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
 from typing import Any
+from google.api_core.exceptions import DeadlineExceeded, ResourceExhausted, RetryError, ServiceUnavailable
 
 from vf_logistics import carrier_registry, payment_freeze
 
@@ -21,6 +23,8 @@ FROZEN_CARRIER = "Aster Freight Co"
 REGISTRANT = "demo-seed-registrant@floorline.example"
 VERIFIER = "demo-seed-verifier@floorline.example"
 _NOTE = "demo seed: the payee is the sandbox carrier account of this deployment"
+logger = logging.getLogger(__name__)
+_STORE_DOWN = (ResourceExhausted, ServiceUnavailable, DeadlineExceeded, RetryError)
 
 
 class DemoSeedError(Exception):
@@ -48,4 +52,10 @@ def maybe_seed() -> dict[str, Any] | None:
             "VF_SEED_PAYMENT_DEMO is true but VF_DEMO_PAYEE_EMAIL is not set; "
             "set it to the sandbox carrier account that demo payouts go to",
         )
-    return asyncio.run(seed(payee))
+    try:
+        return asyncio.run(seed(payee))
+    except _STORE_DOWN as error:
+        # A spent read quota or an outage must not stop the app from starting: a worker that cannot boot takes the live service down with it.
+        # Nothing is seeded, so nothing is paid on a payee that was never verified; the next start seeds again.
+        logger.warning("demo seed skipped, the store is unavailable (%s): %s", type(error).__name__, error)
+        return None
