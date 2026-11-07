@@ -93,6 +93,19 @@ interpretative_principles:
 
 headings:
 
+  # ---- Chapters 44 and 61: ordinary goods that are not controlled ----
+  - hs: "4412"
+    chapter: "44"
+    covers: "plywood, veneered panels and similar laminated wood"
+    residual: false
+    dual_use: false
+
+  - hs: "6109"
+    chapter: "61"
+    covers: "T-shirts, singlets and other vests, knitted or crocheted"
+    residual: false
+    dual_use: false
+
   # ---- Chapter 28: inorganic chemicals ----
   - hs: "2843"
     chapter: "28"
