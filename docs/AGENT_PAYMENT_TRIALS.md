@@ -26,7 +26,7 @@ What this shows:
 
 ## Trials 5 to 16 (7 Nov 2026)
 
-Same path (`agent_payment.py`, Book and pay, PayPal Sandbox), read from `/api/proxy/orchestrator/case/<id>`. From trial 13 the grounded gate switch (`AGENT_GROUNDED_GATE`) was on. "Model" is the fraud model score; "gate" is `gate_risk` when the switch lowered it. The agent needs a score below 40, compliance CLEARED and no findings. No case reached AUTO_CLEARED: the agent paid in none of the sixteen trials, and a person decided trials 1 to 4 only.
+Same path (`agent_payment.py`, Book and pay, PayPal Sandbox), read from `/api/proxy/orchestrator/case/<id>`. From trial 13 the grounded gate switch (`AGENT_GROUNDED_GATE`) was on. "Model" is the fraud model score; "gate" is `gate_risk` when the switch lowered it. The agent needs a score below 40, compliance CLEARED and no findings. No case in trials 5 to 16 reached AUTO_CLEARED: the agent paid in none of those twelve trials, and a person decided trials 1 to 4 only. Trials 17 and 18 follow the list below.
 
 | Case | Input | Outcome | Model / gate | Compliance | Findings (floor) | Why the agent did not pay |
 |---|---|---|---|---|---|---|
@@ -47,4 +47,20 @@ What this shows:
 - Each refusal came from a deterministic finding or from a model verdict; the risk floor was never lowered and no rule was loosened to change an outcome.
 - Three input bugs found by these trials were fixed (company names for compliance, headings 6109 and 4412, headings 6911 and 6912). After each fix the case stopped at a different place.
 - Compliance on a real company name depends on what web search returns. The same company was CLEARED in trial 15 and REVIEW_REQUIRED in trial 16.
-- Not shown: an agent payment to confirmed receipt. No claim of one is made.
+- Not shown by trials 5 to 16: an agent payment to confirmed receipt. Trials 17 and 18 below are the first two.
+
+## Trials 17 and 18 (8 Nov 2026)
+
+The first two cases the agent paid by itself. Both used a fictional demo shipper that a person added to the internal counterparty book (`shipper_registry.py`, Lotus Demo Ceramics Co Ltd, tax id 0399000101, 120 prior transactions, 0 prior flags): every trial that cites them must say the shipper is fictional. Same path as before (Book and pay, PayPal Sandbox, `agent_payment.py`), the grounded gate switch (`AGENT_GROUNDED_GATE`) on, an agent limit of 500 USD published by reviewer-a@floorline.example, delegation boundary version 3. Input of both: ceramic tableware 6912.00, 100 kg, Vietnam to Vietnam (ho chi minh city to hanoi), declared value 5000, freight 1500 USD, payout 400 USD, carrier Mekong Haulage Co, payee the sandbox carrier account.
+
+| Case | Outcome | Model score | Compliance | Findings (floor) | Capture / payout (PayPal) | Payer on PayPal |
+|---|---|---|---|---|---|---|
+| CASE-SHP-PAY-MW781QPK | AUTO_CLEARED, paid, payout confirmed | 12 | CLEARED | none | capture 7FY68372KL510220W, payout VP5N4876RDANA, 1500 held and captured, 400 paid | the carrier's own sandbox account (sb-vjys053493741@personal.example.com) |
+| CASE-SHP-PAY-MW78WWRX | AUTO_CLEARED, paid, payout confirmed | 30 | CLEARED | none | capture 2JH117630B829750E, payout 42BUH8EKYCSSN (transaction 38C074263P410530C), 1500 held and captured, 400 paid | the buyer sandbox account (sb-zk6wx53494318@personal.example.com) |
+
+What this shows:
+- Trial 17 is not counted as proof of three separate parties: the person who approved the payment on PayPal was signed in as the carrier, so the payer and the payee were the same sandbox account. It is kept here because it ran and moved sandbox money.
+- Trial 18 is the case with three separate sandbox accounts: buyer (payer), carrier (payee) and operator (business account that held, captured and paid). The operator account shows the 1500 USD payment from the buyer and the 400 USD payout to the carrier, and the application shows `paid`, payout `confirmed`, `SUCCESS`. No person pressed Release.
+- The model score moved between the two identical inputs (12 and 30), both below the threshold of 40. The deterministic checks raised no finding and no rule was loosened.
+- Receipt on the carrier side: the activity of the carrier account shows two payments of 400 USD from the operator's store (trials 17 and 18) and, for trial 17 only, a purchase of 1500 USD made by the carrier account itself, which is why trial 17 is not three parties. Trial 18 has no such purchase on the carrier account.
+- Not shown: two cases of one fictional shipper on one corridor, under a limit of 500 USD, do not show that the agent pays everyday cases.
