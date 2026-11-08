@@ -102,7 +102,15 @@ function Finish() {
           <p className="text-[13px] text-dim">Authorizing the payment and submitting the shipment...</p>
         )}
         {outcome.kind === "stopped" && (
-          <p className="text-[13px] text-risk-warn">{outcome.message}</p>
+          <>
+            <p className="text-[13px] text-risk-warn">{outcome.message}</p>
+            <Link
+              href="/book"
+              className="mt-3 inline-flex h-11 items-center rounded-md border border-white/10 px-4 text-[13px] text-brand hover:border-white/25"
+            >
+              Go to Book and pay
+            </Link>
+          </>
         )}
         {outcome.kind === "done" && (
           <p className="text-[13px] text-risk-clear">

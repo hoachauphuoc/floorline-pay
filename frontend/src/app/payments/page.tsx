@@ -145,10 +145,10 @@ export default function PaymentsPage() {
                         {item.case_id}
                       </Link>
                     </TableCell>
-                    <TableCell className={cn("text-[12px]", shownFor(item).tone)}>
+                    <TableCell className={cn("min-w-[9rem] whitespace-normal text-[12px]", shownFor(item).tone)}>
                       {shownFor(item).text}
                     </TableCell>
-                    <TableCell className="max-w-[22rem] text-[12px] text-dim">
+                    <TableCell className="min-w-[14rem] max-w-[22rem] whitespace-normal text-[12px] text-dim">
                       {item.reason ?? ""}
                     </TableCell>
                     <TableCell className="font-mono text-[11px]">{item.capture?.paypal_id ?? ""}</TableCell>

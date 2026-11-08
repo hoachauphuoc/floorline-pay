@@ -106,7 +106,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SheetTitle className="px-4 pt-4 text-[13px] font-semibold tracking-display text-white">
                 Floorline
               </SheetTitle>
-              <nav className="p-2">
+              <nav className="min-h-0 flex-1 overflow-y-auto p-2">
                 {NAV_SECTIONS.map((section, index) => (
                   <div key={section.id} className={cn("space-y-0.5", index > 0 && "mt-3")}>
                     <p className="px-2.5 pb-1 text-[10px] font-medium uppercase tracking-wider text-faint">

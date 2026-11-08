@@ -81,7 +81,7 @@ export default function BookPage() {
                 value={form[key]}
                 onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                 placeholder={placeholder}
-                className="mt-1 h-8 border-white/10 bg-black/30 text-[12px]"
+                className="mt-1 h-11 border-white/10 bg-black/30 text-base md:h-8 md:text-[12px]"
               />
             </div>
           ))}
@@ -93,7 +93,7 @@ export default function BookPage() {
           size="sm"
           disabled={pay.isPending || problem !== null}
           onClick={() => pay.mutate()}
-          className="mt-3 h-8 bg-[#FFC439] text-[12px] font-semibold text-[#111111] hover:bg-[#f2b72f]"
+          className="mt-3 h-11 w-full bg-[#FFC439] text-[12px] font-semibold text-[#111111] hover:bg-[#f2b72f] md:h-8 md:w-auto"
         >
           {pay.isPending ? (
             <Loader2 className="mr-1.5 size-3.5 animate-spin" />
