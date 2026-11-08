@@ -66,7 +66,7 @@ export default function BookPage() {
     <>
       <PageHeading title="Book and pay">
         Pay the freight with PayPal. The money is held while Floorline checks the shipment, paid
-        to the carrier only after a person releases it, and returned to you if it is blocked.
+        to the carrier only on a published decision (a person&apos;s, or the agent&apos;s inside a limit a person set), and returned to you if it is blocked.
       </PageHeading>
 
       <section className="bento-card max-w-3xl p-4" aria-label="Booking">

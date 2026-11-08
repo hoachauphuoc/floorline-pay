@@ -25,7 +25,7 @@ const STEPS = [
   {
     href: "/review",
     title: "A person releases",
-    text: "Only a person releases a payout, and a large one needs a second person.",
+    text: "A person decides every disputed payout, and a large one needs a second person. The agent may pay a clean case only below a limit a person published.",
   },
   {
     href: "/payments",
@@ -100,8 +100,8 @@ export default function PayPage() {
   return (
     <>
       <PageHeading title="Floorline Pay">
-        Shipper funds are held at booking and reach the carrier only after a person releases the
-        shipment. A block returns them. Every step below is a screen you can open.
+        Shipper funds are held at booking and reach the carrier only on a published decision (a person&apos;s, or the agent&apos;s
+        inside a limit a person set). A block returns them. Every step below is a screen you can open.
       </PageHeading>
 
       <ol className="mb-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4" aria-label="How a payment moves">
