@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import { AgTable } from "@/components/grid/AgTable";
 import { Gated } from "@/components/layout/Gated";
+import { HelpDot } from "@/components/help/HelpDot";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { EmptyState, ErrorState } from "@/components/layout/States";
 import { Button } from "@/components/ui/button";
@@ -164,7 +165,7 @@ export default function SettlementPage() {
     <>
       {heading}
 
-      <h2 className="mb-2 text-[13px] font-medium text-white">Frozen parties</h2>
+      <h2 className="mb-2 text-[13px] font-medium text-white">Frozen parties <HelpDot id="settlement.frozen" className="ml-1 align-middle" /></h2>
       {frozen.data.frozen.length === 0 ? (
         <EmptyState title="Nobody is frozen">
           A dispute, a reversed capture or a failed payout freezes the carrier and the shipper of its case here.
@@ -178,7 +179,7 @@ export default function SettlementPage() {
             rowId={(row) => `${row.kind}-${row.party}`}
           />
           <section className="bento-card mt-3 max-w-3xl p-4" aria-label="Lift a freeze">
-            <h3 className="text-[12px] font-medium text-white">Lift a freeze</h3>
+            <h3 className="text-[12px] font-medium text-white">Lift a freeze <HelpDot id="settlement.lift" className="ml-1 align-middle" /></h3>
             {selected ? (
               <>
                 <p className="mt-1 text-[12px] text-dim">
@@ -219,7 +220,7 @@ export default function SettlementPage() {
 
       {reconcileLock === null && (
         <section className="bento-card mt-8 max-w-3xl p-4" aria-label="Holds with no case">
-          <h2 className="text-[13px] font-medium text-white">Holds with no case</h2>
+          <h2 className="text-[13px] font-medium text-white">Holds with no case <HelpDot id="settlement.unbound" className="ml-1 align-middle" /></h2>
           {unbound.isError ? (
             <ErrorState error={unbound.error} />
           ) : holds.length === 0 ? (
@@ -238,7 +239,7 @@ export default function SettlementPage() {
         </section>
       )}
       <section className="bento-card mt-8 max-w-3xl p-4" aria-label="PayPal events waiting">
-        <h2 className="text-[13px] font-medium text-white">PayPal events waiting</h2>
+        <h2 className="text-[13px] font-medium text-white">PayPal events waiting <HelpDot id="settlement.events" className="ml-1 align-middle" /></h2>
         {events.isError ? (
           <ErrorState error={events.error} />
         ) : (
@@ -272,7 +273,7 @@ export default function SettlementPage() {
           </div>
         )}
       </section>
-      <h2 className="mb-2 mt-8 text-[13px] font-medium text-white">Payouts</h2>
+      <h2 className="mb-2 mt-8 text-[13px] font-medium text-white">Payouts <HelpDot id="settlement.payouts" className="ml-1 align-middle" /></h2>
       {ledger.data.items.length === 0 ? (
         <EmptyState title="No payments yet">
           A payment appears here once a person has released or blocked a booked shipment.

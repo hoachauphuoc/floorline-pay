@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { Gated } from "@/components/layout/Gated";
+import { HelpDot } from "@/components/help/HelpDot";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { EmptyState, ErrorState } from "@/components/layout/States";
 import { Button } from "@/components/ui/button";
@@ -122,7 +123,7 @@ function RegisterPayee({ onDone, lock }: { onDone: () => void; lock: string | nu
 
   return (
     <section className="bento-card max-w-3xl p-4" aria-label="Register a payee">
-      <h2 className="text-[12px] font-medium text-white">Register a payee</h2>
+      <h2 className="text-[12px] font-medium text-white">Register a payee <HelpDot id="carriers.register" className="ml-1 align-middle" /></h2>
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
         <div>
           <Label htmlFor="carrier-name" className="text-[11px] text-dim">
@@ -151,7 +152,7 @@ function RegisterPayee({ onDone, lock }: { onDone: () => void; lock: string | nu
       </div>
       <div className="mt-2">
         <Label htmlFor="carrier-request" className="text-[11px] text-dim">
-          Message that asked for the change (optional)
+          Message that asked for the change (optional) <HelpDot id="carriers.request" />
         </Label>
         <Textarea
           id="carrier-request"
@@ -288,7 +289,7 @@ function PendingPayee({
       ) : (
         <>
           <Label htmlFor={id} className="mt-2 block text-[11px] text-dim">
-            Callback note
+            Callback note <HelpDot id="carriers.callback" />
           </Label>
           <Input
             id={id}

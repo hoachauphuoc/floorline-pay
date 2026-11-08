@@ -57,9 +57,9 @@ export const NAV_HELP: Record<string, HelpEntry> = {
   "/carriers": {
     title: "Carriers",
     body:
-      "Who each carrier may be paid, and up to how much: the credit standing and the cap kept for each carrier.",
+      "Who each carrier may be paid to: the PayPal account registered for it, who verified it and when, and any change still waiting for a second person.",
     note:
-      "A model or a search may only tighten a carrier's limit, never loosen it.",
+      "A payee changed less than 14 days before a payout holds that payout, and a payout to any other account is held for a person.",
   },
   "/controls": {
     title: "Payment controls",
@@ -483,6 +483,78 @@ export const PANEL_HELP: Record<string, HelpEntry> = {
       "That is correct fail-closed behaviour, not a fault -- but it explains a board where nothing ever clears.",
   },
 
+  // Floorline Pay overview and Payments
+  "pay.paid-confirmed": {
+    title: "Paid to carriers, confirmed by PayPal",
+    body:
+      "Cases the settler paid whose payout PayPal has since confirmed. Only this count means the carrier has the money.",
+  },
+  "pay.paid-accepted": {
+    title: "Payouts accepted, not confirmed yet",
+    body:
+      "The settler sent the payout and PayPal accepted it, but PayPal has not confirmed it yet. A payout state the console does not recognise is counted here too, as a warning.",
+  },
+  "pay.paid-waiting": {
+    title: "Payouts sent, not received yet",
+    body:
+      "PayPal reports the payout as still pending, so the carrier does not have it yet.",
+  },
+  "pay.paid-failed": {
+    title: "Payouts failed at PayPal",
+    body:
+      "PayPal reports the payout failed. The carrier is frozen until a governance admin, signed in with a password, lifts the freeze.",
+  },
+  "pay.paid-returned": {
+    title: "Payouts returned by PayPal",
+    body:
+      "PayPal returned, refunded or reversed the payout, and the carrier is frozen. Check the payee before the freeze is lifted.",
+  },
+  "pay.voided": {
+    title: "Returned to shippers",
+    body:
+      "Cases where the settler voided the PayPal hold after a published block. The shipper's money was never captured.",
+  },
+  "pay.held": {
+    title: "Held by the checks",
+    body:
+      "Cases where the settler refused to move money: a payment check raised a finding, a party is frozen, a limit or the carrier's credit cap was passed, a second approval is missing, or the PayPal hold did not match. Nothing was captured; the reason is in the Why column on Payments.",
+  },
+  "pay.decision-not-sent": {
+    title: "Decisions not sent",
+    body:
+      "A person's decision was saved on the case but never reached the settler, so no money moved. Send it again from the case.",
+  },
+  "pay.sent-today": {
+    title: "Sent for payout today in USD",
+    body:
+      "The total of payouts the settler sent since midnight UTC, for all carriers. It counts what was sent, not what PayPal confirmed, and the daily limits on Payment controls are checked against it.",
+  },
+  "payments.state": {
+    title: "State",
+    body:
+      "What the settler last did with this case's money. A paid case reads as paid to the carrier only once PayPal confirms the payout; until then it says accepted or sent.",
+  },
+  "payments.why": {
+    title: "Why",
+    body:
+      "The reason the settler recorded with that outcome, for example which check held the payout or which limit it would pass.",
+  },
+  "payments.captured": {
+    title: "Captured",
+    body:
+      "PayPal's id for the capture, the moment the shipper's held money was taken. Empty means nothing was captured.",
+  },
+  "payments.paid-out": {
+    title: "Paid out",
+    body:
+      "PayPal's id for the payout sent to the carrier. It shows the payout was sent, not that it arrived; the State column says whether PayPal confirmed it.",
+  },
+  "payments.voided": {
+    title: "Voided",
+    body:
+      "PayPal's id for the void that released the shipper's hold after a published block. A voided case was never captured.",
+  },
+
   // Board
   "board.columns": {
     title: "The board",
@@ -490,6 +562,47 @@ export const PANEL_HELP: Record<string, HelpEntry> = {
       "One card per shipment, in the column for the stage it has reached. Click a card for the full trace: every agent hop, every action, and every finding.",
     note:
       "Columns group several internal states. Awaiting a person also holds held-for-review, escalated and abandoned cases; Cleared holds both automatic and reviewer releases.",
+  },
+
+  // Payment controls
+  "controls.pause": {
+    title: "Pause switch",
+    body:
+      "Any operator signed in with a password can pause payments, with a reason; only a governance admin can resume them. While paused, releases wait and are retried after the resume, and a block still returns the shipper's money.",
+  },
+  "controls.limits": {
+    title: "Limits in force",
+    body:
+      "The limits the settler checks before every payout, the agent's included; a governance admin signed in with a password publishes them, with a reason. If they cannot be read, nothing is paid.",
+    note:
+      "A payout must also fit the carrier's credit cap, so the smaller of the two applies.",
+  },
+  "controls.max_payout_usd": {
+    title: "Largest single payout (USD)",
+    body:
+      "A payout above this is held by the settler and nothing is paid; waiting does not change that.",
+  },
+  "controls.carrier_daily_usd": {
+    title: "Per carrier per day (USD)",
+    body:
+      "A payout that would take one carrier past this total since midnight UTC waits and is retried when the day turns over.",
+  },
+  "controls.tenant_daily_usd": {
+    title: "All carriers per day (USD)",
+    body:
+      "A payout that would take today's total for all carriers past this waits and is retried when the day turns over.",
+  },
+  "controls.carrier_daily_count": {
+    title: "Payouts per carrier per day",
+    body:
+      "Once a carrier has had this many payouts today, the next one waits until the day turns over.",
+  },
+  "controls.agent-limit": {
+    title: "Agent payments",
+    body:
+      "The agent may pay a case without a person only when the case is clean and the payout is below this limit; anything else waits for a person, and the settler runs every check again before money moves. 0 turns agent payments off, and with no limit published every payment waits for a person.",
+    note:
+      "Clean means no findings, a floor that permits an automated decision, the analyst reading it as normal, the carrier found online, credit standing A and no second approval needed. Only a governance admin signed in with a password publishes the limit.",
   },
 
   // Agents screen
@@ -516,6 +629,50 @@ export const PANEL_HELP: Record<string, HelpEntry> = {
       "Which model answers which question, and what each costs per million tokens. Document reading needs vision, so it uses a different model from the reasoning steps.",
   },
 
+  // Settlement and Carriers
+  "settlement.frozen": {
+    title: "Frozen parties",
+    body:
+      "A carrier or shipper is frozen when PayPal reports a dispute, a denied, refunded or reversed capture, or a payout that failed or came back. The settler pays nothing to a frozen party until a governance admin signed in with a password lifts the freeze.",
+    note:
+      "No webhook, model or release decision can lift a freeze.",
+  },
+  "settlement.lift": {
+    title: "Lift a freeze",
+    body:
+      "Choose Select on a frozen party, write why it is safe to pay it again, and lift. Your name and the reason are kept on the audit trail; every other check still runs on the next payout.",
+  },
+  "settlement.unbound": {
+    title: "Holds with no case",
+    body:
+      "PayPal holds the shipper's money for these orders, but the booking never became a case, so no decision can be made on them. Finish the booking from the link.",
+  },
+  "settlement.events": {
+    title: "PayPal events waiting",
+    body:
+      "Messages from PayPal that arrived before Floorline could match them to a settlement. Until they are applied, a refund or dispute among them has frozen nobody.",
+  },
+  "settlement.payouts": {
+    title: "Payouts",
+    body:
+      "Each payout as PayPal last reported it. Only Confirmed by PayPal means the carrier has the money; a payout that failed or came back freezes the carrier.",
+  },
+  "carriers.register": {
+    title: "Register a payee",
+    body:
+      "Names the PayPal account a carrier may be paid at. It stays pending until a different person verifies it after a callback; until then the old payee stays in force, and a payout to any other account is held for a person.",
+  },
+  "carriers.request": {
+    title: "Message that asked for the change",
+    body:
+      "Paste the carrier's request. It is screened for wording typical of payment-diversion fraud; a flagged request holds payouts to that payee until it is registered and verified again, and only the screen's reasons are kept.",
+  },
+  "carriers.callback": {
+    title: "Callback note",
+    body:
+      "Who you called, on which number, and what they confirmed. The person who registered the payee cannot verify it, and a payee changed less than 14 days before a payout holds that payout.",
+  },
+
   // Review screen
   "review.queue": {
     title: "Queue",
@@ -536,6 +693,38 @@ export const PANEL_HELP: Record<string, HelpEntry> = {
     title: "Decision",
     body:
       "Release, block, or ask for more information. The decision is recorded under your signed-in account -- never a typed name -- and a note is required for anything other than a plain release.",
+  },
+
+  // Book and Defense
+  "book.shipping_cost": {
+    title: "Freight to pay (USD)",
+    body:
+      "The amount PayPal holds on the shipper's account at checkout. It is held, not taken: a published decision to pay captures it and a block voids it.",
+  },
+  "book.carrier_payee_email": {
+    title: "Carrier PayPal account for this load",
+    body:
+      "The account this load would pay. It is checked against the payee verified for this carrier on Carriers; a different account, or no verified payee, holds the payout for a person.",
+  },
+  "book.payout_amount": {
+    title: "Payout to the carrier (USD)",
+    body:
+      "What the carrier is paid from the hold; blank means the freight. A payout above the booked freight is a finding that holds it, and the settler never pays more than PayPal holds.",
+  },
+  "book.after-paypal": {
+    title: "After PayPal",
+    body:
+      "PayPal sends you back to Floorline, which asks PayPal to authorize the hold and submits the shipment as a case. If PayPal no longer holds the order nothing is submitted; if a step fails the booking is kept and a reload retries the same order without a second hold.",
+  },
+  "defense.replay": {
+    title: "The attack replay",
+    body:
+      "Each row is one way to be paid wrongly, replayed against the same checks the pipeline and the settler run. The replay reads and writes nothing and calls neither PayPal nor a model, so none of them can move money. A row marked Proved by a test cannot be replayed here because it needs the store or PayPal.",
+  },
+  "defense.catches": {
+    title: "What the checks catch",
+    body:
+      "How often each layer flags a fraudulent payout, and how often it flags a legitimate one, measured on a synthetic corpus and shown with a 95% confidence interval. Each row adds one layer to the row above it.",
   },
 
   // Today screen

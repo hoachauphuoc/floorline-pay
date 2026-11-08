@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ColDef } from "ag-grid-community";
 
 import { AgTable } from "@/components/grid/AgTable";
+import { HelpDot } from "@/components/help/HelpDot";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -126,11 +127,12 @@ export default function DefensePage() {
       <p className="mb-3 text-[13px] text-white/90" data-testid="defense-summary">
         <span className="font-mono tabular-nums text-risk-clear">{stopped} of {of}</span> attacks stopped,
         and no money moved in any of them.
+        <HelpDot id="defense.replay" className="ml-1 align-middle" />
       </p>
       <AgTable label="Attack replay" rows={rows} columns={SCENARIO_COLUMNS} rowId={(row) => row.id} />
       <p className="mt-2 text-[11.5px] text-faint">{note}</p>
 
-      <h2 className="mb-2 mt-8 text-[13px] font-medium text-white">What the checks catch</h2>
+      <h2 className="mb-2 mt-8 text-[13px] font-medium text-white">What the checks catch <HelpDot id="defense.catches" className="ml-1 align-middle" /></h2>
       {evaluation.isError ? (
         <ErrorState error={evaluation.error} />
       ) : evaluation.isLoading || !evaluation.data ? (

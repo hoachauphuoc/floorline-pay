@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
+import { HelpDot } from "@/components/help/HelpDot";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -66,20 +67,20 @@ export default function PayPage() {
     const kinds = paid.map((item) => paidKind(item.payout_status));
     const count = (kind: PaidKind) => String(kinds.filter((found) => found === kind).length);
     const rows = [
-      ["Paid to carriers, confirmed by PayPal", count("confirmed")],
-      ["Payouts accepted, not confirmed yet", count("accepted")],
-      ["Payouts sent, not received yet", count("waiting")],
-      ["Payouts failed at PayPal", count("failed")],
-      ["Payouts returned by PayPal", count("returned")],
-      ["Returned to shippers", String(counts.voided ?? 0)],
-      ["Held by the checks", String(counts.held ?? 0)],
-      ["Decisions not sent", String(counts.decision_not_sent ?? 0)],
-      ["Sent for payout today in USD", controls.data.usage_today.tenant_usd],
+      ["Paid to carriers, confirmed by PayPal", count("confirmed"), "pay.paid-confirmed"],
+      ["Payouts accepted, not confirmed yet", count("accepted"), "pay.paid-accepted"],
+      ["Payouts sent, not received yet", count("waiting"), "pay.paid-waiting"],
+      ["Payouts failed at PayPal", count("failed"), "pay.paid-failed"],
+      ["Payouts returned by PayPal", count("returned"), "pay.paid-returned"],
+      ["Returned to shippers", String(counts.voided ?? 0), "pay.voided"],
+      ["Held by the checks", String(counts.held ?? 0), "pay.held"],
+      ["Decisions not sent", String(counts.decision_not_sent ?? 0), "pay.decision-not-sent"],
+      ["Sent for payout today in USD", controls.data.usage_today.tenant_usd, "pay.sent-today"],
     ];
     return (
       <>
         <ul className="flex flex-wrap gap-2" aria-label="Live payment figures">
-          {rows.map(([label, value]) => (
+          {rows.map(([label, value, help]) => (
             <li
               key={label}
               aria-label={`${label}: ${value}`}
@@ -87,6 +88,7 @@ export default function PayPage() {
             >
               <span className="text-dim">{label}</span>
               <span className="ml-2 font-mono tabular-nums text-white">{value}</span>
+              <HelpDot id={help} className="ml-1 align-middle" />
             </li>
           ))}
         </ul>

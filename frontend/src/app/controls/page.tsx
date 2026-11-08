@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 import { Gated } from "@/components/layout/Gated";
+import { HelpDot } from "@/components/help/HelpDot";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
 import { AgentLimitCard } from "@/components/payments/AgentLimitCard";
@@ -86,6 +87,7 @@ export default function ControlsPage() {
       {heading}
 
       <section className="bento-card p-4" aria-label="Pause switch">
+        <HelpDot id="controls.pause" className="float-right" />
         {pause.paused ? (
           <>
             <p className="text-[13px] font-medium text-risk-critical">Payments are paused</p>
@@ -114,7 +116,7 @@ export default function ControlsPage() {
       </section>
 
       <section className="bento-card p-4" aria-label="Limits">
-        <h2 className="text-[12px] font-medium text-white">Limits in force</h2>
+        <h2 className="text-[12px] font-medium text-white">Limits in force <HelpDot id="controls.limits" className="ml-1 align-middle" /></h2>
         {limits === null ? (
           <p className="mt-1 text-[12px] text-risk-critical">
             The published limits cannot be read, so nothing is paid until a governance admin
@@ -125,7 +127,7 @@ export default function ControlsPage() {
             <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[12px]">
               {LIMIT_FIELDS.map(([key, label]) => (
                 <div key={key} className="contents">
-                  <dt className="text-dim">{label}</dt>
+                  <dt className="text-dim">{label} <HelpDot id={`controls.${key}`} className="ml-1 align-middle" /></dt>
                   <dd className="font-mono tabular-nums text-white/90">{limits[key]}</dd>
                 </div>
               ))}
@@ -143,7 +145,7 @@ export default function ControlsPage() {
       <AgentLimitCard limit={controls.data.agent_limit ?? null} lock={adminLock} onDone={refresh} />
 
       <section className="bento-card p-4" aria-label="Sent for payout today">
-        <h2 className="text-[12px] font-medium text-white">Sent for payout today (UTC)</h2>
+        <h2 className="text-[12px] font-medium text-white">Sent for payout today (UTC) <HelpDot id="pay.sent-today" className="ml-1 align-middle" /></h2>
         <p className="mt-1 text-[12px] text-dim">
           All carriers <span className="font-mono text-white/90">{usage.tenant_usd}</span> USD
         </p>

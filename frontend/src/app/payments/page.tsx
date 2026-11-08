@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
+import { HelpDot } from "@/components/help/HelpDot";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { EmptyState, ErrorState } from "@/components/layout/States";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -69,8 +70,8 @@ export default function PaymentsPage() {
 
   const heading = (
     <PageHeading title="Payments">
-      The newest outcome of every payment: paid to the carrier after a person released the
-      shipment, returned to the shipper after a block, or held back by the payment checks.
+      The newest outcome of every payment: paid to the carrier after a published decision (a person&apos;s, or the agent&apos;s
+      inside a limit a person set), returned to the shipper after a block, or held back by the payment checks.
     </PageHeading>
   );
 
@@ -126,11 +127,11 @@ export default function PaymentsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Case</TableHead>
-                  <TableHead>State</TableHead>
-                  <TableHead>Why</TableHead>
-                  <TableHead>Captured</TableHead>
-                  <TableHead>Paid out</TableHead>
-                  <TableHead>Voided</TableHead>
+                  <TableHead>State <HelpDot id="payments.state" /></TableHead>
+                  <TableHead>Why <HelpDot id="payments.why" /></TableHead>
+                  <TableHead>Captured <HelpDot id="payments.captured" /></TableHead>
+                  <TableHead>Paid out <HelpDot id="payments.paid-out" /></TableHead>
+                  <TableHead>Voided <HelpDot id="payments.voided" /></TableHead>
                   <TableHead>When</TableHead>
                 </TableRow>
               </TableHeader>

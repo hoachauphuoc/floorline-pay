@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
+import { HelpDot } from "@/components/help/HelpDot";
 import { Gated } from "@/components/layout/Gated";
 import { ErrorState } from "@/components/layout/States";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ export function AgentLimitCard({
 
   return (
     <section className="bento-card p-4" aria-label="Agent payments">
-      <h2 className="text-[12px] font-medium text-white">Agent payments</h2>
+      <h2 className="text-[12px] font-medium text-white">Agent payments <HelpDot id="controls.agent-limit" className="ml-1 align-middle" /></h2>
       {limit ? (
         <p className="mt-1 text-[12px] text-dim">
           The agent pays clean cases below <span className="font-mono text-white/90">{limit.limit_usd}</span> USD. Published by{" "}

@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
+import { HelpDot } from "@/components/help/HelpDot";
 import { PageHeading } from "@/components/layout/PageHeading";
 import { ErrorState } from "@/components/layout/States";
 import { Button } from "@/components/ui/button";
@@ -74,7 +75,7 @@ export default function BookPage() {
           {FIELDS.map(([key, label, placeholder]) => (
             <div key={key}>
               <Label htmlFor={`b-${key}`} className="text-[11px] text-dim">
-                {label}
+                {label} <HelpDot id={`book.${key}`} className="ml-1 align-middle" />
               </Label>
               <Input
                 id={`b-${key}`}
@@ -102,6 +103,7 @@ export default function BookPage() {
           )}
           Pay with PayPal
         </Button>
+        <HelpDot id="book.after-paypal" className="ml-2 align-middle" />
 
         <p className="mt-2 flex items-center gap-2 text-[11px] text-dim">
           <span className="inline-flex h-6 items-center rounded-md bg-white px-2">
