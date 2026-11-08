@@ -58,7 +58,17 @@ function Finish() {
         return;
       }
       try {
-        const authorized = await authorizePaymentOrder(token);
+        let authorized: Awaited<ReturnType<typeof authorizePaymentOrder>>;
+        try {
+          authorized = await authorizePaymentOrder(token);
+        } catch (error) {
+          // 409: PayPal no longer holds this order, so a reload can never succeed; say so and stop.
+          if (error instanceof ApiError && error.status === 409) {
+            setOutcome({ kind: "stopped", message: error.message });
+            return;
+          }
+          throw error;
+        }
         const result = await submitShipmentEvent({
           ...shipmentFromForm(form),
           paypal_order_id: authorized.order_id,

@@ -227,6 +227,17 @@ def register(
             return jsonify({"order_id": order_id, "authorization_id": earlier}), 200
         receipt = run_async(paypal_client.authorize_order(order_id, f"authorize-{order_id}"))
         if receipt["status"] != paypal_client.OK:
+            # PayPal answers 404 RESOURCE_NOT_FOUND to an order that expired: nothing was held, and a reload can never succeed.
+            if (
+                receipt["status"] == paypal_client.HTTP_ERROR
+                and receipt.get("http_status") == 404
+                and receipt.get("error") == "RESOURCE_NOT_FOUND"
+            ):
+                return jsonify({
+                    "error": f"PayPal no longer holds order {order_id}: nothing was held or charged. Book again from Book and pay.",
+                    "paypal_status": receipt["status"],
+                    "paypal_error": "RESOURCE_NOT_FOUND",
+                }), 409
             return _refusal(receipt)
         authorization_id = _authorization_id(receipt["body"])
         if authorization_id is None:
