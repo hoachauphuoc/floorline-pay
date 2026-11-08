@@ -15,6 +15,14 @@ type Outcome =
   | { kind: "stopped"; message: string }
   | { kind: "failed"; error: unknown };
 
+// The heading must not say the payment is authorized before it is, nor after PayPal or the booking refused it.
+const SUBTITLE: Record<Outcome["kind"], string> = {
+  working: "PayPal has sent you back. The payment is being authorized and the shipment submitted.",
+  done: "PayPal has sent you back. The payment is authorized, not taken, and the shipment is now being checked.",
+  stopped: "PayPal has sent you back, but this booking cannot be finished here. Nothing was submitted.",
+  failed: "PayPal has sent you back, but the booking did not finish. No money was paid out.",
+};
+
 /** The form the server kept with this order, or null when it kept none; any other failure of the read is thrown. */
 async function keptBooking(orderId: string): Promise<BookingForm | null> {
   try {
@@ -85,8 +93,8 @@ function Finish() {
   return (
     <>
       <PageHeading title="Finishing your booking">
-        PayPal has sent you back. The payment is authorized, not taken, and the shipment is now
-        being checked.
+        {SUBTITLE[outcome.kind]}
+        {/* The sentence follows the outcome: it says "authorized" only once the payment is. */}
       </PageHeading>
 
       <section className="bento-card max-w-3xl p-4" aria-label="Booking result">
