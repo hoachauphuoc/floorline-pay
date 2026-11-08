@@ -28,6 +28,51 @@ export type HelpEntry = {
 // ---------------------------------------------------------------------------
 
 export const NAV_HELP: Record<string, HelpEntry> = {
+  "/pay": {
+    title: "Floorline Pay",
+    body:
+      "How a shipper's money moves: held at booking, screened by deterministic checks, then paid to the carrier or returned on a published decision. The counts are read live from the payment ledger.",
+    note:
+      "Only the settler moves money, and it never calls a model.",
+  },
+  "/book": {
+    title: "Book and pay",
+    body:
+      "Book a shipment and approve the freight on PayPal's own page. PayPal holds the money; nothing is captured until a decision is published.",
+    note:
+      "This runs on the PayPal sandbox, so no real money moves.",
+  },
+  "/payments": {
+    title: "Payments",
+    body:
+      "The newest outcome of every payment: paid to the carrier and confirmed by PayPal, returned to the shipper after a block, or held back by the payment checks.",
+  },
+  "/settlement": {
+    title: "Settlement",
+    body:
+      "Which parties are frozen, and what became of each payout sent to PayPal, so a payout that is not confirmed yet is shown as not confirmed.",
+    note:
+      "A freeze is lifted only by a person signed in with a password.",
+  },
+  "/carriers": {
+    title: "Carriers",
+    body:
+      "Who each carrier may be paid, and up to how much: the credit standing and the cap kept for each carrier.",
+    note:
+      "A model or a search may only tighten a carrier's limit, never loosen it.",
+  },
+  "/controls": {
+    title: "Payment controls",
+    body:
+      "The pause switch and the spending limits. Any operator can stop payments; only a governance admin can start them again or change a limit.",
+    note:
+      "The agent limit is separate: 0 turns agent payments off, and every payment then waits for a person.",
+  },
+  "/defense": {
+    title: "Defense",
+    body:
+      "Ten attacks replayed against the payment path, with the result of each. None of them moves money.",
+  },
   "/today": {
     title: "Today",
     body:
