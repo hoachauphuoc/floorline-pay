@@ -114,7 +114,7 @@ export function AccountMenu() {
       {identity?.authenticated_by === "console_session" && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <a href="/admin" aria-label={`Your role: ${roleLabel(identity.role)}`}>
+            <a href="/admin" aria-label={`Your role: ${roleLabel(identity.role)}`} className="hidden sm:block">
               <RoleChip role={identity.role} />
             </a>
           </TooltipTrigger>

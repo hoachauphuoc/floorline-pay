@@ -45,11 +45,11 @@ export function Header({ display }: { display?: Tenant }) {
           </span>
         </div>
 
-        <div className="ml-auto flex min-w-0 items-center gap-2">
+        <div className="ml-auto flex min-w-0 items-center gap-1 sm:gap-2">
           <PayPalBadge />
           <ModelsChip />
           <HelpModeToggle />
-          {DEMO_MODE ? <DemoPill /> : <LivePill />}
+          <div className="hidden sm:block">{DEMO_MODE ? <DemoPill /> : <LivePill />}</div>
           <AccountMenu />
         </div>
       </div>
