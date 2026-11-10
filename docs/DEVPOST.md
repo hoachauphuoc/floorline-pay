@@ -8,7 +8,7 @@ Floorline Pay
 
 ## Tagline
 
-An agent that pays the carrier only after a person releases the shipment, and can never pay what the rules held.
+PayPal holds the shipper's money at booking. The carrier is paid only on a published decision, behind a risk floor that plain code sets and no AI model can lower. PayPal sandbox proof of concept.
 
 ## Targets
 
@@ -20,23 +20,24 @@ Freight payments run on trust. A forwarder pays a carrier on paperwork it cannot
 
 ## What it does
 
-A shipper books a shipment and approves the payment on PayPal's own page. PayPal **holds** the money (`intent: AUTHORIZE`); nothing is taken. Floorline screens the case. A person then decides:
+A shipper books a shipment and approves the payment on PayPal's own page. PayPal **holds** the money (`intent: AUTHORIZE`); nothing is taken. Floorline screens the case, and money moves only when a decision is published:
 
-- **Release:** the settler checks the payment rules once more, **captures** the money and **pays the carrier** with PayPal Payouts.
-- **Block:** the settler **voids** the hold and the money goes back to the shipper.
+- **Release**, by a person signed in with a password: the settler checks the payment rules once more, **captures** the money and **pays the carrier** with PayPal Payouts.
+- **Block**: the settler **voids** the hold and the money stays with the shipper.
+- **The agent**, only when a governance admin has published an agent limit: it may decide a clean case below that limit by itself. With no limit, or a limit of 0, every payment waits for a person. On the live demo the agent is off.
 
-Deterministic checks (a payee that is not the one on file, a payee changed in the last 14 days, a payout above the booked freight, a missing payee) add to a risk floor. AI agents may raise a case above the floor; no model, learning adjustment or debate verdict can lower it. A guest session can look and book but cannot release or approve; a large release needs a second approver. The settler is the only code that moves money, and it never calls a model.
+Deterministic checks (a payee that is not the one on file, a payee changed in the last 14 days, a payout above the booked freight, a missing payee) add to a risk floor. AI agents may raise a case above the floor; no model, learning adjustment or debate verdict can lower it. A guest session can book, look at every screen and block a case, but cannot release or approve; a large payout (2,500 USD or more by default) needs a second approver. The settler is the only code that moves money, and it never calls a model.
 
 This is a proof of concept on the PayPal sandbox: no real money moves.
 
 ## How we built it
 
 - **PayPal (sandbox only):** REST Orders v2 (create with `AUTHORIZE`, authorize), authorization capture and void, and Payouts. Every call returns a receipt and never raises; each carries a request id derived from the decision key, so a repeat cannot pay twice.
-- **Settlement path:** a person's decision is published to Google Pub/Sub; Pub/Sub pushes it to a receiver that accepts only a Google-signed token; the settler captures, pays or voids. An unknown outcome is answered with 503 so the decision is delivered again.
+- **Settlement path:** a decision is published to Google Pub/Sub; Pub/Sub pushes it to a receiver that accepts only a Google-signed token; the settler captures, pays or voids. An unknown outcome is answered with 503 so the decision is delivered again.
 - **AI:** Nemotron 3 Nano and Super through Nebius Token Factory screen every case; Tavily gives live web search; a payment-risk analyst sees numbers and categories, never a name or an address. Each AI layer may only raise risk or tighten a limit.
 - **Credit security in seven layers:** booking-bound authorizations, a two-person carrier payee registry, limits and a pause switch, dual approval of a large release, settlement integrity (webhook, payout tracking, freezes), and the AI layers above.
 - **Console and API:** Python and Flask backend, Next.js console, Firestore for the case store. Hosted on Render, with Firestore and Pub/Sub in a separate Google Cloud project.
-- **Tests:** 2,902 backend tests pass (47 skipped without the Firestore and Pub/Sub emulators) and 1,903 frontend tests pass; `ruff`, `mypy` and `tsc` are clean. No test calls PayPal: they use fakes and recorded sandbox answers.
+- **Tests:** 3,429 backend tests pass (49 skipped without the Firestore and Pub/Sub emulators) and 2,115 frontend tests pass; `ruff`, `mypy` and `tsc` are clean and `eslint` reports no errors. No test calls PayPal: they use fakes and recorded sandbox answers.
 
 ## What changed during the Submission Period
 
@@ -55,6 +56,8 @@ The baseline is the Nebius submission (tag `nebius-baseline`), which had no paym
 - Measured, with the limits stated. On an invented set of 80 payouts (36 fraudulent, 44 honest), the deterministic checks catch 24 of 36 with 0 of 44 false flags; adding a carrier look-up reaches 32 of 36 with 6 of 44 false flags. These rates describe that invented set only and are not a forecast.
 
 - Run for real on the live service on 5 Nov 2026, sandbox money only: a Block voided a 1,300 USD hold (PayPal answered 204), and a Release captured it (201) and paid the carrier through Payouts (201). The webhook is registered and verified real signed events from PayPal (authorization created, capture completed, payout batch, payout item succeeded), and the second payout moved from `unconfirmed` to `confirmed` from the payout-item event. A capture refund in the sandbox also arrived as a signed event and froze the carrier; no dispute event has arrived yet. The daily-limit reservation ran live too: a release wrote its reservation row before capture and paid, and a payout PayPal refused (insufficient sandbox balance) gave its reservation up. After the balance was topped up, a person sent that failed release to the settler again from the case page; it reused the capture, paid the carrier and was confirmed by the webhook.
+- The agent, stated within what was shown: under a 500 USD limit a person published, it refused sixteen sandbox trials, then paid two cases of one fictional demo shipper (8 Nov 2026). In the second, the buyer, the carrier and the operator were three separate sandbox accounts: 1,500 USD held and captured, 400 USD paid out and confirmed by PayPal. That is not evidence that it pays everyday freight, and the limit is now 0.
+- A repeat does not hold twice (9 Nov 2026): authorizing an already authorized order again returned the stored authorization without calling PayPal, and PayPal's activity shows one authorization for that order.
 
 ## What we learned
 
@@ -63,9 +66,9 @@ A payment agent is mostly a set of refusals. The useful work was deciding what i
 ## What's next
 
 - Get a real dispute event through the webhook against the sandbox (a refund already came through and froze the carrier).
-- Give the payment-risk analyst something to catch: measured live, it added nothing on the invented set (it missed all four impersonated-carrier cases), so it needs better inputs or a better corpus before we rely on it.
+- Run the webhook-first and unknown-outcome recovery paths against the real sandbox; they are tested in simulation only.
+- Give the payment-risk analyst something to catch: measured live, it added nothing on the first invented set (it missed all four impersonated-carrier cases), so it needs better inputs or a better corpus before we rely on it.
 - Exercise the daily-limit reservation (added so two settlements at the same moment cannot both pass a limit) against Firestore under real concurrency. It is tested on the in-memory store and ran once end to end on the live service, one settlement at a time.
-- Show "payout accepted by PayPal" and "money received" as two states on the case page. The ledger already keeps them apart (`unconfirmed`, then `confirmed` from PayPal's payout-item event); only the page does not.
 
 ## Built with
 
@@ -74,5 +77,5 @@ Python · Flask · Next.js · TypeScript · PayPal REST (Orders v2, Authorizatio
 ## Links
 
 - Live demo: https://floorline-pay.onrender.com (Continue as guest judge)
-- Repository: https://github.com/hoachauphuoc/floorline-pay (MIT licence; made public before submission)
+- Repository: https://github.com/hoachauphuoc/floorline-pay (MIT licence; public)
 - Demo video: YOUTUBE_URL_PENDING
