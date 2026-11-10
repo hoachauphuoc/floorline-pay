@@ -37,7 +37,7 @@ describe("PayPage refresh", () => {
     vi.useRealTimers();
   });
 
-  it("asks for the ledger and the controls once and does not poll them while the read quota is the limit", async () => {
+  it("asks for the ledger and the controls again every 15 seconds now that the project is billed", async () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     render(
       <QueryClientProvider client={client}>
@@ -46,7 +46,7 @@ describe("PayPage refresh", () => {
     );
     await waitFor(() => expect(mocks.fetchPaymentControls).toHaveBeenCalled());
     await vi.advanceTimersByTimeAsync(46_000);
-    expect(mocks.fetchPaymentLedger).toHaveBeenCalledTimes(1);
-    expect(mocks.fetchPaymentControls).toHaveBeenCalledTimes(1);
+    expect(mocks.fetchPaymentLedger).toHaveBeenCalledTimes(4);
+    expect(mocks.fetchPaymentControls).toHaveBeenCalledTimes(4);
   });
 });
