@@ -360,9 +360,9 @@ export function hasWorkInFlight(inFlight: number | undefined): boolean {
 export const POLL_BUSY_MS = 250;
 export const POLL_IDLE_MS = 2500;
 
-// Off while the Firestore read quota is the limit: every refresh reads the whole board and one open tab used up the day's quota,
-// so the board loads on a page load only. Set it back to true once the project is billed.
-export const BOARD_AUTO_REFRESH = false;
+// On because the project is billed: each refresh reads the whole board, so without billing one open tab used up the free daily quota.
+// Set it to false again if billing is removed; the board then loads on a page load only.
+export const BOARD_AUTO_REFRESH = true;
 
 export function boardRefetchMs(inFlight: number | undefined, autoRefresh: boolean = BOARD_AUTO_REFRESH): number | false {
   if (!autoRefresh) return false;
