@@ -26,7 +26,7 @@ A shipper books a shipment and approves the payment on PayPal's own page. PayPal
 - **Block**: the settler **voids** the hold and the money stays with the shipper.
 - **The agent**, only when a governance admin has published an agent limit: it may decide a clean case below that limit by itself. With no limit, or a limit of 0, every payment waits for a person. On the live demo the agent is off.
 
-Deterministic checks (a payee that is not the one on file, a payee changed in the last 14 days, a payout above the booked freight, a missing payee) add to a risk floor. AI agents may raise a case above the floor; no model, learning adjustment or debate verdict can lower it. A guest session can book, look at every screen and block a case, but cannot release or approve; a large payout (2,500 USD or more by default) needs a second approver. The settler is the only code that moves money, and it never calls a model.
+Deterministic checks (a payee that is not the one on file, a payee changed in the last 14 days, a payout above the booked freight, a missing payee) add to a risk floor. AI agents may raise a case above the floor; no model, learning adjustment or debate verdict can lower it. A one-click guest session on the live demo has the Viewer role: it can look at every screen but cannot book, block, release or approve; a large payout (2,500 USD or more by default) needs a second approver. The settler is the only code that moves money, and it never calls a model.
 
 This is a proof of concept on the PayPal sandbox: no real money moves.
 
@@ -78,4 +78,4 @@ Python · Flask · Next.js · TypeScript · PayPal REST (Orders v2, Authorizatio
 
 - Live demo: https://floorline-pay.onrender.com (Continue as guest judge)
 - Repository: https://github.com/hoachauphuoc/floorline-pay (MIT licence; public)
-- Demo video: YOUTUBE_URL_PENDING
+- Demo video: https://youtu.be/E8--RZpO4D0

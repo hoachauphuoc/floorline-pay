@@ -1,4 +1,4 @@
-# Agent payment trials on the Render deployment (6 Nov 2026)
+# Agent payment trials on the Render deployment (6 to 8 Nov 2026)
 
 Evidence of what happened when a booking made through Book and pay was offered to the agent payment path (`agent_payment.py`).
 Setup: agent limit 500 USD published and boundary BOUNDARY-v2 active, both by a person (reviewer-a). PayPal Sandbox only.
@@ -18,11 +18,11 @@ carrier Mekong Haulage Co (standing A, 3 confirmed payouts). The payment analyst
 Probe VPROBE2 (deterministic verifier only, 72 value/freight/weight pairs on the same lane): below 100 USD every pair keeps LOW_VALUE_DOMESTIC; from 100 to 500 USD every pair (freight 20 to 450) gives FREIGHT_ANOMALY (floor 75-90). No pair gave an empty findings list, so under the current rules and limits the form cannot produce a case the agent may pay on this lane.
 
 What this shows:
-- The form gap was real and is fixed: shipper and receiver country (03d8393) and receiver company (a2d40be, not yet deployed when these trials ran).
+- The form gap was real and is fixed: shipper and receiver country (03d8393) and receiver company (a2d40be, deployed for trial 4).
 - The remaining blockers are model verdicts. The rules floor stayed 0 in all three, and the models raised risk to 68-78. The agent path stayed closed, as designed.
 - Seeded cases R1105A-E, 28,000 USD, were also marked "review required" by compliance and released by a person.
 - No money moved in these three trials: the authorizations are still held, with no decision taken. A person releases or blocks them from each case page.
-- Not tried: a trial after a2d40be is deployed.
+- Trial 4 ran on a2d40be; trials 5 to 18 below ran after it.
 
 ## Trials 5 to 16 (7 Nov 2026)
 

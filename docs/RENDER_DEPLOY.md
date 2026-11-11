@@ -38,15 +38,15 @@ The hackathon rules ask for a free, unrestricted demo until judging ends on 15 D
 ## 3. The demo reviewers
 
 A release at or above 2500 USD needs a second person, so the demo needs two people who sign in with a password. A one-click guest can
-look around and book but can never release or approve.
+look around. Its address is in no role list, so it holds only the Viewer role and cannot book or block, and as a one-click session it can never release or approve.
 
 ```bash
 node frontend/scripts/make-operator.mjs reviewer-a@floorline.example --out ./tmp-reviewer-a
 node frontend/scripts/make-operator.mjs reviewer-b@floorline.example --out ./tmp-reviewer-b
 ```
 
-Each directory then holds `record.txt` (goes into `VF_OPERATORS`, records separated by `;`) and `password.txt` (goes into the README's
-"Test access" section, since judges need it). Delete both directories afterwards. Add both addresses to `ADMIN_EMAILS` (one of them
+Each directory then holds `record.txt` (goes into `VF_OPERATORS`, records separated by `;`) and `password.txt` (goes into the private testing instructions of the Devpost form,
+never into the repository). Delete both directories afterwards. Add both addresses to `ADMIN_EMAILS` (one of them
 needs to lift a freeze) and `OPERATOR_EMAILS`.
 
 ## 4. The PayPal webhook

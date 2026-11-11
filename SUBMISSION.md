@@ -1,5 +1,7 @@
 # Devpost Submission — Floorline
 
+> This file is the Nebius submission (service `vf-app`, frozen). Floorline Pay, the PayPal submission, is described in `README.md` and `docs/DEVPOST.md`.
+
 Copy-paste material for the Devpost form. The shooting script for the demo video is
 `docs/DEMO_SCRIPT.md`, and the narration it is timed to lives in
 `scripts/build_narration.py`.

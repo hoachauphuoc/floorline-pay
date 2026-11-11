@@ -77,3 +77,11 @@ secrets/
 password.txt
 record.txt
 tmp-reviewer-*/
+# Working notes in Vietnamese and Japanese, video scripts and raw measurement output: kept on the author's machine.
+docs/VIDEO_SCRIPT_PAY_*
+docs/guides_vi/
+docs/GROUNDING_PLAN.md
+docs/screenshots/devpost_pay/
+/analyst.json
+/reader_holdout_300.json
+frontend/AGENTS.md

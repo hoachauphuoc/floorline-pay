@@ -2,6 +2,8 @@
 
 The Devpost video for the PayPal AI Hackathon. The older `docs/DEMO_SCRIPT.md` belongs to the Nebius submission and is not this video.
 
+The published video: https://youtu.be/E8--RZpO4D0 (recorded 11 Nov 2026).
+
 Every claim below names where the evidence is: a section of `README.md`, or a line of the live service. A scene marked **TO RECORD** shows something that has not run yet; do not shoot it until it has, and do not say its narration until the screen shows it.
 
 ## What the cut must satisfy
@@ -41,11 +43,11 @@ Every claim below names where the evidence is: a section of `README.md`, or a li
 
 ### 3. A person decides (30s)
 
-**Screen.** Governance page: *Agent suspended, no delegation boundary published*, then the published boundary (`BOUNDARY-v1`, auto release not permitted). Then the case page with the reviewer's Block button; then a guest session refused when it tries to release (*Releasing a shipment needs a password sign-in*).
+**Screen.** Governance page: *Agent suspended, no delegation boundary published*, then the published boundary (`BOUNDARY-v1`, auto release not permitted). Then the case page with the reviewer's Block button; then the same case opened as the one-click guest, which has the Viewer role and is offered no Release button (*Recording a decision needs the Reviewer role*).
 **Narration.** "The agent starts suspended. It can analyse and propose; it cannot act until a person publishes what it may do, and ours may not release anything on its own. A person decides every disputed case, and releasing needs a password, so a guest can look but cannot pay."
 **Source.** README, *Limits, stated* (the agent starts suspended) and *Signing in*; the refusal text is in `orchestrator.human_decide`.
 
-### 4. Settle only what a person decided (35s) · run for real 5 Nov 2026, still to film
+### 4. Settle only what a person decided (35s) · run for real 5 Nov 2026, filmed 11 Nov 2026
 
 **Screen.** Case A: *Block*, then the Payment card changes to *returned to the shipper* with the PayPal void id, and `/payments` lists it. Case B: *Release* by a password account, then the card shows the capture id and the payout id, and `/payments` lists *paid*.
 **Narration.** "A published block voids the hold, and the money goes back to the shipper. A published release makes the settler check the payment rules once more, capture the money and pay the carrier with PayPal Payouts. Each PayPal call carries a request id built from the decision, so a repeat cannot pay twice."
@@ -60,7 +62,7 @@ Every claim below names where the evidence is: a section of `README.md`, or a li
 ### 6. Close (15s)
 
 **Screen.** The case list with one voided and one paid payment side by side, then the end card: repository address and the live demo address.
-**Narration.** "Money moves only on a person's decision, behind guardrails no model can lower. Floorline Pay: the agent that cannot pay what the rules held."
+**Narration.** "Floorline Pay: paid only on a published decision, behind a floor no model can lower."
 **Source.** README opening and *Credit security* (the AI layers may only raise risk or tighten a limit; the settler never calls a model).
 **If scene 4 is not recorded,** drop the word "paid" and close on the held and blocked states only; say nothing about a payout.
 

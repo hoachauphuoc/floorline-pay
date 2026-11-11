@@ -8,15 +8,15 @@ Deterministic checks set a risk **floor** for every shipment, including new paym
 
 - **Hackathon:** PayPal AI Hackathon · **Targets:** Best Use of Agentic Commerce, Best Use of PayPal + AI
 - **Live demo:** https://floorline-pay.onrender.com (the console on Render; the case store and the decision queue are Firestore and Pub/Sub in a separate Google Cloud project; the Nebius service `vf-app` is not changed)
-- **Demo video (under 3 minutes):** YOUTUBE_URL_PENDING
-- **Licence:** MIT · **Full reference of the inherited system:** [REFERENCE.md](REFERENCE.md) · **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · **Plan:** [docs/PAYPAL_PLAN.md](docs/PAYPAL_PLAN.md)
+- **Demo video (under 3 minutes):** https://youtu.be/E8--RZpO4D0
+- **Licence:** MIT · **Full reference of the inherited system:** [REFERENCE.md](REFERENCE.md) · **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · **Devpost text:** [docs/DEVPOST.md](docs/DEVPOST.md)
 
 ## Try it in two minutes
 
-1. Open the live demo and choose **Continue as guest judge** (one click, no password). A guest can book and pay in the sandbox, look at every screen, and block a case; a guest cannot release or approve.
-2. **Book and pay** (`/book`): fill the booking, press *Pay with PayPal*, approve with a PayPal **sandbox** buyer account, and you come back to a case whose money is *held*, not taken.
+1. Open the live demo and choose **Continue as guest judge** (one click, no password). On the live demo the guest has the Viewer role: it can look at every screen, replay the attacks and simulate a policy, but cannot book, block, release or approve. The Devpost testing instructions give a password account (operator role) that can book, block and release.
+2. **Book and pay** (`/book`), signed in with that password account: fill the booking, press *Pay with PayPal*, approve with a PayPal **sandbox** buyer account, and you come back to a case whose money is *held*, not taken.
 3. Open the case: the Payment card says *Funds held, awaiting a decision*, and the page lists every finding that raised the risk floor and why.
-4. A person decides. Releasing needs a password account, so a guest sees the held state and the refusal rather than a payment. A block returns the held money to the shipper.
+4. A person decides. Blocking and releasing need a password account; a guest sees the held state and the note that recording a decision needs the Reviewer role. A block returns the held money to the shipper.
 
 | Step | Status on the real PayPal sandbox |
 |---|---|
@@ -144,7 +144,7 @@ Open `/book`, book a shipment, approve the payment as the sandbox personal accou
 
 ## Signing in
 
-The console asks everyone to sign in. **Continue as guest judge** signs in with one click and no password: the guest can book and pay in the sandbox, look around, inject shipments, block a case and simulate a policy, but cannot release or approve. Releasing cargo, and so paying a carrier, needs a password account. `GET /api/v1/auth/policy` (after sign-in) returns what every route enforces.
+The console asks everyone to sign in. **Continue as guest judge** signs in with one click and no password: on the live demo the guest has the Viewer role: it can look around, replay the attacks and simulate a policy, but cannot book, inject shipments, block, release or approve. Releasing cargo, and so paying a carrier, needs a password account. `GET /api/v1/auth/policy` (after sign-in) returns what every route enforces.
 
 ## Reproducible testing
 
@@ -159,7 +159,7 @@ python -m ruff check src/ tests/ scripts/ --select E,F,W --ignore E501,E402,W291
 cd frontend && npm ci && npx tsc --noEmit && npx eslint src && npx vitest run && npm run build
 ```
 
-The figures are from full runs on the development machine on 9 Nov 2026 (`ruff` clean; `mypy` clean, run with `--python-version 3.13` locally because the numpy stubs there need it; `tsc` clean, `eslint` 0 errors). CI on this repository runs the same checks and passed on `80d3116`. Every PayPal call in the tests goes through a fake or a recorded sandbox answer: no test calls PayPal.
+The figures are from full runs on the development machine on 11 Nov 2026 (`ruff` clean; `mypy` clean, run with `--python-version 3.13` locally because the numpy stubs there need it; `tsc` clean, `eslint` 0 errors). CI on this repository runs the same checks and is green on the latest commit. Every PayPal call in the tests goes through a fake or a recorded sandbox answer: no test calls PayPal.
 
 ## Limits, stated
 
@@ -187,13 +187,13 @@ The figures are from full runs on the development machine on 9 Nov 2026 (`ruff` 
 |---|---|
 | PayPal developer platform (sandbox) and an AI tool, with PayPal central | `paypal_client.py`, `settler.py`; Nemotron agents on Nebius Token Factory |
 | Significantly updated after 1 Oct 2026, with an explanation | the section above; `git diff nebius-baseline` |
-| Working demo | the hosted URL once deployed, or the local steps above |
+| Working demo | https://floorline-pay.onrender.com, or the local steps above |
 | Public repository with a detectable open source licence | MIT (`LICENSE`); the repository is public |
 | Demo video under 3 minutes on YouTube | link at the top |
 | English | all materials |
 
 ## More
 
-[REFERENCE.md](REFERENCE.md) (API, environment variables, measured results of the inherited screen, repository layout) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/RECEIVER_CONTRACT.md](docs/RECEIVER_CONTRACT.md) · [docs/PAYPAL_PLAN.md](docs/PAYPAL_PLAN.md)
+[REFERENCE.md](REFERENCE.md) (API, environment variables, measured results of the inherited screen, repository layout) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/RECEIVER_CONTRACT.md](docs/RECEIVER_CONTRACT.md) · [docs/AGENT_SURFACE.md](docs/AGENT_SURFACE.md) (read-only MCP tools for an outside agent) · [docs/RENDER_DEPLOY.md](docs/RENDER_DEPLOY.md)
 
 Released under the MIT licence; see [LICENSE](LICENSE).

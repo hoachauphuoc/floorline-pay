@@ -1,7 +1,7 @@
 # Floorline Pay for an outside agent
 
 An agent that pays carriers should be able to ask first. Floorline Pay offers that through the Model Context Protocol, with tools that
-**only read**. Money still moves in one place: the settler, after a person's release.
+**only read**. Money still moves in one place: the settler, after a published decision (a person's release, or the agent under a limit a person published; the agent is off on the live demo).
 
 ## The tools
 
